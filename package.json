@@ -16,7 +16,7 @@
     "passport": ">= 0.1.15",
     "generic-pool": "2.x",
     "mongodb": "1.2.x",
-    "mongoose": "3.5.x",
+    //"mongoose": "3.5.x",
     "request": "2.12.x",
     "oauth": "0.9.x",
     "express": "3.0.x"
