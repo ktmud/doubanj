@@ -1,0 +1,13 @@
+!!!
+html
+head
+  meta(charset='utf-8')
+  title #{conf.site_name}
+  link(rel='stylesheet', href=static('css/basic.css'))
+body
+  form(method="post")
+    p 获取所有收藏：
+    div
+      input(name="uid", value="jyyjcc")
+      input(type="hidden", name="_csrf", value=_csrf)
+      button(type="submit") 提交

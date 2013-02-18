@@ -1,0 +1,38 @@
+{
+  "name": "doubanj",
+  "version": "0.0.1",
+  "homepage": "http:/www.doubanj.com",
+  "description": "Data visualization of douban.com",
+  "private": true,
+  "contributors": [ "ktmud <jyyjcc@gmail.com> (http://ktmud.com)" ],
+  "author": {
+    "name": "Douban F2E",
+    "url": "https://github.com/douban-F2E"
+  },
+  "dependencies": {
+    "debug": "0.7.x",
+    "express-istatic": ">= 0.0.8-1",
+    "jade": "0.28.x",
+    "passport": ">= 0.1.15",
+    "generic-pool": "2.x",
+    "mongodb": "1.2.x",
+    "mongoose": "3.5.x",
+    "request": "2.12.x",
+    "oauth": "0.9.x",
+    "express": "3.0.x"
+  },
+  "devDependencies": {
+    "colors": ">= 0.0.1",
+    "grunt-istatic": ">= 0.1.0",
+    "grunt-contrib-stylus": ">= 0.3.1",
+    "mocha": "*"
+  },
+  "engines": { "node" : ">=0.8.0" },
+  "license": "MIT",
+  "subdomain": "doubanj",
+  "scripts": {
+    "prepublish" : "npm prune",
+    "test": "make test",
+    "start": "node cluster.js"
+  }
+}

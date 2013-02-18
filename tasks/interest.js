@@ -1,0 +1,206 @@
+/*
+* aggregate user subject collections (called "interest") 
+*/
+var debug = require('debug');
+var log = debug('dbj:task:interest:info');
+var error = debug('dbj:task:interest:error');
+
+var task = central.task;
+var request = central.request;
+var mongo = central.mongo;
+
+var User = require(central.cwd + '/models/user').User;
+
+// request stream
+function FetchStream(arg) {
+  this.ns = arg.ns;
+  this.user = arg.user;
+  this.perpage = arg.perpage || 100;
+  this.total = 0;
+  this.fetched = 0;
+  this.status = 'ready';
+
+  this.api_uri = 'https://api.douban.com/v2/' + arg.ns + '/user/' + arg.user.uid + '/collections';
+  return this;
+}
+
+var util = require('util');
+
+util.inherits(FetchStream, require('events').EventEmitter);
+//util.inherits(FetchStream, require('stream').Stream);
+
+
+// starting to collect...
+FetchStream.prototype.run = function() {
+  var self = this;
+
+  log('starting...');
+  self.status = 'running';
+
+  // clear first
+  mongo(function(db, next) {
+    // remove user's all interests
+    var selector;
+    if (self.user.id) {
+      selector = { user_id: self.user.id };
+    } else {
+      selector = { uid: self.user.uid };
+    }
+    db.collection(self.ns + '_interest').remove(selector, function(err, r) {
+      self.fetch(0, self._fetch_cb());
+    });
+  });
+};
+
+// fetch page by page
+FetchStream.prototype._fetch_cb = function() {
+  var self = this;
+  return function(err, data) {
+    if (err) return self.emit('error', err);
+
+    var total = data.total;
+
+    // no data
+    if (!total) return self.end();
+
+    if (self.total && total != self.total) {
+      self.total = total;
+      log('total number changed');
+      // total changed during fetching, run again
+      return self.run();
+    };
+
+    self.total = total;
+    self.fetched += data.count;
+
+    if (self.fetched >= total) {
+      log('reached end');
+      self.end();
+    } else {
+      self.fetch(self.fetched, self._fetch_cb());
+    }
+  };
+};
+// fetch one page of data
+FetchStream.prototype.fetch = function(start, cb) {
+  var self = this;
+
+  log('fetching %s~%s', start, start + self.perpage);
+
+  request.get({
+    uri: self.api_uri,
+    qs: {
+      count: self.perpage,
+      start: start
+    }
+  }, function(err, res, body) {
+    if (err) return self.emit('error', err);
+
+    var data = JSON.parse(body);
+
+    self.write(data, cb);
+  });
+};
+
+// TODO: cache data locally first, wait for some time, then commit to database
+FetchStream.prototype.write = function saveInterest(data, cb) {
+  var ns = this.ns
+    , self = this
+    , uid = self.user.uid || self.user.id
+    , total = data.total
+    , items = data.collections
+    , subjects = [];
+
+  // pick up subjects
+  items.forEach(function(item, i) {
+    var s = item[ns];
+    item['uid'] = uid;
+    delete item[ns];
+    subjects.push(s);
+  });
+
+  mongo(function(db, next) {
+    var save_options = { w: 1, continueOnError: 1 };
+
+    // save user interest
+    log('saving interests...');
+    db.collection(ns + '_interest').insert(items, save_options, function(err, r) {
+      if (err) {
+        if (cb) cb(err);
+        return next();
+      }
+      // save subjects
+      log('saving subjects...');
+      var col_s = db.collection(ns);
+      subjects.forEach(function(s) {
+        col_s.update({ id: s.id }, s, { w: 1, upset: 1 }, function(err, r) {
+          if (err && cb) cb(err);
+        });
+      });
+      return next();
+    });
+  });
+}
+FetchStream.prototype.end = function(arg) {
+  this.emit('end', arg);
+  this.emit('close', arg);
+};
+
+var collect, _collect;
+
+collect = task.api_pool.pooled(_collect = function(client, arg, next) {
+  var collector = new FetchStream(arg);
+
+  var user = arg.user;
+
+  collector.on('error', function(err) {
+    error('collecting for %s failed due to %s', user.uid, err);
+    collector.end();
+  });
+
+  collector.on('close', function(data) {
+    // reset fot next time
+    var obj = {};
+    obj[arg.ns + '_n'] = collector.total;
+    obj[arg.ns +'last_synced'] = new Date();
+    obj[arg.ns +'last_sync_status'] = collector.status;
+    user.update(obj);
+  });
+
+  collector.run();
+});
+
+function collect_in_namespace(ns) {
+  return function(user) {
+    if (user instanceof User) {
+      collect({
+        ns: ns,
+        user: user
+      });
+    }
+    User.get(user, function(err, user) {
+      if (err || !user) {
+        error('collect interest failed because getting user failed');
+        return;
+      }
+      collect({
+        ns: ns,
+        user: user
+      });
+    });
+  };
+}
+
+var exports = {};
+
+central.DOUBAN_APPS.forEach(function(item) {
+  exports['collect_' + item] = collect_in_namespace(item);
+});
+
+// collect all the interest
+exports.collect_all = function(uid) {
+  central.DOUBAN_APPS.forEach(function(item) {
+    exports['collect_' + item](uid);
+  });
+};
+module.exports = exports;
