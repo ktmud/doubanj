@@ -8,17 +8,18 @@ var conf = central.conf;
 var task = central.task;
 
 var mongo = require(cwd + '/lib/mongo');
+var utils = require(cwd + '/lib/utils');
 
 var APP_DATA_DEFAULT = {
   n_interest: 0
 };
+var USER_COLLECTION = 'user';
 
 function User(info) {
   if (!(this instanceof User)) return new User(info);
 
-  for (var i in info) {
-    this[i] = info[i];
-  }
+  utils.extend(this, info);
+
   central.DOUBAN_APPS.forEach(function(ns) {
     this[ns + '_n'] = this[ns + '_n'] || 0;
   });
@@ -27,10 +28,12 @@ function User(info) {
 
 util.inherits(User, mongo.Model);
 
+User.prototype.kind = User.prototype._collection = USER_COLLECTION;
+
 User.get = function(uid, cb) {
   log('getting user obj for %s', uid)
   mongo(function(db) {
-    var collection = db.collection('users');
+    var collection = db.collection(USER_COLLECTION);
     collection.findOne({
       '$or': [
         // douban's uid
@@ -48,6 +51,8 @@ User.get = function(uid, cb) {
 
       if (r) return cb(null, User(r));
 
+      log('user %s not found', uid);
+
       var info = parseInt(uid) ? { 'id': uid } : { uid: uid };
       var u = User(info);
       return cb(null, u);
@@ -55,8 +60,6 @@ User.get = function(uid, cb) {
   }, 0);
 };
 
-
-User.prototype.kind = User.prototype._collection = 'user';
 
 User.prototype.toObject = function() {
   var now = new Date();

@@ -74,7 +74,7 @@ FetchStream.prototype._fetch_cb = function() {
     self.fetched += data.count;
 
     if (self.fetched >= total) {
-      log('reached end');
+      log('fetching reached end.');
       self.end();
     } else {
       self.fetch(self.fetched, self._fetch_cb());
@@ -85,7 +85,7 @@ FetchStream.prototype._fetch_cb = function() {
 FetchStream.prototype.fetch = function(start, cb) {
   var self = this;
 
-  log('fetching %s~%s', start, start + self.perpage);
+  log('fetching %s~%s...', start, start + self.perpage);
 
   request.get({
     uri: self.api_uri,
@@ -96,7 +96,17 @@ FetchStream.prototype.fetch = function(start, cb) {
   }, function(err, res, body) {
     if (err) return self.emit('error', err);
 
-    var data = JSON.parse(body);
+    if (res.satusCode != 200) {
+      return self.emit('error', new Error('douban api response with ' + res.statusCode)); 
+    }
+
+    var data;
+
+    try {
+      data = JSON.parse(body);
+    } catch (e) {
+      return self.emit('error', new Error('parse api response failed: ' + body)); 
+    }
 
     self.write(data, cb);
   });
@@ -119,6 +129,7 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
     subjects.push(s);
   });
 
+  // `next` is to release db client lock
   mongo(function(db, next) {
     var save_options = { w: 1, continueOnError: 1 };
 
@@ -132,12 +143,26 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
       // save subjects
       log('saving subjects...');
       var col_s = db.collection(ns);
-      subjects.forEach(function(s) {
-        col_s.update({ id: s.id }, s, { w: 1, upset: 1 }, function(err, r) {
-          if (err && cb) cb(err);
+
+      function save_subject(i) {
+        var s = subjects[i];
+        if (!s) {
+          log('write data finished.');
+          cb && cb(null, data);
+          return next();
+        }
+
+        log('updating subject %s', s.id);
+        col_s.update({ id: s.id }, s, { upset: 1 }, function(err, r) {
+          if (err) {
+            if (cb) return cb(err);
+            return next();
+          }
+          // let's save next subject
+          save_subject(i + 1);
         });
-      });
-      return next();
+      }
+      save_subject(0);
     });
   });
 }
@@ -154,7 +179,8 @@ collect = task.api_pool.pooled(_collect = function(client, arg, next) {
   var user = arg.user;
 
   collector.on('error', function(err) {
-    error('collecting for %s failed due to %s', user.uid, err);
+    error('collecting for %s failed: %s', user.uid, err);
+    collector.status = 'failed';
     collector.end();
   });
 
@@ -164,6 +190,12 @@ collect = task.api_pool.pooled(_collect = function(client, arg, next) {
     obj[arg.ns + '_n'] = collector.total;
     obj[arg.ns +'last_synced'] = new Date();
     obj[arg.ns +'last_sync_status'] = collector.status;
+
+    log('updating user\'s last synced status... %s: %s, status: %s',
+        arg.ns, collector.total, collector.status);
+
+    // option
+    obj['$upsert'] = true;
     user.update(obj);
   });
 

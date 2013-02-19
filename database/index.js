@@ -37,7 +37,7 @@ module.exports = function(db, next) {
     });
   });
 
-  db.collection('users', function(err, r) {
+  db.collection('user', function(err, r) {
     assert.equal(null, err);
     log('ensuring database "users"...');
     r.ensureIndex({ 'uid': 1, 'id': 1 }, index_options, function(err, indexname) {
