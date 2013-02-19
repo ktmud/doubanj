@@ -7,6 +7,7 @@ stable_cache
 .DS_Store
 var/*.log
 conf/*
+static/components
 static/*.html
 static/*.txt
 static/.file_etags

@@ -4,34 +4,40 @@
   "homepage": "http:/www.doubanj.com",
   "description": "Data visualization of douban.com",
   "private": true,
-  "contributors": [ "ktmud <jyyjcc@gmail.com> (http://ktmud.com)" ],
+  "contributors": [
+    "ktmud <jyyjcc@gmail.com> (http://ktmud.com)"
+  ],
   "author": {
     "name": "Douban F2E",
     "url": "https://github.com/douban-F2E"
   },
   "dependencies": {
-    "debug": "0.7.x",
-    "express-istatic": ">= 0.0.8-1",
-    "jade": "0.28.x",
-    "passport": ">= 0.1.15",
-    "generic-pool": "2.x",
-    "mongodb": "1.2.x",
-    //"mongoose": "3.5.x",
-    "request": "2.12.x",
-    "oauth": "0.9.x",
-    "express": "3.0.x"
+    "debug": "~0.7.0",
+    "express-istatic": "~0.0.9",
+    "jade": "~0.28.1",
+    "passport": "~0.1.15",
+    "generic-pool": "~2.0.3",
+    "mongodb": "~1.2.6",
+    "request": "~2.12.0",
+    "oauth": "~0.9.8",
+    "express": "~3.1"
   },
   "devDependencies": {
     "colors": ">= 0.0.1",
-    "grunt-istatic": ">= 0.1.0",
-    "grunt-contrib-stylus": ">= 0.3.1",
-    "mocha": "*"
+    "grunt-contrib-stylus": "~0.3.1",
+    "grunt-contrib-uglify": "~0.1.1",
+    "grunt-contrib-watch": "~0.1.0",
+    "grunt-ozjs": "~0.1.9",
+    "mocha": "*",
+    "grunt-contrib-jshint": "~0.1.1"
   },
-  "engines": { "node" : ">=0.8.0" },
+  "engines": {
+    "node": ">=0.8.0"
+  },
   "license": "MIT",
   "subdomain": "doubanj",
   "scripts": {
-    "prepublish" : "npm prune",
+    "prepublish": "npm prune",
     "test": "make test",
     "start": "node cluster.js"
   }
