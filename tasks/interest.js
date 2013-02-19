@@ -8,17 +8,22 @@ var error = debug('dbj:task:interest:error');
 var task = central.task;
 var request = central.request;
 var mongo = central.mongo;
+var douban_key = central.conf.douban.key;
 
 var User = require(central.cwd + '/models/user').User;
 
 // request stream
-function FetchStream(arg) {
+function FetchStream(arg, oauth2) {
   this.ns = arg.ns;
   this.user = arg.user;
   this.perpage = arg.perpage || 100;
   this.total = 0;
   this.fetched = 0;
   this.status = 'ready';
+
+  // TODO: use oauth2 client to request,
+  // so we can collect private interests
+  this.oauth2 = oauth2;
 
   this.api_uri = 'https://api.douban.com/v2/' + arg.ns + '/user/' + arg.user.uid + '/collections';
   return this;
@@ -46,6 +51,7 @@ FetchStream.prototype.run = function() {
     } else {
       selector = { uid: self.user.uid };
     }
+    log('cleaning old interests...');
     db.collection(self.ns + '_interest').remove(selector, function(err, r) {
       self.fetch(0, self._fetch_cb());
     });
@@ -75,6 +81,7 @@ FetchStream.prototype._fetch_cb = function() {
 
     if (self.fetched >= total) {
       log('fetching reached end.');
+      self.status = 'succeed';
       self.end();
     } else {
       self.fetch(self.fetched, self._fetch_cb());
@@ -90,13 +97,14 @@ FetchStream.prototype.fetch = function(start, cb) {
   request.get({
     uri: self.api_uri,
     qs: {
+      client_id: douban_key,
       count: self.perpage,
       start: start
     }
   }, function(err, res, body) {
     if (err) return self.emit('error', err);
 
-    if (res.satusCode != 200) {
+    if (res.statusCode != 200) {
       return self.emit('error', new Error('douban api response with ' + res.statusCode)); 
     }
 
@@ -144,23 +152,32 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
       log('saving subjects...');
       var col_s = db.collection(ns);
 
+      //col_s.insert(subjects, { continueOnError: true }, function(err, res) {
+        //log('saving complete.');
+        //cb && cb(null, data);
+        //next();
+      //});
       function save_subject(i) {
         var s = subjects[i];
         if (!s) {
-          log('write data finished.');
+          //log('all subjects saved.');
           cb && cb(null, data);
           return next();
         }
 
-        log('updating subject %s', s.id);
-        col_s.update({ id: s.id }, s, { upset: 1 }, function(err, r) {
-          if (err) {
-            if (cb) return cb(err);
-            return next();
-          }
-          // let's save next subject
-          save_subject(i + 1);
-        });
+        s['type'] = ns;
+
+        //log('updating subject %s', s.id);
+        // we just don't care whether it will succeed.
+        col_s.update({ 'id': s.id }, s, { upsert: true, w: -1 });
+        //, function(err, r) {
+          //if (err) {
+            //if (cb) return cb(err);
+            //return next();
+          //}
+        //});
+        // let's save next subject
+        save_subject(i + 1);
       }
       save_subject(0);
     });
@@ -174,7 +191,7 @@ FetchStream.prototype.end = function(arg) {
 var collect, _collect;
 
 collect = task.api_pool.pooled(_collect = function(client, arg, next) {
-  var collector = new FetchStream(arg);
+  var collector = new FetchStream(arg, client);
 
   var user = arg.user;
 

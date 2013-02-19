@@ -1,0 +1,39 @@
+extend index
+
+block results
+  if stage == 'getting user'
+    p.warning 正在获取用户信息
+  else
+    if interests.book
+      mixin book
+    if interests.movie
+      mixin movie
+    if interests.music
+      mixin music
+
+mixin book
+  div.user-stats
+    为用户 #{user.uid} 找到 #{user.book_n} 条图书记录，已同步 #{interests.book.length} 条
+  ol.interests-list
+    each i in interests.book
+      li 
+        div.status #{i.istatus()}
+        &nbsp;
+        if i.book
+          div.pic
+            a(href=i.book.url)
+              img(src=i.book.images.medium)
+          p.title
+            a(href=i.book.url) #{i.book.title}
+          p.meta
+            span.authors #{i.book.author.join(', ')}
+            &nbsp;
+            | -
+            &nbsp;
+            span.publisher #{i.book.publisher}
+        else
+          a(href="http://book.douban.com/subject/#{i.book_id}/") book:#{i.book_id}
+
+mixin movie
+
+mixin music

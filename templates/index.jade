@@ -5,9 +5,11 @@ head
   title #{conf.site_name}
   link(rel='stylesheet', href=static('css/basic.css'))
 body
-  form(method="post")
-    p 获取所有收藏：
-    div
-      input(name="uid", value="jyyjcc")
-      input(type="hidden", name="_csrf", value=_csrf)
-      button(type="submit") 提交
+  block main
+    form(method="post")
+      p 获取所有收藏：
+      div
+        input(name="uid", value="#{qs.uid || 'jyyjcc'}")
+        input(type="hidden", name="_csrf", value=_csrf)
+        button(type="submit") 提交
+    block results
