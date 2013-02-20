@@ -53,6 +53,7 @@ FetchStream.prototype.run = function() {
     }
     log('cleaning old interests...');
     db.collection(self.ns + '_interest').remove(selector, function(err, r) {
+      next();
       self.fetch(0, self._fetch_cb());
     });
   });
