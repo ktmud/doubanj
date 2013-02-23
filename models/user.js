@@ -98,6 +98,30 @@ User.prototype.url = function() {
   return [conf.site_root, this.kind, this.id].join('/');
 };
 
+var INTEREST_STATUSES =　{
+  book: {
+    wish: 'wish',
+    ing: 'do',
+    done: 'read'
+  }
+};
+User.prototype.interests = function(ns, cb) {
+  return Interest.findByUser(ns, this.uid, cb);
+};
+['wish', 'ing', 'done'].forEach(function(st) {
+  User.prototype[st + 's'] = function(ns, cb) {
+    var self = this;
+    self.interests(ns, function(err, items) {
+      if (err) cb(err, []);
+      items = items.filter(function(item) {
+        return item.status === INTEREST_STATUSES[ns][st];
+      });
+      cb(null, items);
+    });
+  };
+});
+User.prototype.wishes = User.prototype.wishs;
+
 module.exports = function(uid) {
   return new User(uid);
 };

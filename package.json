@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "debug": "~0.7.0",
+    "strftime": "~0.5.0",
     "express-istatic": "~0.0.9",
     "jade": "~0.28.1",
     "passport": "~0.1.15",
@@ -24,12 +25,14 @@
   },
   "devDependencies": {
     "colors": ">= 0.0.1",
-    "grunt-contrib-stylus": "~0.3.1",
+    "grunt-contrib-stylus": "~0.4.1",
     "grunt-contrib-uglify": "~0.1.1",
     "grunt-contrib-watch": "~0.1.0",
-    "grunt-ozjs": "~0.1.9",
+    "grunt-ozjs": "~0.2.0",
     "mocha": "*",
-    "grunt-contrib-jshint": "~0.1.1"
+    "grunt-contrib-jshint": "~0.1.1",
+    "grunt-contrib-mincss": "~0.3.2",
+    "grunt-include-replace": "~0.1.0"
   },
   "engines": {
     "node": ">=0.8.0"

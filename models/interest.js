@@ -169,9 +169,9 @@ Interest.prototype.toObject = function() {
 Interest.prototype.istatus = function() {
   switch (this.status) {
     case 'read':
-      return '在看'
-    case 'reading':
       return '看过'
+    case 'do':
+      return '在看'
     case 'wish':
       return '想读'
     default:

@@ -12,6 +12,8 @@ var douban_key = central.conf.douban.key;
 
 var User = require(central.cwd + '/models/user').User;
 
+var API_REQ_DELAY = task.API_REQ_DELAY;
+
 // request stream
 function FetchStream(arg, oauth2) {
   this.ns = arg.ns;
@@ -21,8 +23,6 @@ function FetchStream(arg, oauth2) {
   this.fetched = 0;
   this.status = 'ready';
 
-  // TODO: use oauth2 client to request,
-  // so we can collect private interests
   this.oauth2 = oauth2;
 
   this.api_uri = 'https://api.douban.com/v2/' + arg.ns + '/user/' + arg.user.uid + '/collections';
@@ -34,13 +34,12 @@ var util = require('util');
 util.inherits(FetchStream, require('events').EventEmitter);
 //util.inherits(FetchStream, require('stream').Stream);
 
-
 // starting to collect...
 FetchStream.prototype.run = function() {
   var self = this;
 
   log('starting...');
-  self.status = 'running';
+  self.status = 'ing';
 
   // clear first
   mongo(function(db, next) {
@@ -81,6 +80,7 @@ FetchStream.prototype._fetch_cb = function() {
     self.fetched += data.count;
 
     if (self.fetched >= total) {
+      self.fetched = total;
       log('fetching reached end.');
       self.status = 'succeed';
       self.end();
@@ -93,32 +93,38 @@ FetchStream.prototype._fetch_cb = function() {
 FetchStream.prototype.fetch = function(start, cb) {
   var self = this;
 
-  log('fetching %s~%s...', start, start + self.perpage);
+  setTimeout(function() {
+    log('fetching %s~%s...', start, start + self.perpage);
 
-  request.get({
-    uri: self.api_uri,
-    qs: {
-      client_id: douban_key,
-      count: self.perpage,
-      start: start
-    }
-  }, function(err, res, body) {
-    if (err) return self.emit('error', err);
+    // TODO: use oauth2 client to request,
+    // so we can collect private interests
+    request.get({
+      uri: self.api_uri,
+      qs: {
+        client_id: douban_key,
+        count: self.perpage,
+        start: start
+      }
+    }, function(err, res, body) {
+      if (err) return self.emit('error', err);
 
-    if (res.statusCode != 200) {
-      return self.emit('error', new Error('douban api response with ' + res.statusCode)); 
-    }
+      if (res.statusCode != 200) {
+        return self.emit('error', new Error('douban api response with ' + res.statusCode)); 
+      }
 
-    var data;
+      var data;
 
-    try {
-      data = JSON.parse(body);
-    } catch (e) {
-      return self.emit('error', new Error('parse api response failed: ' + body)); 
-    }
+      try {
+        data = JSON.parse(body);
+      } catch (e) {
+        return self.emit('error', new Error('parse api response failed: ' + body)); 
+      }
 
-    self.write(data, cb);
-  });
+      self.emit('fetched', data);
+
+      self.write(data, cb);
+    });
+  }, API_REQ_DELAY);
 };
 
 // TODO: cache data locally first, wait for some time, then commit to database
@@ -161,8 +167,12 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
       function save_subject(i) {
         var s = subjects[i];
         if (!s) {
-          //log('all subjects saved.');
+          log('all subjects in saving queue.');
+
           cb && cb(null, data);
+
+          self.emit('saved', data);
+
           return next();
         }
 
@@ -183,10 +193,28 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
       save_subject(0);
     });
   });
+
+  self.emit('data', data);
 }
 FetchStream.prototype.end = function(arg) {
   this.emit('end', arg);
   this.emit('close', arg);
+};
+FetchStream.prototype.updateUser = function() {
+  var self = this;
+  var ns = self.ns;
+  var obj = {};
+  obj[ns + '_n'] = self.total;
+  obj[ns + '_synced_n'] = self.fetched;
+  obj['last_synced'] = obj[ns +'_last_synced'] = new Date();
+  obj['last_synced_status'] = obj[ns +'_last_sync_status'] = self.status;
+
+  log('updating user\'s last synced status... %s: %s, status: %s',
+      ns, self.total, self.status);
+
+  // database option
+  obj['$upsert'] = true;
+  self.user.update(obj);
 };
 
 var collect, _collect;
@@ -199,22 +227,12 @@ collect = task.api_pool.pooled(_collect = function(client, arg, next) {
   collector.on('error', function(err) {
     error('collecting for %s failed: %s', user.uid, err);
     collector.status = 'failed';
+    collector.updateUser();
     collector.end();
   });
 
-  collector.on('close', function(data) {
-    // reset fot next time
-    var obj = {};
-    obj[arg.ns + '_n'] = collector.total;
-    obj[arg.ns +'last_synced'] = new Date();
-    obj[arg.ns +'last_sync_status'] = collector.status;
-
-    log('updating user\'s last synced status... %s: %s, status: %s',
-        arg.ns, collector.total, collector.status);
-
-    // option
-    obj['$upsert'] = true;
-    user.update(obj);
+  collector.on('saved', function(data) {
+    collector.updateUser();
   });
 
   collector.run();

@@ -3,13 +3,14 @@ html
 head
   meta(charset='utf-8')
   title #{conf.site_name}
-  link(rel='stylesheet', href=static('css/basic.css'))
+  link(rel='stylesheet', href=static('css/base.css'))
 body
   block main
     form(method="post")
-      p 获取所有收藏：
-      div
-        input(name="uid", value="#{qs.uid || 'jyyjcc'}")
-        input(type="hidden", name="_csrf", value=_csrf)
-        button(type="submit") 提交
+      input(type="hidden", name="_csrf", value=_csrf)
+      p 获取
+        input(name="uid", size="8", value="#{qs.uid || 'jyyjcc'}")
+        的所有收藏 &nbsp;
+        button(type="submit") 开始
     block results
+  script(src=static('js/main.css'))

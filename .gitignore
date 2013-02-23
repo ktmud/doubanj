@@ -8,6 +8,7 @@ stable_cache
 var/*.log
 conf/*
 static/components
+static/dist
 static/*.html
 static/*.txt
 static/.file_etags

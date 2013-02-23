@@ -1,0 +1,11 @@
+node_modules
+*.bak
+.DS_Store
+Gruntfile.js
+var/*
+*.styl
+*.css
+*.min.js
+*.jade
+static/**
+templates/**

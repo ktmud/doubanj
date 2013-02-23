@@ -14,19 +14,8 @@ var express = require('express');
 var central = require('./lib/central');
 var serve = require('./serve');
 var jade = require('jade');
-var istatic = require('express-istatic');
-var public_root = __dirname + '/static';
 
-var reg_log = /_log\(.*?\);/g;
-istatic.default({
-  root: public_root,
-  debug: false,
-  js: {
-    filter: function(str) {
-      return str.replace(reg_log, '');
-    }
-  }
-});
+var TWO_WEEKS = 60 * 60 * 24 * 14;
 
 // initial bootstraping, only serve the API
 module.exports.boot = function() {
@@ -39,13 +28,9 @@ module.exports.boot = function() {
   app.set('view cache', !central.conf.debug);
   app.set('views', __dirname + '/templates');
 
-  app.use(express.static(public_root));
+  app.use(express.static(central.assets_root, { maxAge: TWO_WEEKS }));
 
-  app.locals({
-    conf: central.conf,
-    static: central.staticPath,
-    istatic: istatic.serve(),
-  });
+  app.locals(central.template_helpers);
 
   app.use(express.methodOverride());
   app.use(express.cookieParser());
