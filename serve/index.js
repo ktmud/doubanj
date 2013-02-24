@@ -19,7 +19,7 @@ module.exports = function(app, central) {
     res.redirect('/user/' + uid + '/');
   });
 
-  app.get('/*', utils.navbar);
+  app.all('/*', utils.navbar);
 
   app.get('/', function(req, res, next) {
     res.render('index');

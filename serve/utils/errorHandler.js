@@ -53,7 +53,7 @@ var notFound = module.exports.notFound = function(req, res, next) {
   if (req.method == 'HEAD') {
     return next();
   }
-  req.statusCode = 404;
+  res.statusCode = 404;
   res.render('404', {
     statusCode: 404,
     data: { r: 1, err: 404 }

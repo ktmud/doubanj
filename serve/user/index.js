@@ -7,26 +7,32 @@ module.exports = function(app, central) {
     return res.redirect(301, req._parsedUrl.path + '/');
   });
   app.get(/^\/user\/(\w+)\/.*$/, function(req, res, next) {
-    var uid = req.params.uid;
+    var uid = req.params[0];
 
     var c = {
       stage: 'nothing',
       qs: req.query
     };
 
+    if (!uid) return next();
+
     User.get(uid, function(err, user) {
       c.err = err;
       c.user = user;
-
-      if (!user || !user._id) {
-        return res.render('user/404', c);
-      }
       res.data = c;
+
+      if (user && uid === user.id && user.uid) {
+        return res.redirect(301, '/user/' + user.uid + '/');
+      }
       next();
     });
   });
 
   app.get('/user/:uid/', function(req, res, next) {
+    if (!res.data || !res.data.user || res.data.user.invalid == 'NO_USER') {
+      res.statusCode = 404;
+      return res.render('user/404');
+    }
     res.render('user', res.data);
   }); 
 

@@ -1,6 +1,8 @@
 extend ../layout/basic
 
 block main 
-  h1 #{user.screen_name || user.uid} 的豆瓣数据
+  h1 #{user.name || user.uid} 的豆瓣酱
+  if user.invalid
+    p.alert.alert-error 获取用户信息不小心失败了，过两天再来试试看吧
   if !user.stats
-    p.alert 数据还未准备好，请过一会儿再来
+    p.alert.vmiddle 数据还未准备好，请稍后再來

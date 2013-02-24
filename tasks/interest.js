@@ -89,6 +89,11 @@ FetchStream.prototype._fetch_cb = function() {
     }
   };
 };
+
+var ERRORS = {
+  '404': 'NO_USER',
+};
+
 // fetch one page of data
 FetchStream.prototype.fetch = function(start, cb) {
   var self = this;
@@ -109,7 +114,9 @@ FetchStream.prototype.fetch = function(start, cb) {
       if (err) return self.emit('error', err);
 
       if (res.statusCode != 200) {
-        return self.emit('error', new Error('douban api response with ' + res.statusCode)); 
+        var err_code = ERRORS[String(res.statusCode)];
+        self.user.invalid = err_code || 1;
+        return self.emit('error', err_code || new Error('douban api response with ' + res.statusCode)); 
       }
 
       var data;

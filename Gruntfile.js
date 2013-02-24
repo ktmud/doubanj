@@ -97,6 +97,9 @@ module.exports = function(grunt) {
         options: {
           paths: ['<%= meta.src %>/css'],
           urlfunc: 'embedurl',
+          import: [
+            'base/feel',
+          ],
         },
         files: [
           {

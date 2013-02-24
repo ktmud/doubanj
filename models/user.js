@@ -9,6 +9,7 @@ var task = central.task;
 
 var mongo = require(cwd + '/lib/mongo');
 var utils = require(cwd + '/lib/utils');
+var task = require(cwd + '/lib/task');
 
 var APP_DATA_DEFAULT = {
   n_interest: 0
@@ -30,7 +31,7 @@ util.inherits(User, mongo.Model);
 
 User.prototype.kind = User.prototype._collection = USER_COLLECTION;
 
-User.get = function(uid, cb) {
+User.getFromMongo = function(uid, cb) {
   log('getting user obj for %s', uid)
   mongo(function(db) {
     var collection = db.collection(USER_COLLECTION);
@@ -44,8 +45,8 @@ User.get = function(uid, cb) {
         { '_id': uid }
       ]
     }, function(err, r) {
-      if (err !== null) {
-        log('get user failed: %s', err);
+      if (err) {
+        error('get user from mongo failed: %s', err);
         return cb(err);
       }
 
@@ -53,11 +54,39 @@ User.get = function(uid, cb) {
 
       log('user %s not found', uid);
 
-      var info = parseInt(uid) ? { 'id': uid } : { uid: uid };
-      var u = User(info);
-      return cb(null, u);
+      return cb(null, null);
     });
-  }, 0);
+  });
+};
+User.get = function(uid, cb) {
+  User.getFromMongo(uid, function(err, u) {
+    if (err) return cb(err);
+    // got a 404
+    if (!u) {
+      // try get user info from 
+      var info = parseInt(uid) ? { 'id': uid } : { uid: uid };
+      u = User(info);
+    }
+    // haven't got douban account info yet
+    if (!u.name) {
+      task.api(function(oauth2) {
+        oauth2.clientFromToken().request('GET', '/v2/user/' + uid, function(err, data) {
+          if (err) {
+            error('get douban info for %s failed: %s', uid, err);
+            err.stack && console.trace(err);
+            return cb(err);
+          }
+          data.created = new Date(data.created);
+          u.update(data, function(err, doc) {
+            console.log(u);
+            cb(err, u);
+          });
+        });
+      });
+      return;
+    }
+    return cb(null, u);
+  });
 };
 
 
