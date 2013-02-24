@@ -1,0 +1,11 @@
+extend layout/message
+
+- title = '服务器错误'
+
+block message
+  if locals.stack
+    pre.code
+      !{stack}
+  else
+    h1 Oops...
+    p 服务器出错了，呵呵呵...

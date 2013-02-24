@@ -5,4 +5,13 @@ dev:
 watch:
 	grunt watch
 
-.PHONY: dev build deploy
+deploy:
+	grunt deploy
+
+init:
+	git submodule init
+	git submodule update
+	cd ./static/components/bootstrap/ && npm install && make
+	grunt deps
+
+.PHONY: dev watchh build deploy

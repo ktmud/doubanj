@@ -1,0 +1,6 @@
+extend ../layout/basic
+
+block main 
+  h1 #{user.screen_name || user.uid} 的豆瓣数据
+  if !user.stats
+    p.alert 数据还未准备好，请过一会儿再来

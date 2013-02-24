@@ -1,16 +1,16 @@
-!!!
-html
-head
-  meta(charset='utf-8')
-  title #{conf.site_name}
-  link(rel='stylesheet', href=static('css/base.css'))
-body
-  block main
-    form(method="post")
-      input(type="hidden", name="_csrf", value=_csrf)
-      p 获取
-        input(name="uid", size="8", value="#{qs.uid || 'jyyjcc'}")
-        的所有收藏 &nbsp;
-        button(type="submit") 开始
-    block results
-  script(src=static('js/main.css'))
+extend layout/basic
+
+title = conf.site_name
+
+block main
+  form.vmiddle.form-inline(id="start-form", method="post")
+    input(type="hidden", name="_csrf", value=_csrf)
+    div
+      label(for="uid")
+        输入你的豆瓣ID或个人主页地址：
+    p
+      input#uid.span6(name="uid", type="text", size="20", placeholder="http://www.douban.com/people/.../")
+      &nbsp;
+      button.btn.btn-primary(type="submit") 开始
+
+block navbar_form

@@ -1,13 +1,13 @@
-extend index
+extend layout/basic
 
-block results
-  if stage == 'getting user'
-    p.warning 正在获取用户信息
-  else if typeof user !== 'undefined'
+block main 
+  if !interests
+    p.alert 此用户的数据还未准备好，请过一会儿再回来
+  else 
     .user-info
       h1 用户 #{user.screen_name || user.uid} 的收藏
-        //if user.last_synced_status === 'ing'
-        span.badge.badge-syncing 正在同步
+        if user.last_synced_status === 'ing'
+          span.alert.badge-syncing 正在同步
     if interests.book
       mixin book
     if interests.movie
@@ -27,7 +27,7 @@ mixin stars(star)
   span.stars !{s}
 
 mixin book
-  .stats
+  .alert.alert-success
     p 共 #{user.book_n} 条图书记录，已同步 #{user.book_synced_n} 条，上次同步于&nbsp;
       time #{strftime('%Y年%m月%d日 %a %H:%M:%S', user.book_last_synced)}
   ol.interests-list

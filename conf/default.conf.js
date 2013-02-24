@@ -12,8 +12,8 @@ module.exports = {
 
   site_name: '豆瓣酱',
 
-  site_root: 'http://www.doubanj.com',
-  cdn_root: 'http://assets.doubanj.com',
+  site_root: 'http://127.0.0.1:3000',
+  assets_root: 'http://127.0.0.1:3000',
 
   // whether to send gzipped content
   gzip: true,

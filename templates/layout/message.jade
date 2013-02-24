@@ -1,0 +1,8 @@
+extend basic
+
+block title
+  title #{typeof title != 'undefined' ? title + ' | ' : ''} #{conf.site_name}
+
+block main
+   .container.vmiddle.fmessage
+      block message

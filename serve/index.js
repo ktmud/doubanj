@@ -4,12 +4,11 @@ function auth(req, res, next) {
   }
 }
 
-var cwd = process.cwd();
-var tasks = require(cwd + '/tasks');
-var User = require(cwd + '/models/user').User;
-var Interest = require(cwd + '/models/interest').Interest;
+var utils = require('./utils');
 
 module.exports = function(app, central) {
+  var tasks = require(central.cwd + '/tasks');
+
   app.post('/', function(req, res, next) {
     var uid = req.body.uid;
 
@@ -17,42 +16,19 @@ module.exports = function(app, central) {
 
     tasks.interest.collect_book(uid);
 
-    res.redirect('/?uid=' + uid);
+    res.redirect('/user/' + uid + '/');
   });
+
+  app.get('/*', utils.navbar);
 
   app.get('/', function(req, res, next) {
-    var uid = req.query.uid;
-
-    var c = {
-      stage: 'nothing',
-      qs: req.query
-    };
-    if (uid) {
-      User.get(uid, function(err, user) {
-        if (!user || !user._id) {
-          c.stage = 'getting user';
-          return res.render('list', c);
-        }
-
-        c.user = user;
-
-        Interest.findByUser('book', user.uid, function(err, data) {
-          c.err = err;
-          c.interests = {
-            book: data
-          };
-          res.render('list', c);
-        }, {
-          reversed: true,
-          attach_subject: true
-        });
-      });
-      return;
-    }
-    res.render('index', c);
+    res.render('index');
   });
 
-  ['api'].forEach(function(item) {
+  ['user', 'api'].forEach(function(item) {
     require('./' + item)(app, central);
   });
+
+  app.use(utils.errorHandler({ dump: central.conf.debug }));
+  app.use(utils.errorHandler.notFound);
 };

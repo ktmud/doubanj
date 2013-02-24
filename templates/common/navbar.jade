@@ -1,0 +1,18 @@
+.navbar
+  .container
+    a.navbar-toggler(data-toggle="collapse", data-target=".navbar-responsive-collapse")
+      span.icon-bar
+      span.icon-bar
+      span.icon-bar
+    a.navbar-brand(href=conf.site_root) #{conf.site_name}
+
+    .nav-collapse.collapse.navbar-responsive-collapse
+      .nav
+        each link in navbar_links
+          li(class=link.active ? 'active' : null)
+            a(href=link.href, title=link.title, target=link.target) #{link.text}
+    block navbar_form
+      form.navbar-form.pull-right(id="navbar-form", method="post")
+        input(type="hidden", name="_csrf", value=_csrf)
+        div
+          input(name="uid", type="text", placeholder="豆瓣ID...", title="输入豆瓣ID以查看其统计", size="8", value=locals.uid)
