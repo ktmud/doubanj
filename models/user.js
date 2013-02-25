@@ -11,10 +11,10 @@ var mongo = require(cwd + '/lib/mongo');
 var utils = require(cwd + '/lib/utils');
 var task = require(cwd + '/lib/task');
 
-var APP_DATA_DEFAULT = {
-  n_interest: 0
-};
-var USER_COLLECTION = 'user';
+var consts = require('./consts');
+
+var INTEREST_STATUSES = consts.INTEREST_STATUSES;
+var USER_COLLECTION = consts.USER_COLLECTION;
 
 function User(info) {
   if (!(this instanceof User)) return new User(info);
@@ -32,6 +32,7 @@ util.inherits(User, mongo.Model);
 User.prototype.kind = User.prototype._collection = USER_COLLECTION;
 
 User.getFromMongo = function(uid, cb) {
+  if (uid instanceof User) return cb(null, uid);
   log('getting user obj for %s', uid)
   mongo(function(db) {
     var collection = db.collection(USER_COLLECTION);
@@ -69,23 +70,38 @@ User.get = function(uid, cb) {
     }
     // haven't got douban account info yet
     if (!u.name) {
-      task.api(function(oauth2) {
-        oauth2.clientFromToken().request('GET', '/v2/user/' + uid, function(err, data) {
-          if (err) {
-            error('get douban info for %s failed: %s', uid, err);
-            err.stack && console.trace(err);
-            return cb(err);
-          }
-          data.created = new Date(data.created);
-          u.update(data, function(err, doc) {
-            console.log(u);
-            cb(err, u);
-          });
-        });
-      });
+      u.pull(cb);
       return;
     }
     return cb(null, u);
+  });
+};
+
+// pull from douban api, get account info
+User.prototype.pull = function(cb) {
+  var self = this;
+  var uid = self.uid || self.id;
+  task.api(function(oauth2) {
+    oauth2.clientFromToken().request('GET', '/v2/user/' + uid, function(err, data) {
+      if (err) {
+        error('get douban info for %s failed: %s', uid, err);
+        // no such user in douban
+        if (err.statusCode == 404) {
+          self.invalid = 'NO_USER';
+        }
+        return cb(err);
+      }
+      data['$upsert'] = true;
+      data.created = new Date(data.created);
+      // save douban account info
+      self.update(data, function(err, doc) {
+        if (err) {
+          error('save user %s douban info failed: %s', uid, err);
+          self.invalid = 1;
+        }
+        cb(err, self);
+      });
+    });
   });
 };
 
@@ -93,16 +109,60 @@ User.get = function(uid, cb) {
 User.prototype.toObject = function() {
   var now = new Date();
   return {
-    '_id': this['_id'],
+    // douban account
     'id': this['id'],
+    'alt': this['alt'],
     'uid': this['uid'],
+    'created': this['created'],
+    'avatar': this['avatar'],
+    'desc': this['desc'],
+    'loc_id': this['loc_id'],
+    'loc_name': this['loc_name'],
+    'signature': this['signature'],
+
+    // local props
+    '_id': this['_id'],
     'ctime': this['ctime'] || now,
+    'last_synced': this.last_synced,
+    'last_synced_status': this.last_synced_status,
+    'stats': this.stats,
+    'stat_p': this.stat_p, // stats percentage
+    'book_stats': this.book_stats,
     'book_n': this.book_n || 0,
+    'book_synced_n': this.book_synced_n || 0,
     'book_last_synced': this.book_last_synced,
+    'book_last_synced_status': this.book_last_synced_status,
     'movie_n': this.movie_n || 0,
     'movie_last_synced': this.movie_last_synced,
     'atime': now
   };
+};
+
+// the percentage of generating progress
+User.prototype.progress = function() {
+  var ps = this.progresses();
+  var n = 0;
+  ps.forEach(function(item) {
+    n += item;
+  });
+  return n;
+};
+User.prototype.progresses = function() {
+  var ps = [0, 0];
+  var user = this;
+  // got douban account info
+  if (user.created) ps[0] = 5;
+  // starting to sync
+  if (user.last_synced) ps[0] = 10;
+  if (user.book_n === 0) {
+    ps[0] = 60;
+  } else if (user.book_synced_n) {
+    // only book for now
+    ps[0] = (user.book_synced_n / user.book_n) * 60;
+  }
+  // 40% percent is for computing
+  ps[1] = (user.stat_p || 0) * 0.4;
+  return ps;
 };
 
 Object.defineProperty(User.prototype, 'is', {
@@ -124,16 +184,13 @@ Object.defineProperty(User.prototype, 'isAdmin', {
 });
 
 User.prototype.url = function() {
-  return [conf.site_root, this.kind, this.id].join('/');
+  return [conf.site_root, this.kind, this.uid || this.id].join('/') + '/';
+};
+User.prototype.db_url = function(ns) {
+  ns = ns || 'www';
+  return 'http://' + ns + '.douban.com/people/' + (this.uid || this.id) + '/';
 };
 
-var INTEREST_STATUSES =　{
-  book: {
-    wish: 'wish',
-    ing: 'do',
-    done: 'read'
-  }
-};
 User.prototype.interests = function(ns, cb) {
   return Interest.findByUser(ns, this.uid, cb);
 };
@@ -153,5 +210,30 @@ User.prototype.wishes = User.prototype.wishs;
 
 module.exports = function(uid) {
   return new User(uid);
+};
+// the uid to user decorator
+module.exports.ensured = function(fn) {
+  var self = this;
+  return function() {
+    var args = arguments;
+    var uid = args[0];
+
+    if (uid instanceof User || (uid && uid.user instanceof User)) return fn.apply(self, args);
+
+    if (typeof uid === 'string' || typeof uid === 'number') {
+      // fn(12346);
+      User.get(uid, function(err, user) {
+        args[0] = user;
+        fn.apply(self, args);
+      });
+    } else {
+      // some fn like:
+      // fn({ user: xxx });
+      User.get(uid.user, function(err, user) {
+        args[0].user = user;
+        fn.apply(self, args);
+      });
+    }
+  };
 };
 module.exports.User = User;

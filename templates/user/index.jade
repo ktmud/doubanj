@@ -1,8 +1,39 @@
 extend ../layout/basic
 
 block main 
-  h1 #{user.name || user.uid} 的豆瓣酱
-  if user.invalid
-    p.alert.alert-error 获取用户信息不小心失败了，过两天再来试试看吧
-  if !user.stats
-    p.alert.vmiddle 数据还未准备好，请稍后再來
+  name = user.name || user.uid
+  .row
+    .span9
+      h1 #{name} 的豆瓣酱
+      if user.invalid
+        p.vmiddle.alert.alert-error 获取用户信息不小心失败了，休息一会再重试看看吧
+        - return
+      if user.desc
+        mixin user_info(user)
+      if !user.last_synced
+        // 根本没有同步过
+        form(method="post", action="/queue")
+          input(type="hidden", name="_csrf", value=_csrf)
+          input(type="hidden", name="uid", value=user.uid)
+          p.vmiddle
+            button.btn.btn-primary 开始为 #{name} 制造美味豆瓣酱
+      else if !user.stats
+        // 同步正在进行中，还没用准备好
+        .vmiddle
+          .progress.progress-striped.active
+            each p in user.progresses()
+              .progress-bar(style="width:#{p}%")
+          p.muted
+            正在准备数据，请耐心等待
+      else
+        include ./mods/stats
+    .span3.user-intro
+      if user.created
+        include ./mods/intro
+
+block ending
+  script
+    dbj_book_stats = !{JSON.stringify(user.book_stats)}
+
+mixin user_info(user)
+  .user-info

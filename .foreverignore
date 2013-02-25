@@ -6,6 +6,9 @@ Makefile
 Gruntfile.js
 *.styl
 *.css
+*.gif
+*.png
+*.jpg
 *.min.js
 *.jade
 *.yaml

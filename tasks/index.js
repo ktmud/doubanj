@@ -1,5 +1,5 @@
 module.exports = {};
 
-['interest'].forEach(function(item) {
+['interest', 'compute'].forEach(function(item) {
   module.exports[item] = require('./' + item);
 });

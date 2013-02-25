@@ -10,7 +10,7 @@ var request = central.request;
 var mongo = central.mongo;
 var douban_key = central.conf.douban.key;
 
-var User = require(central.cwd + '/models/user').User;
+var user_ensured = require(central.cwd + '/models/user').ensured;
 
 var API_REQ_DELAY = task.API_REQ_DELAY;
 
@@ -56,6 +56,7 @@ FetchStream.prototype.run = function() {
       self.fetch(0, self._fetch_cb());
     });
   });
+  return self;
 };
 
 // fetch page by page
@@ -214,7 +215,7 @@ FetchStream.prototype.updateUser = function() {
   obj[ns + '_n'] = self.total;
   obj[ns + '_synced_n'] = self.fetched;
   obj['last_synced'] = obj[ns +'_last_synced'] = new Date();
-  obj['last_synced_status'] = obj[ns +'_last_sync_status'] = self.status;
+  obj['last_synced_status'] = obj[ns +'_last_synced_status'] = self.status;
 
   log('updating user\'s last synced status... %s: %s, status: %s',
       ns, self.total, self.status);
@@ -226,42 +227,52 @@ FetchStream.prototype.updateUser = function() {
 
 var collect, _collect;
 
-collect = task.api_pool.pooled(_collect = function(client, arg, next) {
-  var collector = new FetchStream(arg, client);
+collect = task.api_pool.pooled(_collect = function(oauth2, arg, next) {
+  function do_collect(arg, next) {
+    if (!arg.user) return arg.error && arg.error('NO_USER');
 
-  var user = arg.user;
+    var user = arg.user;
+    var collector = new FetchStream(arg, oauth2);
 
-  collector.on('error', function(err) {
-    error('collecting for %s failed: %s', user.uid, err);
-    collector.status = 'failed';
-    collector.updateUser();
-    collector.end();
-  });
+    // halt if syncing is already running
+    if (user.last_synced_status === 'ing') {
+      arg.error && arg.error('RUNNING');
+      return next();
+    }
 
-  collector.on('saved', function(data) {
-    collector.updateUser();
-  });
+    collector.on('error', function(err) {
+      error('collecting for %s failed: %s', user.uid, err);
+      collector.status = 'failed';
+      collector.updateUser();
+      collector.end();
+    });
 
-  collector.run();
+    collector.on('saved', function(data) {
+      collector.updateUser();
+    });
+
+    collector.once('end', function() {
+      if (this.status == 'succeed' && arg.success) {
+        arg.success.call(collector, user);
+      } else if (arg.error) {
+        arg.error.call(collector, user);
+      }
+    });
+
+    collector.once('close', next);
+
+    collector.run();
+  }
+  user_ensured(do_collect)(arg, next);
 });
 
 function collect_in_namespace(ns) {
-  return function(user) {
-    if (user instanceof User) {
-      collect({
-        ns: ns,
-        user: user
-      });
-    }
-    User.get(user, function(err, user) {
-      if (err || !user) {
-        error('collect interest failed because getting user failed');
-        return;
-      }
-      collect({
-        ns: ns,
-        user: user
-      });
+  return function(user, succeed_cb, error_cb) {
+    collect({
+      ns: ns,
+      user: user,
+      success: succeed_cb,
+      error: error_cb
     });
   };
 }
@@ -273,9 +284,20 @@ central.DOUBAN_APPS.forEach(function(item) {
 });
 
 // collect all the interest
-exports.collect_all = function(uid) {
-  central.DOUBAN_APPS.forEach(function(item) {
-    exports['collect_' + item](uid);
-  });
+exports.collect_all = function(user, succeed_cb, error_cb) {
+  if (!user) return error_cb('NO_USER');
+
+  var apps = central.DOUBAN_APPS;
+  var collectors = [];
+  (function run(i) {
+    var ns = apps[i];
+    // all apps proceeded
+    if (!ns) succeed_cb(collectors);
+    exports['collect_' + item](user, function(collectors) {
+      collectors.push(collector);
+      run(i+1);
+    }, error_cb);
+  })(0);
 };
+exports.collect = collect;
 module.exports = exports;

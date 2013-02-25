@@ -28,12 +28,10 @@ module.exports = function(grunt) {
         },
         files: [
           {
-            flatten: true,
-            src: [
-              '<%= meta.src %>/components/jquery/jquery.js',
-              '<%= meta.src %>/components/bootstrap/docs/assets/js/bootstrap.js',
-            ],
-            dest: '<%= meta.dest %>/deps/bootstrap.js',
+            expand: true,
+            cwd: '<%= meta.dest %>/deps/',
+            src: ['**/?*.js'],
+            dest: '<%= meta.dest %>/deps/'
           }
         ]
       },
@@ -62,6 +60,35 @@ module.exports = function(grunt) {
         //}
       //}
     //},
+    concat: {
+      dep_js: {
+        files: [
+          {
+            src: [
+              '<%= meta.src %>/components/jquery/jquery.js',
+              '<%= meta.src %>/components/bootstrap/docs/assets/js/bootstrap.js',
+            ],
+            dest: '<%= meta.dest %>/deps/bootstrap.js',
+          },
+          {
+            src: [
+              '<%= meta.src %>/components/raphael.js',
+            ],
+            dest: '<%= meta.dest %>/deps/raphael.js',
+          }
+        ]
+      },
+      dep_css: {
+        files: [
+          {
+            src: [
+              '<%= meta.src %>/components/bootstrap/docs/assets/css/bootstrap.css',
+            ],
+            dest: '<%= meta.dest %>/deps/bootstrap.css',
+          },
+        ],
+      },
+    },
     copy: {
       deps: {
         files: [
@@ -116,11 +143,9 @@ module.exports = function(grunt) {
       deps: {
         files: [
           {
-            flatten: true,
             expand: true,
-            src: [
-              '<%= meta.src %>/components/bootstrap/docs/assets/css/bootstrap.css',
-            ],
+            cwd: '<%= meta.dest %>/deps/',
+            src: ['**/?*.css'],
             dest: '<%= meta.dest %>/deps/',
           },
         ],
@@ -134,7 +159,7 @@ module.exports = function(grunt) {
             dest: '<%= meta.dest %>/css/',
           }
         ]
-      }
+      },
     },
     watch: {
       js: {
@@ -169,19 +194,15 @@ module.exports = function(grunt) {
   });
 
   // Default task.
-  grunt.registerTask('dist_js', ['copy:js', 'includereplace:js', 'jshint']);
-  grunt.registerTask('dist_css', ['stylus']);
+  grunt.registerTask('dist_js', ['concat:dep_js', 'copy:js', 'includereplace:js', 'jshint']);
+  grunt.registerTask('dist_css', ['concat:dep_css', 'stylus']);
 
-  grunt.registerTask('deps', ['uglify:deps', 'cssmin:deps', 'copy:deps']);
+  grunt.registerTask('deps', ['concat:dep_js', 'concat:dep_css', 'copy:deps']);
 
-  grunt.registerTask('default', ['clean', 'deps', 'dist_js', 'dist_css']);
+  grunt.registerTask('default', ['clean', 'copy:deps', 'dist_js', 'dist_css']);
 
   grunt.registerTask('build', ['dist_js', 'dist_css', 'uglify', 'cssmin']);
   //grunt.registerTask('init', ['istatic']);
-
-  // build files and add it in git
-  grunt.registerTask('build', function() {
-  });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -190,6 +211,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-concat');
 
   grunt.loadNpmTasks('grunt-include-replace');
   //grunt.loadNpmTasks('grunt-istatic');

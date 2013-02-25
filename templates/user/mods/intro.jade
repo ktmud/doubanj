@@ -1,0 +1,11 @@
+h2 谁是 #{name} ?
+p.basic
+  a(href=user.db_url(), target="_blank") #{name}
+  |，住在
+  a(href='http://www.douban.com/location/#{user.loc_id}/', target="_blank") #{user.loc_name}
+  | ，#{strftime(FULL_TIME_1, user.created)}加入豆瓣。
+if user.desc
+  hr
+  .pull-right
+    img.img-rounded(src=user.avatar)
+  p.desc !{user.desc.replace(/\n/g, '<br>')}

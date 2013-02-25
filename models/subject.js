@@ -70,6 +70,14 @@ Subject.gets = function(ns, ids, cb) {
     });
   });
 };
+Subject.stream = function(ns, ids, cb) {
+  mongo(function(db) {
+    var collection = db.collection(ns);
+    cb(collection.find({
+      'id': { '$in': ids }
+    }).stream());
+  });
+};
 
 
 Subject.prototype.toObject = function() {

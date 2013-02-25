@@ -136,13 +136,20 @@ Interest.findByUser = function(ns, uid, cb, opts) {
           //tick();
         //}); 
       });
-      Subject.gets(ns, Object.keys(sids), function(err, ss) {
-        ss && ss.forEach(function(s) {
-          i = sids[s.id];
+      Subject.stream(ns, Object.keys(sids), function(stream) {
+        stream.on('data', function(item) {
+          s = Subject(item);
+          var i = sids[s.id];
           i.subject = i[ns] = s;
         });
-        log('all subjects attached.');
-        cb(null, ret);
+        stream.once('error', function(err) {
+          error('getting subjects failed: %s', err);
+          cb(err);
+        });
+        stream.on('close', function() {
+          log('all subjects attached.');
+          cb(null, ret);
+        });
       });
     });
   });

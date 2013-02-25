@@ -1,18 +1,20 @@
 !!!
 html
-head
-  meta(charset='utf-8')
-  block title
-    title #{typeof title === 'undefined' ? conf.site_name : title}
-  link(rel='stylesheet', href=static('/deps/bootstrap.css'))
-  link(rel='stylesheet', href=static('/css/base.css'))
-body
-  block header
-    block navbar
-      include ../common/navbar
-  .container
-    block main
-  block footer
-  script(src=static('/deps/bootstrap.js'))
-  script(src=static('/js/main.js'))
+  head
+    meta(charset='utf-8')
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    block title
+      title #{typeof title === 'undefined' ? conf.site_name : title}
+    link(rel='stylesheet', href=static('/deps/bootstrap.css'))
+    link(rel='stylesheet', href=static('/css/base.css'))
+  body
+    block header
+      block navbar
+        include ../common/navbar
+    .container
+      block main
+    block footer
+    script(src=static('/deps/bootstrap.js'))
+    script(src=static('/js/main.js'))
+    block ending
 
