@@ -4,9 +4,9 @@ block main
   if !interests
     p.alert 此用户的数据还未准备好，请过一会儿再回来
   else 
-    .user-info
-      h1 用户 #{user.screen_name || user.uid} 的#{app_names[ns]}收藏
-        if user.last_synced_status === 'ing'
+    .people-info
+      h1 用户 #{people.screen_name || people.uid} 的#{app_names[ns]}收藏
+        if people.last_synced_status === 'ing'
           span.alert.badge-syncing 正在同步
     if interests.book
       mixin book
@@ -28,8 +28,8 @@ mixin stars(star)
 
 mixin book
   .alert.alert-success
-    p 共 #{user.book_n} 条图书记录，已同步 #{user.book_synced_n} 条，上次同步于&nbsp;
-      time #{strftime(FULL_TIME, user.book_last_synced)}
+    p 共 #{people.book_n} 条图书记录，已同步 #{people.book_synced_n} 条，上次同步于&nbsp;
+      time #{strftime(FULL_TIME, people.book_last_synced)}
   ol.interests-list
     each i in interests.book
       li 

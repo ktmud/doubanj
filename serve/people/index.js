@@ -5,10 +5,10 @@ var Interest = require(cwd + '/models/interest').Interest;
 module.exports = function(app, central) {
   var tasks = require(central.cwd + '/tasks');
 
-  app.get(/^\/user\/\w+$/, function(req, res, next) {
+  app.get(/^\/people\/\w+$/, function(req, res, next) {
     return res.redirect(301, req._parsedUrl.path + '/');
   });
-  app.get(/^\/user\/(\w+)\/.*$/, function(req, res, next) {
+  app.get(/^\/people\/(\w+)\/.*$/, function(req, res, next) {
     var uid = req.params[0];
 
     var c = {
@@ -18,42 +18,42 @@ module.exports = function(app, central) {
 
     if (!uid) return next();
 
-    User.get(uid, function(err, user) {
+    User.get(uid, function(err, people) {
       c.err = err;
-      c.user = user;
+      c.people = people;
       res.data = c;
 
-      if (user && uid === user.id && user.uid) {
-        return res.redirect(301, '/user/' + user.uid + '/');
+      if (people && uid === people.id && people.uid) {
+        return res.redirect(301, '/people/' + people.uid + '/');
       }
       next();
     });
   });
 
-  app.get('/user/:uid/', function(req, res, next) {
-    if (!res.data || !res.data.user || res.data.user.invalid == 'NO_USER') {
+  app.get('/people/:uid/', function(req, res, next) {
+    if (!res.data || !res.data.people || res.data.people.invalid == 'NO_USER') {
       res.statusCode = 404;
-      return res.render('user/404');
+      return res.render('people/404');
     }
 
-    var user = res.data.user;
-    if (!user.stats_p) {
+    var people = res.data.people;
+    if (!people.stats_p) {
       //try compute the results
       tasks.compute({
-        user: user,
+        user: people,
         force: 'recount' in req.query
       });
     }
-    res.render('user', res.data);
+    res.render('people', res.data);
   }); 
 
-  app.get('/user/:uid/books', function(req, res, next) {
-    Interest.findByUser('book', user.uid, function(err, data) {
+  app.get('/people/:uid/books', function(req, res, next) {
+    Interest.findByUser('book', people.uid, function(err, data) {
       c.err = err;
       c.interests = {
         book: data
       };
-      res.render('user/interests', c);
+      res.render('people/interests', c);
     }, {
       reversed: true,
       attach_subject: true

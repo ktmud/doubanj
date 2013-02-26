@@ -14,7 +14,7 @@
   "dependencies": {
     "debug": "~0.7.0",
     "strftime": "~0.5.0",
-    "express-istatic": "~0.0.9-1",
+    "express-istatic": "~0.0.9-2",
     "jade": "~0.28.1",
     "passport": "~0.1.15",
     "generic-pool": "~2.0.3",

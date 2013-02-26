@@ -30,8 +30,6 @@ module.exports.boot = function() {
 
   app.use(express.static(central.assets_root, { maxAge: TWO_WEEKS }));
 
-  app.locals(central.template_helpers);
-
   app.use(express.methodOverride());
   app.use(express.cookieParser());
   app.use(express.cookieSession({
@@ -44,6 +42,8 @@ module.exports.boot = function() {
     res.locals._csrf = req.session._csrf;
     next();
   });
+
+  app.locals(central.template_helpers);
 
   serve(app, central);
   app.listen(central.conf.port);

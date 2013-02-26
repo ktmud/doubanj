@@ -16,6 +16,11 @@ module.exports = function(app, central) {
   app.get('/', function(req, res, next) {
     res.render('index');
   });
+  app.post('/', function(req, res, next) {
+    var uid = req.body.uid;
+    if (!uid) res.redirec('/');
+    res.redirect('/people/' + uid + '/');
+  });
 
   app.post('/queue', function(req, res, next) {
     var uid = req.body.uid;
@@ -24,17 +29,17 @@ module.exports = function(app, central) {
     var m = uid.match(reg_uid);
     if (m) uid = m[1];
 
-    tasks.interest.collect_book(uid, function(user) {
+    tasks.interest.collect_book(uid, function(people) {
       tasks.compute({
-        user: user,
+        user: people,
         force: true
       });
     });
 
-    res.redirect('/user/' + uid + '/');
+    res.redirect('/people/' + uid + '/');
   });
 
-  ['user', 'api'].forEach(function(item) {
+  ['people', 'api'].forEach(function(item) {
     require('./' + item)(app, central);
   });
 

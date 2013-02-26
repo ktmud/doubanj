@@ -1,3 +1,6 @@
 [submodule "static/components/bootstrap"]
 	path = static/components/bootstrap
 	url = git://github.com/twitter/bootstrap.git
+[submodule "static/components/g.raphael"]
+	path = static/components/g.raphael
+	url = git://github.com/DmitryBaranovskiy/g.raphael.git

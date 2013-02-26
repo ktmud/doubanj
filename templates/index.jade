@@ -3,7 +3,7 @@ extend layout/basic
 title = conf.site_name
 
 block main
-  form.vmiddle.form-inline(id="start-form", method="post", action="/queue")
+  form.vmiddle.form-inline(id="start-form", method="post", action="/")
     input(type="hidden", name="_csrf", value=_csrf)
     div
       label(for="uid")
