@@ -15,6 +15,6 @@ Gruntfile.js
 *.xml
 *.md
 **.statictmp/**
-static/**
+**static/**/*.js
 templates/**
 var/*

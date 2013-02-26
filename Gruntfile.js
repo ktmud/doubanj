@@ -11,10 +11,10 @@ module.exports = function(grunt) {
         distUrl: '<%= meta.desc %>/js/'
       },
       banner: '/*! 豆瓣酱 - v<%= pkg.version %> - ' +
-        '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-        '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
-        '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-        ' Licensed <%= pkg.license %> */'
+      '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
+      '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
+      '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
+      ' Licensed <%= pkg.license %> */'
     },
     uglify: {
       options: {
@@ -47,18 +47,18 @@ module.exports = function(grunt) {
       }
     },
     //istatic: {
-      //main: {
-        //repos: {
-          //'twitter/bootstrap': {
-            //commit: '3.0.0-wip',
-            //file: {
-              //'./docs/assets/js/bootstrap.js': 'static/dist/bootstrap.js',
-              //'./docs/assets/css/bootstrap.css': 'static/dist/bootstrap.css',
-              //'./docs/assets/fonts': 'static/dist/fonts'
-            //}
-          //}
-        //}
-      //}
+    //main: {
+    //repos: {
+    //'twitter/bootstrap': {
+    //commit: '3.0.0-wip',
+    //file: {
+    //'./docs/assets/js/bootstrap.js': 'static/dist/bootstrap.js',
+    //'./docs/assets/css/bootstrap.css': 'static/dist/bootstrap.css',
+    //'./docs/assets/fonts': 'static/dist/fonts'
+    //}
+    //}
+    //}
+    //}
     //},
     concat: {
       dep_js: {
@@ -113,9 +113,14 @@ module.exports = function(grunt) {
         ]
       }
     },
-    includereplace: {
+    includes: {
+      options: {
+        regex: /^(\/\/|\/\*)?\s*[\@\#]*(include|import)\s+[\"\'\(]*([^\"\'\)]+)[\"\'\)]*\s*(\*\/)?$/,
+        pos: 3
+      },
       js: {
-        src: '<%= meta.src %>/js/**/*.js',
+        cwd: '<%= meta.src %>/js/',
+        src: '**/*.js',
         dest: '<%= meta.dest %>/js/'
       }
     },
@@ -163,8 +168,8 @@ module.exports = function(grunt) {
     },
     watch: {
       js: {
-        files: '<%= jshint.files %>',
-        tasks: ['copy:js', 'includereplace:js', 'jslint']
+        files: ['<%= meta.src %>/js/**/*.js'],
+        tasks: ['includes:js', 'jshint']
       }, 
       css: {
         files: '<%= meta.src %>/css/**/*.styl',
@@ -194,7 +199,7 @@ module.exports = function(grunt) {
   });
 
   // Default task.
-  grunt.registerTask('dist_js', ['concat:dep_js', 'copy:js', 'includereplace:js', 'jshint']);
+  grunt.registerTask('dist_js', ['concat:dep_js', 'includes:js', 'jshint']);
   grunt.registerTask('dist_css', ['concat:dep_css', 'stylus']);
 
   grunt.registerTask('deps', ['concat:dep_js', 'concat:dep_css', 'copy:deps']);
@@ -213,6 +218,58 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
 
-  grunt.loadNpmTasks('grunt-include-replace');
+  grunt.loadNpmTasks('grunt-includes');
   //grunt.loadNpmTasks('grunt-istatic');
+
+  //var path = require('path');
+  //grunt.registerMultiTask('includes', 'include other files', function() {
+    //this.files.forEach(function(f) {
+      //var src = f.src.filter(function(path) {
+        //if(grunt.file.exists(path)) {
+          //return true;
+        //} else {
+          //grunt.log.warn('Source file "' + path + '" not found.');
+          //return false;
+        //}
+      //});
+
+      //if (grunt.file.isFile(f.dest)) {
+        //grunt.fail.warn('Destination directory "' + f.dest + '" is a file.');
+      //}
+
+      //src.forEach(function(file) {
+        //var save_path = file;
+        //if (f.flatten) save_path = path.basename(file);
+        //grunt.file.write(path.join(f.dest, save_path), recurse(file));
+        //grunt.log.oklns('Saved ' + file);
+      //});
+
+    //});
+  //});
+
+  /**
+  * Helper for `includes` builds all includes for `p`
+  *
+  * @param {String} p
+  * @return {String}
+  */
+
+  //function recurse(p) {
+    //if(!grunt.file.isFile(p)) {
+      //grunt.log.warn('Included file "' + p + '" not found.');
+      //return 'Error including "' + p + '".';
+    //}
+
+    //var src = grunt.file.read(p).split(grunt.util.linefeed);
+    //var compiled = src.map(function(line) {
+      //var match = line.match(regex);
+
+      //if(match) {
+        //return recurse(path.join(path.dirname(p), match[3]));
+      //}
+      //return line;
+    //});
+
+    //return  compiled.join(grunt.util.linefeed);
+  //}
 };
