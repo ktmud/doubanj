@@ -7,8 +7,8 @@ module.exports = function(grunt) {
       src: 'static',
       dest: 'static/dist',
       oz: {
-        baseUrl: '<%= meta.src %>/js/',
-        distUrl: '<%= meta.desc %>/js/'
+        baseUrl: 'static/js/',
+        distUrl: 'static/dist/js/'
       },
       banner: '/*! 豆瓣酱 - v<%= pkg.version %> - ' +
       '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -29,9 +29,9 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true,
-            cwd: '<%= meta.dest %>/deps/',
+            cwd: 'static/dist/deps/',
             src: ['**/?*.js'],
-            dest: '<%= meta.dest %>/deps/'
+            dest: 'static/dist/deps/'
           }
         ]
       },
@@ -39,9 +39,9 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true,
-            cwd: '<%= meta.dest %>/js/',
+            cwd: 'static/dist/js/',
             src: ['**/?*.js'],
-            dest: '<%= meta.dest %>/js/'
+            dest: 'static/dist/js/'
           }
         ]
       }
@@ -61,30 +61,13 @@ module.exports = function(grunt) {
     //}
     //},
     concat: {
-      dep_js: {
-        files: [
-          {
-            src: [
-              '<%= meta.src %>/components/jquery/jquery.js',
-              '<%= meta.src %>/components/bootstrap/docs/assets/js/bootstrap.js',
-            ],
-            dest: '<%= meta.dest %>/deps/bootstrap.js',
-          },
-          {
-            src: [
-              '<%= meta.src %>/components/raphael.js',
-            ],
-            dest: '<%= meta.dest %>/deps/raphael.js',
-          }
-        ]
-      },
       dep_css: {
         files: [
           {
             src: [
-              '<%= meta.src %>/components/bootstrap/docs/assets/css/bootstrap.css',
+              'static/components/bootstrap/docs/assets/css/bootstrap.css',
             ],
-            dest: '<%= meta.dest %>/deps/bootstrap.css',
+            dest: 'static/dist/deps/bootstrap.css',
           },
         ],
       },
@@ -97,8 +80,8 @@ module.exports = function(grunt) {
             src: [
               '**',
             ],
-            cwd: '<%= meta.src %>/components/bootstrap/docs/assets/fonts/',
-            dest: '<%= meta.dest %>/fonts/',
+            cwd: 'static/components/bootstrap/docs/assets/fonts/',
+            dest: 'static/dist/fonts/',
           }
         ]
       },
@@ -106,9 +89,9 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true,
-            cwd: '<%= meta.src %>/js/',
+            cwd: 'static/js/',
             src: ['**/?*.js'],
-            dest: '<%= meta.dest %>/js/'
+            dest: 'static/dist/js/'
           }
         ]
       }
@@ -119,15 +102,15 @@ module.exports = function(grunt) {
         pos: 3
       },
       js: {
-        cwd: '<%= meta.src %>/js/',
+        cwd: 'static/js/',
         src: '**/*.js',
-        dest: '<%= meta.dest %>/js/'
+        dest: 'static/dist/js/'
       }
     },
     stylus: {
       compile: {
         options: {
-          paths: ['<%= meta.src %>/css'],
+          paths: ['static/css'],
           urlfunc: 'embedurl',
           import: [
             'base/feel',
@@ -136,9 +119,9 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true,
-            cwd: '<%= meta.src %>/css/',
+            cwd: 'static/css/',
             src: ['base.styl'],
-            dest: '<%= meta.dest %>/css/',
+            dest: 'static/dist/css/',
             ext: '.css'
           }
         ]
@@ -149,9 +132,9 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true,
-            cwd: '<%= meta.dest %>/deps/',
+            cwd: 'static/dist/deps/',
             src: ['**/?*.css'],
-            dest: '<%= meta.dest %>/deps/',
+            dest: 'static/dist/deps/',
           },
         ],
       },
@@ -159,20 +142,20 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true,
-            cwd: '<%= meta.dest %>/css/',
+            cwd: 'static/dist/css/',
             src: ['**/?*.css'],
-            dest: '<%= meta.dest %>/css/',
+            dest: 'static/dist/css/',
           }
         ]
       },
     },
     watch: {
       js: {
-        files: ['<%= meta.src %>/js/**/*.js'],
+        files: ['static/js/**/*.js'],
         tasks: ['includes:js', 'jshint']
       }, 
       css: {
-        files: '<%= meta.src %>/css/**/*.styl',
+        files: 'static/css/**/*.styl',
         tasks: ['stylus']
       }
     },
@@ -194,15 +177,15 @@ module.exports = function(grunt) {
       globals: {}
     },
     clean: {
-      files: ['<%= meta.dest %>/js/', '<%= meta.dest %>/css/', '<%= meta.dest %>/deps/']
+      files: ['static/dist/js/', 'static/dist/css/', 'static/dist/deps/']
     },
   });
 
   // Default task.
-  grunt.registerTask('dist_js', ['concat:dep_js', 'includes:js', 'jshint']);
+  grunt.registerTask('dist_js', ['includes:js', 'jshint']);
   grunt.registerTask('dist_css', ['concat:dep_css', 'stylus']);
 
-  grunt.registerTask('deps', ['concat:dep_js', 'concat:dep_css', 'copy:deps']);
+  grunt.registerTask('deps', ['concat:dep_css', 'copy:deps']);
 
   grunt.registerTask('default', ['clean', 'copy:deps', 'dist_js', 'dist_css']);
 
