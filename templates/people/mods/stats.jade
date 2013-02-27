@@ -1,5 +1,39 @@
-.alert.alert-success
-  p 共 #{people.book_n} 条图书记录，已同步 #{people.book_synced_n} 条，上次同步于&nbsp;
+if people.progress() == 100
+  p.alert.alert-success
+    | 上次同步于&nbsp;
     time #{strftime(FULL_TIME, people.book_last_synced)}
-    | ，数据报表生成于 
+    | ，报表生成于 
     time #{strftime(FULL_TIME, people.stats.book)}
+else
+  .alert(style="padding: 10px;")
+    .row
+      .span8
+        正在同步最新数据，以下是基于同步于 #{strftime(FULL_TIME, people.book_last_synced)} 的数据生成的结果
+      .span3
+        include ./progress
+      .span1
+        a.btn.btn-mini.btn-warning.pull-right(href=".") 刷新
+hr
+.mod
+  h2 总览
+  - book_stats = people.book_stats
+  - n_book = book_stats.all.total
+  - n_done = book_stats.done.total
+  - n_wish = book_stats.wish.total
+  - n_ing = book_stats.ing.total
+  - ratio_done = (n_done / n_book * 100).toFixed(2)
+  - ratio_with = (n_wish / n_book * 100).toFixed(2)
+  .span6
+    p
+      | 从 #{people.created.getFullYear()} 年至今，你一共收藏了 
+      strong.num #{book_stats.all.total} 
+      | 本图书，其中读过 
+      strong.num #{n_done} 
+      | 本，占全部收藏的 
+      em.percent #{ratio_done}%
+      | 。想读 #{n_wish} 本，在读 #{n_ing} 本。
+  .span6
+    #d-summary
+.row
+hr
+include ./resync

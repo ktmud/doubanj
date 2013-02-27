@@ -1,0 +1,12 @@
+.alert.alert-error
+  p 准备数据时出错了，这可能是程序bug，请等待我们的工程师修复
+
+if people.stats_status == 'ing'
+  p.muted 数据同步已成功，正在重新计算... 已重试 #{people.stats_fail} 次
+else
+  p.muted 你也可以在当前 url 后添加 <em>?recount</em> 重新尝试计算
+
+// compute failed 5 times more
+if people.stats_fail > 5
+  include ./resync
+

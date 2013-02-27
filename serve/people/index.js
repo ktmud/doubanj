@@ -6,7 +6,7 @@ module.exports = function(app, central) {
   var tasks = require(central.cwd + '/tasks');
 
   app.get(/^\/people\/\w+$/, function(req, res, next) {
-    return res.redirect(301, req._parsedUrl.path + '/');
+    return res.redirect(301, req._parsedUrl.pathname + '/');
   });
   app.get(/^\/people\/(\w+)\/.*$/, function(req, res, next) {
     var uid = req.params[0];
@@ -37,14 +37,23 @@ module.exports = function(app, central) {
     }
 
     var people = res.data.people;
-    if (!people.stats_p) {
+    var sleep = false;
+    var recount = 'recount' in req.query;
+    if (!people.stats_p || recount) {
       //try compute the results
       tasks.compute({
         user: people,
-        force: 'recount' in req.query
+        force: recount
       });
+      sleep = true;
     }
-    res.render('people', res.data);
+    setTimeout(function() {
+      if (recount) {
+        res.redirect(req._parsedUrl.pathname);
+      } else {
+        res.render('people', res.data);
+      }
+    }, sleep ? 500 : 0);
   }); 
 
   app.get('/people/:uid/books', function(req, res, next) {

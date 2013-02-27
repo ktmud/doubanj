@@ -126,7 +126,9 @@ User.prototype.toObject = function() {
     'last_synced': this.last_synced,
     'last_synced_status': this.last_synced_status,
     'stats': this.stats,
-    'stat_p': this.stat_p, // stats percentage
+    'stats_status': this.stats_status,
+    'stats_p': this.stats_p, // stats percentage
+    'stats_fail': this.stats_fail,
     'book_stats': this.book_stats,
     'book_n': this.book_n || 0,
     'book_synced_n': this.book_synced_n || 0,
@@ -161,7 +163,7 @@ User.prototype.progresses = function() {
     ps[0] = (user.book_synced_n / user.book_n) * 60;
   }
   // 40% percent is for computing
-  ps[1] = (user.stat_p || 0) * 0.4;
+  ps[1] = ps[0] >= 60 ? (user.stats_p || 0) * 0.4 : 0;
   return ps;
 };
 

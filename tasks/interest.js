@@ -11,6 +11,7 @@ var mongo = central.mongo;
 var douban_key = central.conf.douban.key;
 
 var user_ensured = require(central.cwd + '/models/user').ensured;
+var utils = require('./utils');
 
 var API_REQ_DELAY = task.API_REQ_DELAY;
 
@@ -146,10 +147,15 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
 
   // pick up subjects
   items.forEach(function(item, i) {
-    var s = item[ns];
+    item = utils.norm_interest(item);
+
     item['uid'] = uid;
-    delete item[ns];
+    item['subject_id'] = item[ns + '_id'];
+
+    var s = item[ns];
+    s = utils.norm_subject(s, ns);
     subjects.push(s);
+    delete item[ns];
   });
 
   // `next` is to release db client lock
@@ -184,8 +190,6 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
           return next();
         }
 
-        s['type'] = ns;
-
         //log('updating subject %s', s.id);
         // we just don't care whether it will succeed.
         col_s.update({ 'id': s.id }, s, { upsert: true, w: -1 });
@@ -204,11 +208,11 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
 
   self.emit('data', data);
 }
-FetchStream.prototype.end = function(arg) {
+FetchStream.prototype.close = FetchStream.prototype.end = function(arg) {
   this.emit('end', arg);
   this.emit('close', arg);
 };
-FetchStream.prototype.updateUser = function() {
+FetchStream.prototype.updateUser = function(cb) {
   var self = this;
   var ns = self.ns;
   var obj = {};
@@ -222,7 +226,7 @@ FetchStream.prototype.updateUser = function() {
 
   // database option
   obj['$upsert'] = true;
-  self.user.update(obj);
+  self.user.update(obj, cb);
 };
 
 var collect, _collect;
@@ -235,7 +239,7 @@ collect = task.api_pool.pooled(_collect = function(oauth2, arg, next) {
     var collector = new FetchStream(arg, oauth2);
 
     // halt if syncing is already running
-    if (user.last_synced_status === 'ing') {
+    if (user.last_synced_status === 'ing' && !arg.force) {
       arg.error && arg.error('RUNNING');
       return next();
     }
@@ -243,8 +247,9 @@ collect = task.api_pool.pooled(_collect = function(oauth2, arg, next) {
     collector.on('error', function(err) {
       error('collecting for %s failed: %s', user.uid, err);
       collector.status = 'failed';
-      collector.updateUser();
-      collector.end();
+      collector.updateUser(function() {
+        collector.end();
+      });
     });
 
     collector.on('saved', function(data) {
@@ -252,11 +257,14 @@ collect = task.api_pool.pooled(_collect = function(oauth2, arg, next) {
     });
 
     collector.once('end', function() {
-      if (this.status == 'succeed' && arg.success) {
-        arg.success.call(collector, user);
-      } else if (arg.error) {
-        arg.error.call(collector, user);
-      }
+      // wait for the really ends
+      setTimeout(function() {
+        if (collector.status == 'succeed' && arg.success) {
+          arg.success.call(collector, user);
+        } else if (arg.error) {
+          arg.error.call(collector, user);
+        }
+      }, 2000);
     });
 
     collector.once('close', next);
@@ -267,13 +275,9 @@ collect = task.api_pool.pooled(_collect = function(oauth2, arg, next) {
 });
 
 function collect_in_namespace(ns) {
-  return function(user, succeed_cb, error_cb) {
-    collect({
-      ns: ns,
-      user: user,
-      success: succeed_cb,
-      error: error_cb
-    });
+  return function(arg) {
+    arg.ns = ns;
+    collect(arg);
   };
 }
 

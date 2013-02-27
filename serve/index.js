@@ -29,11 +29,15 @@ module.exports = function(app, central) {
     var m = uid.match(reg_uid);
     if (m) uid = m[1];
 
-    tasks.interest.collect_book(uid, function(people) {
-      tasks.compute({
-        user: people,
-        force: true
-      });
+    tasks.interest.collect_book({
+      user: uid, 
+      force: true,
+      success: function(people) {
+        tasks.compute({
+          user: people,
+          force: true
+        });
+      }
     });
 
     res.redirect('/people/' + uid + '/');
