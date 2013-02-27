@@ -53,7 +53,7 @@ module.exports = function(app, central) {
       } else {
         res.render('people', res.data);
       }
-    }, sleep ? 500 : 0);
+    }, sleep ? 100 : 0);
   }); 
 
   app.get('/people/:uid/books', function(req, res, next) {

@@ -17,6 +17,9 @@ hr
 .mod
   h2 总览
   - book_stats = people.book_stats
+  - book_stats.all.label = '全部'
+  - book_stats.wish.label = '想读'
+  - book_stats.wish.label = '想读'
   - n_book = book_stats.all.total
   - n_done = book_stats.done.total
   - n_wish = book_stats.wish.total
@@ -33,7 +36,8 @@ hr
       em.percent #{ratio_done}%
       | 。想读 #{n_wish} 本，在读 #{n_ing} 本。
   .span6
-    #d-summary
+    .donuts#d-summary
+      label 想读/读过/在读图书比例
 .row
 hr
 include ./resync

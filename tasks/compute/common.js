@@ -6,10 +6,9 @@ var error = debug('dbj:aggregate:error');
 
 var conf_interest = {
   top: ['tags'],
-  $top_u: ['tags'],
   most: [{ 'commented': -1 }],
   date: {
-    'updated': ['year', 'month', 'year-month', 'dayOfMonth', 'dayOfWeek']
+    'updated': ['year', 'month', 'year_month', 'dayOfMonth', 'dayOfWeek']
   }
 };
 
@@ -87,12 +86,12 @@ function aggParam(conf) {
   var param = conf;
   if ('top' in conf) {
     var ptop = conf.top;
-    var ptop_u = conf.$top_u; // props don't need unwind
+    var ptop_u = conf.$top_u || []; // props don't need unwind
     var ptop_k = conf.$top_k; // need to flatten the object, get key
     var limit = conf.$top_limit;
 
     ptop.forEach(function(p) {
-      var r = aggTop(p, ptop_u && ptop_u.indexOf(p) == -1, limit);
+      var r = aggTop(p, ptop_u.indexOf(p) == -1, limit);
       var prj = {};
       var k = ptop_k && ptop_k[p];
       if (k) {
@@ -126,7 +125,7 @@ function aggParam(conf) {
   if ('most' in conf) {
     var pmost = conf.most;
     var pmost_limit = conf.$most_limit;
-    var pmost_fields = conf.$most_fields || { 'id': 1, '_id': -1 };
+    var pmost_fields = conf.$most_fields || { 'id': 1, '_id': 0 };
     pmost.forEach(function(p) {
       if (typeof p === 'object') {
         var n = p['$name'];
@@ -215,7 +214,7 @@ function aggRange(p, dots) {
 }
 function aggDate(p, period) {
   var prd = {};
-  period = period.split('-');
+  period = period.split('_');
   // will output something like:
   // prd = {
   //   $year: '$pubdate'
@@ -224,6 +223,10 @@ function aggDate(p, period) {
     prd[i] = {};
     prd[i]['$' + i] = '$' + p;
   });
+  var _id = '$period';
+  var sort = {
+    '_id': 1
+  }
   return [{
     $project: {
       _id: 0,
@@ -231,9 +234,11 @@ function aggDate(p, period) {
     }
   }, {
     $group: {
-      _id: '$period',
+      _id: _id,
       count: { $sum: 1 }
     }
+  }, {
+    $sort: sort 
   }];
 }
 
