@@ -22,8 +22,14 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
     var user = arg.user;
 
     var called = false;
+    var timeouts = {};
     var error_cb = function(err) {
       err = err || 'UNKNOWN';
+
+      for (var j in timeouts) {
+        clearTimeout(timeouts[j]);
+      }
+
       if (!user) {
         arg.error && arg.error(err);
         if (!called) next();
@@ -45,7 +51,6 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
         user.update({
           stats_fail: stats_fail + 1,
           stats_status: err,
-          stats_p: 0
         });
       }
       next();
@@ -60,7 +65,8 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
     if (user.last_synced_status !== 'succeed') return error_cb('NOT_READY');
 
     // in queue means 5 percent of work has been done
-    user.update({ stats_p: 5, stats_fail: 0, stats_status: 'ing' });
+    var obj = { stats_p: 5, stats_status: 'ing' };
+    user.update(obj);
 
     var jobs = {};
     function runJob(ns, done_percent) {
@@ -76,6 +82,9 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
             error_cb(err);
             return next();
           }
+
+          // already failed, no need to save..
+          if (called) return;
 
           var stats = user.stats || {};
           stats[ns] = new Date();
@@ -94,6 +103,7 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
 
           var obj = {
             stats: stats,
+            stats_fail: 0,
             stats_status: stats_status,
             stats_p: stats_p
           };
@@ -108,6 +118,7 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
             next();
           });
         }, function(percent) {
+          if (called) return;
           var stats_p = user.stats_p || 5;
           var p = percent * done_percent / 100
           if (stats_p > p + 5) return;
@@ -119,7 +130,7 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
         });
 
         // timeout
-        setTimeout(function() {
+        timeouts[ns] = setTimeout(function() {
           error_cb('TIMEOUT');
         }, 60000);
       });

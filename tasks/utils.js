@@ -166,7 +166,8 @@ function norm_subject(s, ns) {
   }
   if (s.rating) {
     s.raters = s.rating.numRaters;
-    s.rated = s.rating.average;
+    // zero is ignored
+    s.rated = parseFloat(s.rating.average, 10) || null;
   }
   return s;
 }

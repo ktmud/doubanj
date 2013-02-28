@@ -18,14 +18,11 @@ block main
           p.vmiddle
             button.btn.btn-primary 开始为 #{name} 制造美味豆瓣酱
       else if !people.stats || people.stats_status == 'ing'
-        // 同步正在进行中，还没用准备好
         .vmiddle
-          include ./mods/progress
-          p.muted
-            正在准备数据，请耐心等待
+          include ./cases/wait
       else if people.stats_fail
         .vmiddle
-          include ./mods/failed
+          include ./cases/failed
       else
         include ./mods/stats
     .span3.people-intro

@@ -6,8 +6,6 @@ function auth(req, res, next) {
 
 var utils = require('./utils');
 
-var reg_uid = /\/people\/([^\/]+)/;
-
 module.exports = function(app, central) {
   var tasks = require(central.cwd + '/tasks');
 
@@ -22,15 +20,20 @@ module.exports = function(app, central) {
     res.redirect('/people/' + uid + '/');
   });
 
-  app.post('/queue', function(req, res, next) {
-    var uid = req.body.uid;
+  app.post('/queue', utils.getUser({
+    redir: '/',
+  }), function(req, res, next) {
+    var user = res.data.people;
 
-    if (!uid) res.redirec('/');
-    var m = uid.match(reg_uid);
-    if (m) uid = m[1];
+    var uid = user.uid || user.id;
+
+    if (!user) {
+      res.redirect('/people/' + uid + '/');
+      return;
+    }
 
     tasks.interest.collect_book({
-      user: uid, 
+      user: user, 
       force: true,
       success: function(people) {
         tasks.compute({
@@ -40,7 +43,11 @@ module.exports = function(app, central) {
       }
     });
 
-    res.redirect('/people/' + uid + '/');
+    User.update({
+      last_synced_status: 'ing'
+    }, function() {
+      res.redirect('/people/' + uid + '/');
+    });
   });
 
   ['people', 'api'].forEach(function(item) {

@@ -30,7 +30,16 @@ var conf_book = {
   //     'prop2': -1
   //   }
   // for more advanced settings
-  most: ['pages', 'price', 'rated', 'raters'],
+  most: ['pages', 'rated', 'raters', {
+    price: -1,
+    $name: 'most_price',
+    $fields: { id: 1, _id: 0, price: 1, ori_price: 1, title: 1 }
+  }, {
+    price: 1,
+    $name: 'least_price',
+    $fields: { id: 1, _id: 0, price: 1, ori_price: 1, title: 1 }
+  }],
+  $most_fields: { id: 1, _id: 0, title: 1 },
   $most_limit: 20,
   range: {
     'pages': [100, 300, 500, 800],

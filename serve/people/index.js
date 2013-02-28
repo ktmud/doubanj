@@ -2,32 +2,23 @@ var cwd = central.cwd;
 var User = require(cwd + '/models/user').User;
 var Interest = require(cwd + '/models/interest').Interest;
 
+var utils = require('../utils');
+
 module.exports = function(app, central) {
   var tasks = require(central.cwd + '/tasks');
 
   app.get(/^(\/api)?\/people\/\w+$/, function(req, res, next) {
     return res.redirect(301, req._parsedUrl.pathname + '/');
   });
-  app.get(/^(\/api)?\/people\/(\w+)\/.*$/, function(req, res, next) {
-    var uid = req.params[1];
-
-    var c = {
-      stage: 'nothing',
-      qs: req.query
-    };
-
-    if (!uid) return next();
-
-    User.get(uid, function(err, people) {
-      c.err = err;
-      c.people = people;
-      res.data = c;
-
-      if (people && uid === people.id && people.uid) {
-        return res.redirect(301, '/people/' + people.uid + '/');
-      }
-      next();
-    });
+  app.get(/^(\/api)?\/people\/(\w+)\/.*$/, utils.getUser({
+    fn: function(req) { return req.params[1]; }
+  }), function(req, res, next) {
+    var people = res.data.people;
+    var uid = req.params[1]; 
+    if (people && uid === people.id && people.uid) {
+      return res.redirect(301, '/people/' + people.uid + '/');
+    }
+    next();
   });
 
   app.get('/people/:uid/', function(req, res, next) {
