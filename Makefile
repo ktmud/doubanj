@@ -1,4 +1,11 @@
 
+init:
+	git submodule init
+	git submodule update
+	cd ./static/components/bootstrap/ && npm install && make
+	cd ./static/ && component install -d
+	grunt deps
+
 dev:
 	forever -w -d app.js
 
@@ -8,10 +15,4 @@ watch:
 deploy:
 	grunt deploy
 
-init:
-	git submodule init
-	git submodule update
-	cd ./static/components/bootstrap/ && npm install && make
-	grunt deps
-
-.PHONY: dev watchh build deploy
+.PHONY: dev watch build deploy

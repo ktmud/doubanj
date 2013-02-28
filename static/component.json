@@ -1,0 +1,7 @@
+{
+  "name": "doubanj",
+  "dependencies": {
+    "component/d3": "*",
+    "component/jquery": "*"
+  }
+}

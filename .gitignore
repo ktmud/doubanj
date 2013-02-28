@@ -8,6 +8,7 @@ stable_cache
 var/*.log
 conf/*
 static/components
+static/build
 static/dist
 static/*.html
 static/*.txt
