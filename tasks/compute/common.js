@@ -4,6 +4,8 @@ var debug = require('debug');
 var log = debug('dbj:aggregate:log');
 var error = debug('dbj:aggregate:error');
 
+var extend = require(process.cwd() + '/lib/utils').extend;
+
 var conf_interest = {
   top: ['tags'],
   most: [{ 'commented': -1 }],
@@ -41,16 +43,19 @@ AggStream.prototype.run = function(agg_id) {
   if (self.prefilter instanceof Array) {
     param = self.prefilter.concat(param);
   } else if (self.prefilter) {
-    param.unshift(self.prefilter);
+    param = [self.prefilter].concat(param);
   };
   col.aggregate(param, function(err, result) {
+    //log(JSON.stringify(param));
     if (err) {
       error('%s failed: %s', agg_id, err);
       //error('params: %s', JSON.stringify(param));
       self.emit('error', err);
       self.failures[agg_id] = err;
     }
-    //if (!result || !result.length) log('%s for %s got empty results.', agg_id, self.uid);
+    //if (!result || !result.length) {
+      //log('%s for %s got empty results.', agg_id, self.uid);
+    //}
     self.results[agg_id] = result;
     if (self.percent() >= 100) self.drain();
   });
@@ -126,6 +131,13 @@ function aggParam(conf) {
     var pmost = conf.most;
     var pmost_limit = conf.$most_limit;
     var pmost_fields = conf.$most_fields || { 'id': 1, '_id': 0 };
+
+    function get_fields(p) {
+      var f = {};
+      f[p] = 1;
+      extend(f, pmost_fields);
+      return f;
+    }
     pmost.forEach(function(p) {
       if (typeof p === 'object') {
         var n = p['$name'];
@@ -135,14 +147,19 @@ function aggParam(conf) {
         delete p['$name'];
         delete p['$limit'];
         delete p['$fields'];
-        param[n] = aggSort(p, null, l || pmost_limit, f || pmost_fields);
+        if (!f) {
+          f = get_fields(n);
+        }
+        param[n] = aggSort(p, null, l || pmost_limit, f);
       } else {
-        param['most_' + p] = aggSort(p, 1, pmost_limit, pmost_fields);
-        param['least_' + p] = aggSort(p, -1, pmost_limit, pmost_fields);
+        var f = get_fields(p);
+        param['most_' + p] = aggSort(p, -1, pmost_limit, f);
+        param['least_' + p] = aggSort(p, 1, pmost_limit, f);
       }
     });
-    delete param['most'];
-    delete param['$most_limit'];
+    delete conf['most'];
+    delete conf['$most_limit']
+    delete conf['$most_fields']
   }
   if ('range' in conf) {
     var prange = conf.range;

@@ -155,7 +155,7 @@ module.exports = function(grunt) {
         tasks: ['includes:js', 'jshint']
       }, 
       css: {
-        files: 'static/css/**/*.styl',
+        files: ['static/css/**/*.styl'],
         tasks: ['stylus']
       }
     },

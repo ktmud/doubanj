@@ -12,6 +12,8 @@
     npm install bower -g 
     npm install
     make init
+    export DEBUG="dbj*"
+    grunt
     make
 
 如果要修改静态文件，还需要新开进程运行

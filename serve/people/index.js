@@ -5,11 +5,11 @@ var Interest = require(cwd + '/models/interest').Interest;
 module.exports = function(app, central) {
   var tasks = require(central.cwd + '/tasks');
 
-  app.get(/^\/people\/\w+$/, function(req, res, next) {
+  app.get(/^(\/api)?\/people\/\w+$/, function(req, res, next) {
     return res.redirect(301, req._parsedUrl.pathname + '/');
   });
-  app.get(/^\/people\/(\w+)\/.*$/, function(req, res, next) {
-    var uid = req.params[0];
+  app.get(/^(\/api)?\/people\/(\w+)\/.*$/, function(req, res, next) {
+    var uid = req.params[1];
 
     var c = {
       stage: 'nothing',
@@ -53,7 +53,7 @@ module.exports = function(app, central) {
       } else {
         res.render('people', res.data);
       }
-    }, sleep ? 100 : 0);
+    }, sleep ? 70 : 0);
   }); 
 
   app.get('/people/:uid/books', function(req, res, next) {
