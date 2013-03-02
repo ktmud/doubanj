@@ -120,10 +120,8 @@ function parse_date(d) {
   var r = new Date(d);
   if (isNaN(+r)) {
     log('invalid date: %s', d);
-    return null;
-  } else {
-    return r;
   }
+  return r;
 }
 function parse_pubdate(d) {
   d = d || '';

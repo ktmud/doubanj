@@ -1,2 +1,1 @@
-// @import ../components/d3.js
-
+// @import ../components/ktmud-d3/d3.js

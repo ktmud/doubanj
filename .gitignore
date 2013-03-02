@@ -7,7 +7,6 @@ stable_cache
 .DS_Store
 var/*.log
 conf/*
-static/components
 static/build
 static/dist
 static/*.html

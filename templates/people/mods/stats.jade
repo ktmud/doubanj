@@ -15,18 +15,19 @@ else
         a.btn.btn-mini.btn-warning.pull-right(href=".") 刷新
 hr
 .mod
-  h2 总览
   - book_stats = people.book_stats
   - book_stats.all.label = '全部'
   - book_stats.wish.label = '想读'
-  - book_stats.wish.label = '想读'
+  - book_stats.ing.label = '在读'
+  - book_stats.done.label = '读过'
   - n_book = book_stats.all.total
   - n_done = book_stats.done.total
   - n_wish = book_stats.wish.total
   - n_ing = book_stats.ing.total
   - ratio_done = (n_done / n_book * 100).toFixed(2)
   - ratio_with = (n_wish / n_book * 100).toFixed(2)
-  .span6
+  .span4
+    h2 总览
     p
       | 从 #{people.created.getFullYear()} 年至今，你一共收藏了 
       strong.num #{book_stats.all.total} 
@@ -35,9 +36,13 @@ hr
       | 本，占全部收藏的 
       em.percent #{ratio_done}%
       | 。想读 #{n_wish} 本，在读 #{n_ing} 本。
-  .span6
-    .chart.donuts#d-summary
+  .span5
+    - pie_summary = ['label,value', '想读,' + n_wish, '在读,' + n_ing, '读过,' + n_done]
+    - pie_summary = pie_summary.join('\n');
+    .chart.donuts#d-summary(data-pie=pie_summary)
       .caption 想读/读过/在读图书比例
+  .span3
+    h4 最新收藏
 .row
 hr
 include ./resync

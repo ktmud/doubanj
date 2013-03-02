@@ -16,12 +16,13 @@ module.exports = {
   errorHandler: require('./errorHandler'),
   getUser: function(opts) {
     opts = opts || {};
-    redir = opts.redir;
-    fn = opts.fn || matchPeople;
+    var redir = opts.redir;
+    var fn = opts.fn || matchPeople;
     return function(req, res, next) {
       var uid = fn(req);
       var c = res.data = {
-        qs: req.query
+        qs: req.query,
+        uid: uid
       };
 
       if (!uid) {

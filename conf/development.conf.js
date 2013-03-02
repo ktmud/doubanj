@@ -5,6 +5,7 @@ var util = require('util');
  */
 module.exports = {
   debug: true,
+  assets_root: 'http://127.0.0.1:3000/',
   sessionStore: {
     memcached: true,
     dbname: 'sessions',

@@ -14,15 +14,18 @@ block main
         // 根本没有同步过
         form(method="post", action="/queue")
           input(type="hidden", name="_csrf", value=_csrf)
-          input(type="hidden", name="uid", value=people.uid)
+          input(type="hidden", name="uid", value=uid)
           p.vmiddle
             button.btn.btn-primary 开始为 #{name} 制造美味豆瓣酱
-      else if !people.stats || people.stats_status == 'ing'
+      else if people.last_synced_status === 'ing'
         .vmiddle
           include ./cases/wait
       else if people.stats_fail
         .vmiddle
           include ./cases/failed
+      else if people.stats_status === 'ing'
+        .vmiddle
+          include ./cases/wait
       else
         include ./mods/stats
     .span3.people-intro
@@ -30,7 +33,6 @@ block main
         include ./mods/intro
 
 block ending
-  script(src=static('/js/d3.js'))
   if people.stats
     include ./mods/stats_js
 

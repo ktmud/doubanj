@@ -23,14 +23,15 @@ module.exports = function(app, central) {
   app.post('/queue', utils.getUser({
     redir: '/',
   }), function(req, res, next) {
+    var uid = res.data.uid;
     var user = res.data.people;
-
-    var uid = user.uid || user.id;
 
     if (!user) {
       res.redirect('/people/' + uid + '/');
       return;
     }
+
+    var uid = user.uid || user.id;
 
     tasks.interest.collect_book({
       user: user, 
@@ -43,7 +44,7 @@ module.exports = function(app, central) {
       }
     });
 
-    User.update({
+    user.update({
       last_synced_status: 'ing'
     }, function() {
       res.redirect('/people/' + uid + '/');

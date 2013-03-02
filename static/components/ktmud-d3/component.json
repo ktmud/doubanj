@@ -1,0 +1,9 @@
+{
+  "name": "d3",
+  "version": "3.0.6",
+  "main": "./d3.js",
+  "scripts": [
+    "d3.js"
+  ],
+  "repo": "https://raw.github.com/ktmud/d3"
+}

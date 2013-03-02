@@ -23,12 +23,17 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
 
     var called = false;
     var timeouts = {};
+    var clear_timeouts = function() {
+      for (var j in timeouts) {
+        try {
+          clearTimeout(timeouts[j]);
+        } catch (e) {}
+      }
+    }
     var error_cb = function(err) {
       err = err || 'UNKNOWN';
 
-      for (var j in timeouts) {
-        clearTimeout(timeouts[j]);
-      }
+      clear_timeouts();
 
       if (!user) {
         arg.error && arg.error(err);
@@ -55,7 +60,9 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
       }
       next();
     };
-    var succeed_cb = arg.success;
+    var succeed_cb = function() {
+      arg.success && arg.success();
+    };
 
     if (!user) return error_cb('NO_USER');
     // already running
@@ -64,18 +71,28 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
     if (user.invalid) return error_cb(user.invalid);
     if (user.last_synced_status !== 'succeed') return error_cb('NOT_READY');
 
-    // in queue means 5 percent of work has been done
-    var obj = { stats_p: 5, stats_status: 'ing' };
-    user.update(obj);
+    var stats = user.stats || {}; // save last stats date
+    var all_results = {
+      stats_fail: 0,
+      stats_status: 'ing',
+      stats_p: 5 // start running means 5 percent of work has been done
+    };
+    user.update(all_results);
 
-    var jobs = {};
+    var jobs_percent = {};
+
     function runJob(ns, done_percent) {
 
       var job = require('./' + ns);
 
-      jobs[ns] = 0;
+      jobs_percent[ns] = 0;
 
       mongo.queue(function(db, next) {
+        // timeout
+        timeouts[ns] = setTimeout(function() {
+          error_cb('TIMEOUT');
+        }, 80000);
+
         // rung single job
         job(db, user, function(err, results) {
           if (err) {
@@ -86,40 +103,40 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
           // already failed, no need to save..
           if (called) return;
 
-          var stats = user.stats || {};
+          clearTimeout(timeouts[ns]);
+
           stats[ns] = new Date();
+          all_results[ns + '_stats'] = results; 
 
-          stats_p = 5;
+          var stats_p = all_results.stats_p;
 
-          jobs[ns] = done_percent;
+          jobs_percent[ns] = done_percent;
 
-          for (var j in jobs) {
-            stats_p += jobs[j] || 0; 
+          for (var j in jobs_percent) {
+            stats_p += (jobs_percent[j] || 0); 
           }
+
+          // all works done, safe to save.
           if (stats_p >= 100) {
             stats_p = 100;
-            stats_status = 'succeed';
+            all_results.stats = stats;
+            all_results.stats_p = stats_p;
+            all_results.stats_status = 'succeed';
+
+            user.update(all_results, function(err) {
+              if (err) {
+                error_cb(err);
+              } else {
+                succeed_cb(user);
+              }
+              next();
+            });
           }
-
-          var obj = {
-            stats: stats,
-            stats_fail: 0,
-            stats_status: stats_status,
-            stats_p: stats_p
-          };
-          obj[ns + '_stats'] = results; 
-
-          user.update(obj, function(err) {
-            if (err) {
-              error_cb(err);
-            } else {
-              succeed_cb && succeed_cb(user);
-            }
-            next();
-          });
         }, function(percent) {
           if (called) return;
-          var stats_p = user.stats_p || 5;
+
+          // update computing percentage
+          var stats_p = all_results.stats_p;
           var p = percent * done_percent / 100
           if (stats_p > p + 5) return;
 
@@ -129,10 +146,6 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
           user.update(obj);
         });
 
-        // timeout
-        timeouts[ns] = setTimeout(function() {
-          error_cb('TIMEOUT');
-        }, 60000);
       });
     }
 

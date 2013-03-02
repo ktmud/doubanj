@@ -5,8 +5,11 @@ html
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     block title
       title #{typeof title === 'undefined' ? conf.site_name : title}
-    link(rel='stylesheet', href=static('/deps/bootstrap.css'))
+    link(rel='stylesheet', href=static('/css/bootstrap.css'))
     link(rel='stylesheet', href=static('/css/base.css'))
+    script(src=static('/js/do.js'), data-cfg-corelib='main', data-cfg-root=static('/'))
+    script
+      Do.urls(!{urlmap('main')});
   body
     block header
       block navbar
@@ -14,6 +17,5 @@ html
     .container
       block main
     block footer
-    script(src=static('/js/main.js'))
     block ending
 

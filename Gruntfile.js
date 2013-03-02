@@ -60,18 +60,6 @@ module.exports = function(grunt) {
     //}
     //}
     //},
-    concat: {
-      dep_css: {
-        files: [
-          {
-            src: [
-              'static/components/bootstrap/docs/assets/css/bootstrap.css',
-            ],
-            dest: 'static/dist/deps/bootstrap.css',
-          },
-        ],
-      },
-    },
     copy: {
       deps: {
         files: [
@@ -85,27 +73,33 @@ module.exports = function(grunt) {
           }
         ]
       },
-      js: {
-        files: [
-          {
-            expand: true,
-            cwd: 'static/js/',
-            src: ['**/?*.js'],
-            dest: 'static/dist/js/'
-          }
-        ]
-      }
     },
     includes: {
       options: {
-        regex: /^(\/\/|\/\*)?\s*[\@\#]*(include|import)\s+[\"\'\(]*([^\"\'\)]+)[\"\'\)]*\s*(\*\/)?$/,
+        regex: /^\s*(\/\/|\/\*)?\s*[\@\#]*(include|import)\s+[\"\'\(]*([^\"\'\)]+)[\"\'\)]*\s*(\*\/)?$/,
         pos: 3
       },
       js: {
         cwd: 'static/js/',
         src: '**/*.js',
         dest: 'static/dist/js/'
+      },
+      css: {
+        cwd: 'static/css/',
+        src: '**/*.css',
+        dest: 'static/dist/css/'
       }
+    },
+    wrapper: {
+      options: {
+        // wrap indicator
+        wrap: 'module.exports =',
+      },
+      js: {
+        cwd: 'static/dist/js/',
+        src: '**/*.js',
+        dest: 'static/dist/js/'
+      },
     },
     stylus: {
       compile: {
@@ -128,16 +122,6 @@ module.exports = function(grunt) {
       }
     },
     cssmin: {
-      deps: {
-        files: [
-          {
-            expand: true,
-            cwd: 'static/dist/deps/',
-            src: ['**/?*.css'],
-            dest: 'static/dist/deps/',
-          },
-        ],
-      },
       compress: {
         files: [
           {
@@ -149,110 +133,136 @@ module.exports = function(grunt) {
         ]
       },
     },
+    hashmap: {
+      options: {
+        output: 'static/hash.json',
+        merge: true,
+      },
+      js: {
+        cwd: 'static/dist',
+        src: ['js/**/*.js'],
+        dest: 'static/dist/',
+      },
+      css: {
+        cwd: 'static/dist',
+        src: ['css/**/*.css'],
+        dest: 'static/dist/',
+      }
+    },
     watch: {
       js: {
         files: ['static/js/**/*.js'],
-        tasks: ['includes:js', 'jshint']
+        tasks: ['dist_js']
       }, 
       css: {
         files: ['static/css/**/*.styl'],
-        tasks: ['stylus']
+        tasks: ['dist_css']
       }
     },
-    jshint: {
-      files: ['static/dist/js/**/*!{.min}.js'],
-      options: {
-        curly: true,
-        eqeqeq: true,
-        immed: true,
-        latedef: true,
-        newcap: true,
-        noarg: true,
-        sub: true,
-        undef: true,
-        boss: true,
-        eqnull: true,
-        browser: true
-      },
-      globals: {}
-    },
     clean: {
-      files: ['static/dist/js/', 'static/dist/css/', 'static/dist/deps/']
+      hash: {
+        src: ['static/hash.json']
+      },
+      js: {
+        src: ['static/dist/js/']
+      },
+      css: {
+        src: ['static/dist/css/']
+      }
     },
   });
 
   // Default task.
-  grunt.registerTask('dist_js', ['includes:js', 'jshint']);
-  grunt.registerTask('dist_css', ['concat:dep_css', 'stylus']);
+  grunt.registerTask('dist_js', ['includes:js', 'wrapper:js']);
+  grunt.registerTask('dist_css', ['includes:css', 'stylus']);
 
-  grunt.registerTask('deps', ['concat:dep_css', 'copy:deps']);
+  grunt.registerTask('deps', ['copy:deps']);
 
   grunt.registerTask('default', ['clean', 'copy:deps', 'dist_js', 'dist_css']);
 
-  grunt.registerTask('build', ['dist_js', 'dist_css', 'uglify', 'cssmin']);
-  //grunt.registerTask('init', ['istatic']);
+  grunt.registerTask('build', ['clean', 'dist_js', 'dist_css', 'uglify', 'cssmin', 'hashmap']);
 
-  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-stylus');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-concat');
+
+  grunt.loadNpmTasks('grunt-hashmap');
 
   grunt.loadNpmTasks('grunt-includes');
   //grunt.loadNpmTasks('grunt-istatic');
 
-  //var path = require('path');
-  //grunt.registerMultiTask('includes', 'include other files', function() {
-    //this.files.forEach(function(f) {
-      //var src = f.src.filter(function(path) {
-        //if(grunt.file.exists(path)) {
-          //return true;
-        //} else {
-          //grunt.log.warn('Source file "' + path + '" not found.');
-          //return false;
-        //}
-      //});
+  var path = require('path');
 
-      //if (grunt.file.isFile(f.dest)) {
-        //grunt.fail.warn('Destination directory "' + f.dest + '" is a file.');
+  grunt.registerMultiTask('wrapper', 'Wrap things up.', function() {
+    var opts = this.options({
+      head: 'require.register("<%= path %>", function(exports, require, module) {\n',
+      nowrap: /(\@\@nowrap|require\.register)/,
+      wrap: null,
+      tail: '\n}); require.alias("<%= path %>", "<%= filename %>");'
+    });
+
+    this.files.forEach(function(f) {
+      var cwd = f.cwd;
+      var src = f.src.filter(function(p) {
+        p = cwd ? path.join(cwd, p) : p;
+        if (grunt.file.exists(p)) {
+          return true;
+        } else {
+          grunt.log.warn('Source file "' + p + '" not found.');
+          return false;
+        }
+      });
+
+      var isfile = grunt.file.isFile(f.dest);
+
+      var flatten = f.flatten;
+
+      src.forEach(function(p) {
+        var save_name = flatten ? path.basename(p) : p;
+        var dest_file = isfile ? f.dest : path.join(f.dest, save_name);
+
+        p = cwd ? path.join(cwd, p) : p;
+
+        var data = { path: save_name, fullpath: p, filename: path.basename(p) };
+        grunt.file.write(dest_file, wrap(p, opts, data));
+        //grunt.log.oklns('Saved ' + dest_file);
+      });
+
+      grunt.log.oklns('All done.');
+    });
+
+    function wrap(p, opts, data) {
+      if (!grunt.file.isFile(p)) {
+        grunt.log.warn('file "' + p + '" not found.');
+        return 'Error wrapping "' + p + '".';
+      }
+
+      var contents = grunt.file.read(p);
+
+      if (opts.wrap && contents.search(opts.wrap) == -1) {
+        grunt.log.writeln('Wont\'t wrap "' + p + '"');
+        return contents;
+      }
+      if (contents.search(opts.nowrap) !== -1) return contents;
+
+      var tmpl_opt = { data: data };
+      var head = grunt.template.process(opts.head, tmpl_opt);
+      var tail = grunt.template.process(opts.tail, tmpl_opt);
+
+      return head + contents + tail;
+
+      //contents = contents.split(grunt.util.linefeed);
+      //if (contents[0].indexOf(opts.nowrap) !== -1) {
+        //contents = contents.slice(1);
+      //} else {
+        //contens.unshift(head);
+        //contents.push(tail);
       //}
+      //return contents.join(grunt.util.linefeed);
+    }
+  });
 
-      //src.forEach(function(file) {
-        //var save_path = file;
-        //if (f.flatten) save_path = path.basename(file);
-        //grunt.file.write(path.join(f.dest, save_path), recurse(file));
-        //grunt.log.oklns('Saved ' + file);
-      //});
-
-    //});
-  //});
-
-  /**
-  * Helper for `includes` builds all includes for `p`
-  *
-  * @param {String} p
-  * @return {String}
-  */
-
-  //function recurse(p) {
-    //if(!grunt.file.isFile(p)) {
-      //grunt.log.warn('Included file "' + p + '" not found.');
-      //return 'Error including "' + p + '".';
-    //}
-
-    //var src = grunt.file.read(p).split(grunt.util.linefeed);
-    //var compiled = src.map(function(line) {
-      //var match = line.match(regex);
-
-      //if(match) {
-        //return recurse(path.join(path.dirname(p), match[3]));
-      //}
-      //return line;
-    //});
-
-    //return  compiled.join(grunt.util.linefeed);
-  //}
 };

@@ -28,7 +28,7 @@ module.exports.boot = function() {
   app.set('view cache', !central.conf.debug);
   app.set('views', __dirname + '/templates');
 
-  app.use(express.static(central.assets_root, { maxAge: TWO_WEEKS }));
+  app.use(express.static(central.assets.root, { maxAge: TWO_WEEKS }));
 
   app.use(express.methodOverride());
   app.use(express.cookieParser());

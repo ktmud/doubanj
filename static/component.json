@@ -1,7 +1,8 @@
 {
   "name": "doubanj",
   "dependencies": {
-    "component/d3": "*",
-    "component/jquery": "*"
+    "component/jquery": "*",
+    "ktmud/lodash": "*",
+    "ktmud/d3": "*"
   }
 }
