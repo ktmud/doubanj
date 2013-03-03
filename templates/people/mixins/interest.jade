@@ -1,3 +1,24 @@
+mixin tagcloud(tags, ns)
+  ns = ns || locals.ns
+  .tagcloud
+    each tag in tags
+      if tag && tag._id
+        span.tag-item
+          a(href="http://" + ns + '.douban.com/tag/' + encodeURIComponent(tag._id), target="_blank") #{tag._id}
+          span.muted (#{tag.count})
+
+- ns_cats = { 'book': '1001' }
+mixin searchcloud(tags, ns)
+  ns = ns || locals.ns
+  cat = ns_cats[ns]
+  .tagcloud
+    each tag in tags
+      if tag && tag._id
+        span.tag-item
+          a(href="http://" + ns + '.douban.com/subject_search?cat=' + cat + '&amp;search_text=' + encodeURIComponent(tag._id),
+            target="_blank") #{tag._id}
+          span.muted (#{tag.count})
+
 mixin stars(star)
   if !star || !star.value
     - return
@@ -14,8 +35,9 @@ mixin interest_item(i)
   &nbsp;
   if i.book
     a(href="http://book.douban.com/subject/#{i.book_id}/",
+      target="_blank",
       title="#{i.book.name} - #{i.book.author.join(', ')}")
       | #{i.book.title}
   else
-    a(href="http://book.douban.com/subject/#{i.book_id}/")
+    a(href="http://book.douban.com/subject/#{i.book_id}/", target="_blank")
       | #{i.book_id}

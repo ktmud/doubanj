@@ -17,15 +17,12 @@ block main
           input(type="hidden", name="uid", value=uid)
           p.vmiddle
             button.btn.btn-primary 开始为 #{name} 制造美味豆瓣酱
-      else if people.last_synced_status === 'ing'
+      else if people.last_synced_status === 'ing' && !people.stats
         .vmiddle
           include ./cases/wait
       else if people.stats_fail
         .vmiddle
           include ./cases/failed
-      else if people.stats_status === 'ing'
-        .vmiddle
-          include ./cases/wait
       else
         include ./mods/stats
     .span3.people-intro

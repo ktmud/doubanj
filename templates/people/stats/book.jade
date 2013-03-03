@@ -1,5 +1,9 @@
 include ../mixins/interest
 
+h2 #{people.name} 的读书酱
+  a.btn.btn-mini.btn-compact(href=people.db_url('book'), target="db-profile")   读书主页 ⇗
+
+.pull-right
 if people.progress() == 100
   p.alert.alert-success
     | 上次同步于&nbsp;
@@ -16,7 +20,7 @@ else
       .span1
         a.btn.btn-mini.btn-warning.pull-right(href=".") 刷新
 hr
-.mod
+.row.mod
   - book_stats = people.book_stats
   - book_stats.all.label = '全部'
   - book_stats.wish.label = '想读'
@@ -29,7 +33,7 @@ hr
   - ratio_done = (n_done / n_book * 100).toFixed(2)
   - ratio_wish = (n_wish / n_book * 100).toFixed(2)
   .span4
-    h2 总览
+    h3 总览
     p
       | 从 #{people.created.getFullYear()} 年至今，你一共收藏了 
       strong.num #{book_stats.all.total} 
@@ -37,7 +41,16 @@ hr
       strong.num #{n_done} 
       | 本，占全部收藏的 
       em.percent #{ratio_done}%
-      | 。想读 #{n_wish} 本，在读 #{n_ing} 本。
+      | 。
+      if n_done < 10
+        是不是有点太少了呢？
+      if n_wish > 10 && ratio_wish > 60
+        想读的书有 #{n_wish} 本，占全部收藏的 #{ratio_wish}% 。似乎有点太多了，不要光想不做哦。
+      if n_ing
+        | 另外还有 #{n_ing} 本在读
+        if n_ing > 15
+          ，怎么可能同时读这么呢？一本本看完先吧
+        | 。
   .span5
     - pie_summary = ['label,value', '想读,' + ratio_wish, '在读,' + (100 - ratio_done - ratio_wish).toFixed(2), '读过,' + ratio_done]
     - pie_summary = pie_summary.join('\n');
@@ -49,6 +62,24 @@ hr
       each item in latest_interests
         li 
           mixin interest_item(item)
-.row
+hr
+.row.mod
+  - locals.ns = 'book'
+  .span3
+    h4 收藏时标注
+    mixin tagcloud(book_stats.interest.top_tags)
+  .span5
+    h4 全部热门
+    mixin tagcloud(book_stats.all.top_tags)
+  .span4
+    h4 作者
+    mixin searchcloud(book_stats.all.top_author.slice(0,10))
+  .span4
+    h4 译者
+    mixin searchcloud(book_stats.all.top_translator.slice(0,8))
+  .span12
+    h4 出版社
+    mixin searchcloud(book_stats.all.top_publisher.slice(0,6))
+
 hr
 include ../mods/resync

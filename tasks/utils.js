@@ -128,6 +128,10 @@ function parse_pubdate(d) {
   d = d.replace('年', '-').replace('月', '-').replace('日', ' ').replace('第一版', '');
   return parse_date(d);
 }
+function parse_publisher(p) {
+  if (!p) return null;
+  return p;
+}
 var time_funcs = {
   year: function(date) { return date.getFullYear() + '' },
   month: function(date) { return date.getFullYear() + '-' + date.getMonth() },
@@ -145,6 +149,7 @@ function norm_status(s) {
   return normalize_status[s];
 }
 var parsers = {
+  'publisher': parse_publisher,
   'pubdate': parse_pubdate,
   'pages': parse_pages,
   'price': parse_price,
