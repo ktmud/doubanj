@@ -111,7 +111,7 @@ function parse_price(price) {
   return n;
 }
 function parse_pages(pages) {
-  if (!pages) return 0;
+  if (!pages) return null;
   var n = parseInt(pages, 10);
   if (isNaN(n)) log('invalid page %s', pages);
   return n;

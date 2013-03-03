@@ -13,6 +13,7 @@ var Subject = require(cwd + '/models/subject').Subject;
 
 var consts = require('./consts');
 var DOUBAN_APPS = consts.DOUBAN_APPS;
+var INTEREST_STATUS_LABELS = consts.INTEREST_STATUS_LABELS;
 var APP_DATA_DEFAULT = {
   n_interest: 0
 };
@@ -78,12 +79,17 @@ Interest.get = function(ns, i_id, cb, attach_subject) {
   });
 };
 
-Interest.findByUser = function(ns, uid, cb, opts) {
+Interest.findByUser = function(ns, uid, opts, cb) {
   log('getting interests obj for user %s', uid);
 
   opts = opts || {};
+  if (typeof opts === 'function') {
+    cb = opts;
+    opts = {};
+  }
 
   mongo(function(db) {
+    var sort = opts.sort || 'updates';
     var collection = db.collection(ns + '_' + INTEREST_COLLECTION);
     collection.find({
       '$or': [
@@ -93,7 +99,8 @@ Interest.findByUser = function(ns, uid, cb, opts) {
         { 'user_id': uid }
       ]
     }, {
-      sort: opts.sort || 'updated'
+      limit: opts.limit,
+      sort: sort
     }).toArray(function(err, docs) {
       if (err) {
         error('get interests failed: %s', err);
@@ -104,9 +111,11 @@ Interest.findByUser = function(ns, uid, cb, opts) {
         return cb(err);
       }
 
-      if (opts.reversed) docs = docs.reverse();
-
       log('found %s interests', docs.length);
+
+      var reversed = true;
+      if (sort != 'updated' || 'reversed' in opts) reversed = opts.reversed;
+      if (reversed) docs = docs.reverse();
 
       var ret = docs.map(function(item) {
         var i = new Interest(item);
@@ -114,7 +123,7 @@ Interest.findByUser = function(ns, uid, cb, opts) {
       });
       log('extended to Interest.');
 
-      if (!opts.attach_subject) {
+      if (opts.attach_subject === false) {
         log('no need for attach subject, interests got.');
         return cb(null, ret);
       }
@@ -173,17 +182,9 @@ Interest.prototype.toObject = function() {
   return ret;
 };
 
-Interest.prototype.istatus = function() {
-  switch (this.status) {
-    case 'read':
-      return '看过'
-    case 'do':
-      return '在看'
-    case 'wish':
-      return '想读'
-    default:
-      return '未知'
-  }
+Interest.prototype.istatus = function(ns, unknown) {
+  unknown = '' || unknown;
+  return INTEREST_STATUS_LABELS[ns || 'book'][this.status] || unknown;
 };
 
 module.exports = function(uid) {

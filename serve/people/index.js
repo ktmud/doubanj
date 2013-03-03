@@ -42,9 +42,15 @@ module.exports = function(app, central) {
       if (recount) {
         res.redirect(req._parsedUrl.pathname);
       } else {
-        res.render('people', res.data);
+        next();
       }
-    }, sleep ? 70 : 0);
+    }, sleep ? 100 : 0);
+  }, function(req, res, next) {
+    var people = res.data.people;
+    Interest.findByUser('book', people.uid, { limit: 5 }, function(err, ilist) {
+      res.data.latest_interests = ilist;
+      res.render('people', res.data);
+    });
   }); 
 
   app.get('/people/:uid/books', function(req, res, next) {
@@ -54,9 +60,6 @@ module.exports = function(app, central) {
         book: data
       };
       res.render('people/interests', c);
-    }, {
-      reversed: true,
-      attach_subject: true
     });
   });
 };

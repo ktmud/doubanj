@@ -114,7 +114,7 @@ function aggParam(conf) {
         // docs = [{
         //   p: 'abc'
         // }]
-        prj[k] = '$' + p + '.' + k;
+        prj[p] = '$' + p + '.' + k;
       } else {
         prj[p] = 1;
       }
@@ -207,9 +207,9 @@ function aggTop(p, unwind, limit) {
 function aggRange(p, dots) {
   function addcond(items) {
     var n = items.shift();
-    if (!n) return 'MAX';
+    if (!n) return Infinity;
     return {
-      $cond: [ { $lt: ['$' + p, n] }, n.toString(), addcond(items) ]
+      $cond: [ { $lt: ['$' + p, n] }, n, addcond(items) ]
     }
   }
   return [

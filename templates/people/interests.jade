@@ -15,17 +15,6 @@ block main
     if interests.music
       mixin music
 
-mixin stars(star)
-  if !star || !star.value
-    - return
-  - var n = star.max, s = '';
-  - star = star.value
-  while n > 0
-    - star--
-    - n --
-    - s += star > 0 ? '&#10029;' : '&#10025'
-  span.stars !{s}
-
 mixin book
   .alert.alert-success
     p 共 #{people.book_n} 条图书记录，已同步 #{people.book_synced_n} 条，上次同步于&nbsp;

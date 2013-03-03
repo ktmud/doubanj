@@ -6,6 +6,9 @@ Do('lodash', 'd3', 'chart/all', function(_require) {
   var d_summary = $('#d-summary');
   chart.Pie(d_summary[0], {
     width: d_summary.width(),
-    height: d_summary.height() - 20
+    height: d_summary.height() - 20,
+    textValue: function(d) {
+      return d.data.value + '%' + '\n' + d.data.label;
+    },
   }).draw();
 });

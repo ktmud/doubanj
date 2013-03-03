@@ -18,7 +18,7 @@ var conf_book = {
   $top_k: {
     'tags': 'name'
   },
-  $top_limit: 20,
+  $top_limit: 30,
   // sorting by prop value, return a 'most_xxx' list
   // by default, will count 'least_xxx' too
   // can set `[ { pages: -1 } ]` (means descending by pages) to avoid.

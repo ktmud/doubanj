@@ -1,0 +1,21 @@
+mixin stars(star)
+  if !star || !star.value
+    - return
+  - var n = star.max, s = '';
+  - star = star.value
+  while n > 0
+    - star--
+    - n --
+    - s += star > 0 ? '&#10029;' : '&#10025'
+  span.stars !{s}
+
+mixin interest_item(i)
+  span.label.label-status #{i.istatus()}
+  &nbsp;
+  if i.book
+    a(href="http://book.douban.com/subject/#{i.book_id}/",
+      title="#{i.book.name} - #{i.book.author.join(', ')}")
+      | #{i.book.title}
+  else
+    a(href="http://book.douban.com/subject/#{i.book_id}/")
+      | #{i.book_id}
