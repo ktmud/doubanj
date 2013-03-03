@@ -30,14 +30,15 @@ mixin stars(star)
     - s += star > 0 ? '&#10029;' : '&#10025'
   span.stars !{s}
 
-mixin interest_item(i)
+mixin interest_item(i, trimto)
+  trimto = trimto || 100
   span.label.label-status #{i.istatus()}
   &nbsp;
   if i.book
     a(href="http://book.douban.com/subject/#{i.book_id}/",
       target="_blank",
       title="#{i.book.name} - #{i.book.author.join(', ')}")
-      | #{i.book.title}
+      | #{trunc(i.book.title, 8)}
   else
     a(href="http://book.douban.com/subject/#{i.book_id}/", target="_blank")
       | #{i.book_id}

@@ -73,8 +73,7 @@ hr
     mixin tagcloud(book_stats.all.top_tags)
   .span4
     h4 作者
-    mixin searchcloud(book_stats.all.top_author.slice(0,10))
-  .span4
+    mixin searchcloud(book_stats.all.top_author.slice(0,5))
     h4 译者
     mixin searchcloud(book_stats.all.top_translator.slice(0,8))
   .span12
