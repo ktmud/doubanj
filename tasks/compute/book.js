@@ -46,7 +46,9 @@ var conf_book = {
     'price': [10, 20, 40, 60, 80, 100, 200, 500],
   },
   date: {
-    'pubdate': ['year']
+    'pubdate': {
+      periods: ['year']
+    }
   }
 };
 var agg_param_book = common.aggParam(conf_book);

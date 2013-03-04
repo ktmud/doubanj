@@ -1,3 +1,4 @@
+// @import ./consts.js
 
 function Pie(container, options) {
   if (!container) throw new Error('Must give a container for Pie chart.');
@@ -10,7 +11,7 @@ function Pie(container, options) {
 }
 
 Pie.defaultOptions = {
-  colors: ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"],
+  colors: D3_COLORS,
   width: 150,
   height: 150,
   data: null,

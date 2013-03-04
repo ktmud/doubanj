@@ -54,7 +54,7 @@ hr
   .span5
     - pie_summary = ['label,value', '想读,' + ratio_wish, '在读,' + (100 - ratio_done - ratio_wish).toFixed(2), '读过,' + ratio_done]
     - pie_summary = pie_summary.join('\n');
-    .chart.donuts#d-summary(data-pie=pie_summary)
+    .chart.chart-pie#d-summary(data-pie=pie_summary)
       .caption 想读/读过/在读图书比例
   .span3
     h4 最新收藏
@@ -79,6 +79,16 @@ hr
   .span12
     h4 出版社
     mixin searchcloud(book_stats.all.top_publisher.slice(0,6))
-
 hr
+.row.mod
+  .span12
+    h3 阅读编年史
+  - bar_updated = ['label,value']
+  each item in book_stats.interest.n_by_updated_year_month
+    - bar_updated.push([item._id.year, item._id.month].join('-'), item.count)
+  .span6.chart.chart-bar#d_by_updated(data-bar=bar_updated)
+    .caption 按月阅读数量
+  .span6.chart.chart-bar#d_by_pubdate
+    .caption 按出版年代
+
 include ../mods/resync

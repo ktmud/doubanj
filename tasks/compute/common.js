@@ -10,7 +10,10 @@ var conf_interest = {
   top: ['tags'],
   most: [{ 'commented': -1 }],
   date: {
-    'updated': ['year', 'month', 'year_month', 'dayOfMonth', 'dayOfWeek']
+    'updated': {
+      periods: ['year', 'month', 'year_month', 'dayOfMonth', 'dayOfWeek'],
+      group_by: 'status::ing,done,wish'
+    },
   }
 };
 
@@ -171,9 +174,11 @@ function aggParam(conf) {
   if ('date' in conf) {
     var pdate = conf.date;
     for (var p in pdate) {
-      var periods = pdate[p];
+      var obj = pdate[p];
+      var periods = obj.periods;
+      var group_by = obj.group_by;
       periods.forEach(function(period) {
-        param[['n', 'by', p, period].join('_')] = aggDate(p, period);
+        param[['n', 'by', p, period].join('_')] = aggDate(p, period, group_by);
       });
     }
     delete param['date'];
@@ -229,7 +234,7 @@ function aggRange(p, dots) {
     }
   ];
 }
-function aggDate(p, period) {
+function aggDate(p, period, group_by) {
   var prd = {};
   period = period.split('_');
   // will output something like:
@@ -241,22 +246,39 @@ function aggDate(p, period) {
     prd[i]['$' + i] = '$' + p;
   });
   var _id = '$period';
+  var prj = {
+    _id: 0,
+    period: prd
+  }
+  var grp = {
+    _id: _id,
+    count: { $sum: 1 }
+  };
   var sort = {
     '_id': 1
   }
-  return [{
-    $project: {
-      _id: 0,
-      period: prd
-    }
+  if (group_by) {
+    var tmp = group_by.split('::');
+    var k = tmp[0];
+    var vals = tmp[1].split(',');
+    vals.forEach(function(item) {
+      var prj_key = k + '_' + item;
+      prj[prj_key] = {
+        $cond: [{ $eq: ['$' + k, item] }, 1, 0]
+      };
+      grp[prj_key] = {
+        $sum: '$' + prj_key
+      };
+    });
+  }
+  var ret = [{
+    $project: prj
   }, {
-    $group: {
-      _id: _id,
-      count: { $sum: 1 }
-    }
+    $group: grp 
   }, {
     $sort: sort 
   }];
+  return ret;
 }
 
 var agg_param_interest = aggParam(conf_interest);
