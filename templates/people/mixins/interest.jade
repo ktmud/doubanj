@@ -37,7 +37,7 @@ mixin interest_item(i, trimto)
   if i.book
     a(href="http://book.douban.com/subject/#{i.book_id}/",
       target="_blank",
-      title="#{i.book.name} - #{i.book.author.join(', ')}")
+      title="#{i.book.title} - #{i.book.author.join(', ')}")
       | #{trunc(i.book.title, 8)}
   else
     a(href="http://book.douban.com/subject/#{i.book_id}/", target="_blank")

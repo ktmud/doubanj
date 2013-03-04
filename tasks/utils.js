@@ -111,7 +111,7 @@ function parse_price(price) {
   return n;
 }
 function parse_pages(pages) {
-  if (!pages) return null;
+  if (!pages || pages.search('册') > -1) return null;
   var n = parseInt(pages, 10);
   if (isNaN(n)) log('invalid page %s', pages);
   return n;

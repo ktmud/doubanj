@@ -1,7 +1,26 @@
+text
+  font-size: 11px;
+
 .chart
   padding: 10px;
+  height: 160px; // default height
+  position: relative;
+
   .caption
+    position: absolute;
+    width: 100%;
+    bottom: 0;
     text-align: center;
+
+.chart-bar
+  height: 200px;
 
 .arc path
   stroke: #fff;
+
+.axis path,
+.axis line
+  fill: none;
+  stroke: #bbb;
+  shape-rendering: crispEdges;
+

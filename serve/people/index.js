@@ -47,7 +47,7 @@ module.exports = function(app, central) {
     }, sleep ? 100 : 0);
   }, function(req, res, next) {
     var people = res.data.people;
-    Interest.findByUser('book', people.uid, { limit: 6 }, function(err, ilist) {
+    Interest.findByUser('book', people.uid, { limit: 7 }, function(err, ilist) {
       res.data.latest_interests = ilist;
       res.render('people', res.data);
     });

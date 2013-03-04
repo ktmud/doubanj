@@ -11,7 +11,7 @@ var mongo = require(cwd + '/lib/mongo');
 var utils = require(cwd + '/lib/utils');
 var task = require(cwd + '/lib/task');
 
-var consts = require('./consts');
+var consts = require('../consts');
 
 var INTEREST_STATUSES = consts.INTEREST_STATUSES;
 var USER_COLLECTION = consts.USER_COLLECTION;
@@ -28,6 +28,8 @@ function User(info) {
 };
 
 util.inherits(User, mongo.Model);
+
+utils.extend(User.prototype, require('./stats'));
 
 User.prototype.kind = User.prototype._collection = USER_COLLECTION;
 
@@ -157,15 +159,19 @@ User.prototype.progresses = function() {
   // starting to sync
   if (user.last_synced) ps[0] = 10;
   if (user.book_n === 0) {
-    ps[0] = 60;
+    ps[0] = 80;
   } else if (user.book_synced_n) {
     // only book for now
-    ps[0] = (user.book_synced_n / user.book_n) * 60;
+    ps[0] = 5 + (user.book_synced_n / user.book_n) * 75;
   }
-  // 40% percent is for computing
-  ps[1] = ps[0] >= 60 ? (user.stats_p || 0) * 0.4 : 0;
+  // 20% percent is for computing
+  ps[1] = ps[0] >= 80 ? (user.stats_p || 0) * 0.2 : 0;
   return ps;
 };
+
+/**
+* To prepare stats csv
+*/
 
 Object.defineProperty(User.prototype, 'is', {
   get: function() {

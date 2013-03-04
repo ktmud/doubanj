@@ -123,14 +123,17 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
             all_results.stats_p = stats_p;
             all_results.stats_status = 'succeed';
 
-            user.update(all_results, function(err) {
-              if (err) {
-                error_cb(err);
-              } else {
-                succeed_cb(user);
-              }
-              next();
-            });
+            // to ensure all the other writings are done.
+            setTimeout(function() {
+              user.update(all_results, function(err) {
+                if (err) {
+                  error_cb(err);
+                } else {
+                  succeed_cb(user);
+                }
+                next();
+              });
+            }, 1000);
           }
         }, function(percent) {
           if (called) return;

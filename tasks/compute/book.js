@@ -78,13 +78,24 @@ module.exports = function(db, user, cb, ondata) {
 
   var n_phrase = 5;
 
-  var tick = function() {
+  function tick() {
     var percent = Object.keys(results).length / n_phrase * 100;
-    ondata && ondata(percent);
     if (percent >= 100) {
-      cb(null, results);
+      finish();
+    } else {
+      ondata && ondata(percent);
     }
-  };
+  }
+  function finish() {
+    var n_book = results.total = results.all.total
+      , n_done = results.n_done = results.done.total
+      , n_wish = results.n_wish = results.wish.total
+      , n_ing = results.n_ing = results.ing.total
+      , ratio_done = results.ratio_done = (n_done / n_book * 100).toFixed(2)
+      , ratio_wish = results.ratio_wish = (n_wish / n_book * 100).toFixed(2)
+      , ratio_ing = results.ratio_ing = (n_ing / n_book * 100).toFixed(2);
+    cb(null, results);
+  }
 
   // find out all collected books by user
   col_i.find(ifilter, { fields: { subject_id: 1, status: 1 } }).toArray(function(err, docs) {

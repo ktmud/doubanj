@@ -1,9 +1,11 @@
 h2 谁是 #{name} ?
 p.basic
   a(href=people.db_url(), target="_blank") #{name}
-  |，住在
-  a(href='http://www.douban.com/location/#{people.loc_id}/', target="_blank") #{people.loc_name}
-  | ，#{strftime(FULL_TIME_1, people.created)}加入豆瓣。
+  if people.loc_name
+    |，住在
+    a(href='http://www.douban.com/location/#{people.loc_id}/', target="_blank") #{people.loc_name}
+  | ，#{strftime(FULL_TIME_1, people.created)}加入豆瓣。至今已经
+  span.elapse #{time_elapse(people.created)}。
 if people.desc
   hr
   .pull-right

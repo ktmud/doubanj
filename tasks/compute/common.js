@@ -193,8 +193,16 @@ function aggSort(p, desc_asc, limit, fields) {
     obj[p] = desc_asc;
     p = obj;
   }
+  var match_q = {};
+  Object.keys(p).forEach(function(item, i) {
+    match_q[item] = {
+      $not: {
+        $type: 10
+      }
+    };
+  });
   // only output the id (which is subject_id or user_id in douban)
-  return [{ $sort: p }, { $limit: limit },  { $project: fields }];
+  return [{ $sort: p }, { $match: match_q }, { $limit: limit },  { $project: fields }];
 }
 function aggTop(p, unwind, limit) {
   limit = limit || 20;

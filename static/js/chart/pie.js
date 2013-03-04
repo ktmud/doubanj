@@ -11,7 +11,8 @@ function Pie(container, options) {
 }
 
 Pie.defaultOptions = {
-  colors: D3_COLORS,
+  //colors: D3_COLORS,
+  colorCate: 10,
   width: 150,
   height: 150,
   data: null,
@@ -41,7 +42,7 @@ Pie.prototype.draw = function() {
 
   var arc = self.arc = d3.svg.arc().outerRadius(radius).innerRadius(radiusInner);
   var pie = self.pie = d3.layout.pie().sort(options.sort).value(options.val);
-  var color = self.color = d3.scale.ordinal().range(options.colors);
+  var color = self.color = d3_colors(options.colorCate, options.colors);
 
   var svg = self.svg = self.container.append('svg')
   .attr('height', height).attr('width', width)

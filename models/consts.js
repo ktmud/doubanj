@@ -1,6 +1,9 @@
 module.exports = {
   DOUBAN_APPS: ['book', 'movie', 'music'],
   USER_COLLECTION: 'user',
+  INTEREST_STATUS_ORDERED: {
+    book: ['wish', 'ing', 'done'],
+  },
   INTEREST_STATUS_LABELS: {
     book: {
       wish: '想读',
