@@ -47,6 +47,7 @@ module.exports.boot = function() {
 
   serve(app, central);
   app.listen(central.conf.port);
+  central.log('Now listening on ' + central.conf.port);
 };
 
 if (!module.parent) {
