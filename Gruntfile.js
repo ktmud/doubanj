@@ -14,7 +14,7 @@ module.exports = function(grunt) {
       '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
       '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
       '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-      ' Licensed <%= pkg.license %> */'
+      ' Licensed <%= pkg.license %> */\n'
     },
     uglify: {
       options: {
@@ -192,7 +192,7 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-hashmap');
 
-  grunt.loadNpmTasks('grunt-includes');
+  grunt.loadNpmTasks('grunt-includes-ktmud');
   //grunt.loadNpmTasks('grunt-istatic');
 
   var path = require('path');
