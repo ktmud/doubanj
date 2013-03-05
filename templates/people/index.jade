@@ -10,16 +10,16 @@ block main
         - return
       if people.desc
         mixin people_info(people)
-      if people.last_synced_status === 'ing'
-        .vmiddle
-          include ./cases/wait
-      else if !people.last_synced
+      if !people.last_synced
         // 根本没有同步过
         form(method="post", action="/queue")
           input(type="hidden", name="_csrf", value=_csrf)
           input(type="hidden", name="uid", value=uid)
           p.vmiddle
             button.btn.btn-primary 开始为 #{name} 制造美味豆瓣酱
+      else if people.last_synced_status === 'ing' && !people.stats
+        .vmiddle
+          include ./cases/wait
       else if people.stats_fail
         .vmiddle
           include ./cases/failed

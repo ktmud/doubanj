@@ -22,6 +22,7 @@ module.exports = {
       var uid = fn(req);
       var c = res.data = {
         qs: req.query,
+        title: uid + '的豆瓣酱',
         uid: uid
       };
 
@@ -36,6 +37,7 @@ module.exports = {
       User.get(uid, function(err, people) {
         c.err = err;
         c.people = people;
+        c.title = people.name + '的豆瓣酱';
         next();
       });
     };

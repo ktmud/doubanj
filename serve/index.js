@@ -52,7 +52,7 @@ module.exports = function(app, central) {
     });
   });
 
-  ['people', 'api'].forEach(function(item) {
+  ['people', 'api', 'misc'].forEach(function(item) {
     require('./' + item)(app, central);
   });
 

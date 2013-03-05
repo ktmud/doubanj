@@ -34,7 +34,7 @@ module.exports = {
   },
 
   douban: {
-    limit: 40, // request limit per hour
+    limit: 10, // request limit per minute
     key: 'appkey',
     secret: 'secret'
   },

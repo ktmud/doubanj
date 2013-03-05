@@ -74,5 +74,3 @@ mixin small_list(items, prop, suffix)
       li
         a(href="http://book.douban.com/subject/#{b.id}/", target="_blank") #{trunc(b.title, 8)}
         span.label-compact #{b[prop]}#{suffix}
-hr
-include ../mods/resync

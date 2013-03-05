@@ -35,7 +35,7 @@ Do('lodash', 'd3', 'chart/all', function(_require) {
   });
 
   function lazycheck() {
-    while (charts[0] && charts[0][0].offset().top > win.scrollTop() - win.height()) {
+    while (charts[0] && charts[0][0].offset().top < win.scrollTop() + win.height() + 100) {
       charts.shift()[1].draw();
     }
   }
