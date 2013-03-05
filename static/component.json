@@ -3,6 +3,7 @@
   "dependencies": {
     "component/jquery": "*",
     "ktmud/lodash": "*",
-    "ktmud/d3": "*"
+    "ktmud/d3": "*",
+    "ktmud/bootstrap": "3.0.0-wip"
   }
 }

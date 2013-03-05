@@ -60,20 +60,20 @@ module.exports = function(grunt) {
     //}
     //}
     //},
-    copy: {
-      deps: {
-        files: [
-          {
-            expand: true,
-            src: [
-              '**',
-            ],
-            cwd: 'static/components/bootstrap/docs/assets/fonts/',
-            dest: 'static/dist/fonts/',
-          }
-        ]
-      },
-    },
+    //copy: {
+      //deps: {
+        //files: [
+          //{
+            //expand: true,
+            //src: [
+              //'**',
+            //],
+            //cwd: 'static/components/bootstrap/docs/assets/fonts/',
+            //dest: 'static/dist/fonts/',
+          //}
+        //]
+      //},
+    //},
     includes: {
       options: {
         regex: /^\s*(\/\/|\/\*)?\s*[\@\#]*(include|import)\s+[\"\'\(]*([^\"\'\)]+)[\"\'\)]*\s*(\*\/)?$/,
@@ -177,9 +177,9 @@ module.exports = function(grunt) {
   grunt.registerTask('dist_js', ['includes:js', 'wrapper:js']);
   grunt.registerTask('dist_css', ['includes:css', 'stylus']);
 
-  grunt.registerTask('deps', ['copy:deps']);
+  //grunt.registerTask('deps', ['copy:deps']);
 
-  grunt.registerTask('default', ['clean', 'copy:deps', 'dist_js', 'dist_css']);
+  grunt.registerTask('default', ['clean', 'dist_js', 'dist_css']);
 
   grunt.registerTask('build', ['clean', 'dist_js', 'dist_css', 'uglify', 'cssmin', 'hashmap']);
 
@@ -187,7 +187,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-stylus');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-copy');
+  //grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
 
   grunt.loadNpmTasks('grunt-hashmap');

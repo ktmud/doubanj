@@ -1,0 +1,18 @@
+{
+  "name": "bootstrap",
+  "version": "3.0.0",
+  "scripts": [
+    "./docs/assets/js/bootstrap.js"
+  ],
+  "styles": [
+    "./docs/assets/css/bootstrap.css"
+  ],
+  "fonts": [
+    "./docs/assets/fonts/glyphiconshalflings-regular.eot",
+    "./docs/assets/fonts/glyphiconshalflings-regular.otf",
+    "./docs/assets/fonts/glyphiconshalflings-regular.svg",
+    "./docs/assets/fonts/glyphiconshalflings-regular.ttf",
+    "./docs/assets/fonts/glyphiconshalflings-regular.woff"
+  ],
+  "repo": "https://raw.github.com/ktmud/bootstrap"
+}

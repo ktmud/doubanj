@@ -5,6 +5,6 @@ require.register("main", function(exports, require, module) {
   // expose to window
   window.jQuery = window.$ = require('/jquery');
   window.Sizzle = $.find;
-  // @import ../components/bootstrap/docs/assets/js/bootstrap.js
+  // @import ../components/ktmud-bootstrap/docs/assets/js/bootstrap.js
 });
 require('main');
