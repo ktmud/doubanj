@@ -15,7 +15,7 @@ module.exports = function(app, central) {
   }), function(req, res, next) {
     var people = res.data.people;
     var uid = req.params[1]; 
-    if (people && uid === people.id && people.uid) {
+    if (people && uid === people.id && people.uid && people.uid !== people.id) {
       return res.redirect(301, '/people/' + people.uid + '/');
     }
     next();
