@@ -47,6 +47,6 @@
   "scripts": {
     "prepublish": "npm prune",
     "test": "make test",
-    "start": "node cluster.js"
+    "start": "grunt build && node app.js"
   }
 }
