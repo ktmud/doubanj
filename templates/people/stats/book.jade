@@ -66,6 +66,18 @@ hr
   .span3
     h4 最便宜的书
     mixin small_list(coll.least_price.slice(0,5), 'ori_price')
+  .span3
+    h4 豆瓣评分最高
+    mixin small_list(coll.most_rated.slice(0,10), 'rated')
+  .span3
+    h4 豆瓣评分最低
+    mixin small_list(coll.least_rated.slice(0,10), 'rated')
+  .span3
+    h4 最多人看过
+    mixin small_list(coll.most_raters.slice(0,10), 'raters')
+  .span3
+    h4 最少人看过
+    mixin small_list(coll.least_raters.slice(0,10), 'raters')
 
 mixin small_list(items, prop, suffix)
   - suffix = suffix || ''
