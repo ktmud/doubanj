@@ -84,5 +84,5 @@ mixin small_list(items, prop, suffix)
   ol.muted.list-small
     each b in items
       li
-        a(href="http://book.douban.com/subject/#{b.id}/", target="_blank") #{trunc(b.title, 8)}
+        a(href="http://book.douban.com/subject/#{b.id}/", target="db-book") #{trunc(b.title, 8)}
         span.label-compact #{b[prop]}#{suffix}

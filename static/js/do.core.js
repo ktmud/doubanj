@@ -54,12 +54,17 @@ resolveType = function(f) {
 
 realPath = function(m, type) {
   type = type || 'js';
+
+  if (m in urlmap) return urlmap[m];
+
   if (type === 'js' && notin(m, '.js')) {
     m = _config.root + 'js/' + m + '.js';
   }
+
   if (m in urlmap) {
     m = urlmap[m];
   }
+
   return m;
 },
 
@@ -372,7 +377,10 @@ Do.css = function(str) {
 };
 
 if (_config.autoload) {
-  Do(_config.corelib);
+  // so we can use Do.urls to map corelib js later in document
+  setTimeout(function() {
+    Do(_config.corelib);
+  }, 0);
 }
 
 Do.define = Do.add;

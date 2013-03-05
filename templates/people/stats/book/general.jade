@@ -24,8 +24,13 @@ block general
         .caption 想读/读过/在读图书比例
     .span3
       h4 最新收藏
-      ul.muted
-        each item in latest_interests
-          li 
-            mixin interest_item(item)
+      if latest_interests
+        ul.muted
+          each item in latest_interests
+            li 
+              mixin interest_item(item)
+      else if people.last_synced_status === 'ing'
+        p.muted 正在重新同步...
+      else
+        p 暂时没有
 

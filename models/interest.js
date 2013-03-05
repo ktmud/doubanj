@@ -89,8 +89,14 @@ Interest.findByUser = function(ns, uid, opts, cb) {
   }
 
   mongo(function(db) {
-    var sort = opts.sort || 'updates';
+    var sort = opts.sort || 'updated';
     var collection = db.collection(ns + '_' + INTEREST_COLLECTION);
+
+    if (typeof sort === 'string') {
+      var obj = {};
+      obj[sort] = opts.asc ? 1 : -1;
+      sort = obj;
+    }
     collection.find({
       '$or': [
         // douban id
@@ -112,10 +118,6 @@ Interest.findByUser = function(ns, uid, opts, cb) {
       }
 
       log('found %s interests', docs.length);
-
-      var reversed = true;
-      if (sort != 'updated' || 'reversed' in opts) reversed = opts.reversed;
-      if (reversed) docs = docs.reverse();
 
       var ret = docs.map(function(item) {
         var i = new Interest(item);

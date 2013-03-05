@@ -22,26 +22,13 @@ module.exports = function(grunt) {
       },
       //static_mappings: {
       //},
-      deps: {
-        options: {
-          banner: '',
-        },
-        files: [
-          {
-            expand: true,
-            cwd: 'static/dist/deps/',
-            src: ['**/?*.js'],
-            dest: 'static/dist/deps/'
-          }
-        ]
-      },
       dynamic_mappings: {
         files: [
           {
             expand: true,
             cwd: 'static/dist/js/',
-            src: ['**/?*.js'],
-            dest: 'static/dist/js/'
+            src: ['**/*.js', '!**/*_*.js'],
+            dest: 'tmp/static/js/'
           }
         ]
       }
@@ -98,7 +85,7 @@ module.exports = function(grunt) {
       },
       js: {
         cwd: 'static/dist/js/',
-        src: '**/*.js',
+        src: ['**/*.js', '!**/*_*.js'],
         dest: 'static/dist/js/'
       },
     },
@@ -128,8 +115,8 @@ module.exports = function(grunt) {
           {
             expand: true,
             cwd: 'static/dist/css/',
-            src: ['**/?*.css'],
-            dest: 'static/dist/css/',
+            src: ['**/*.css', '!**/*_*.css'],
+            dest: 'tmp/static/css/',
           }
         ]
       },
@@ -140,12 +127,12 @@ module.exports = function(grunt) {
         merge: true,
       },
       js: {
-        cwd: 'static/dist',
+        cwd: 'tmp/static/',
         src: ['js/**/*.js'],
         dest: 'static/dist/',
       },
       css: {
-        cwd: 'static/dist',
+        cwd: 'tmp/static/',
         src: ['css/**/*.css'],
         dest: 'static/dist/',
       }
@@ -161,6 +148,9 @@ module.exports = function(grunt) {
       }
     },
     clean: {
+      tmp: {
+        src: ['tmp/static/js', 'tmp/static/css']
+      },
       hash: {
         src: ['static/hash.json']
       },
@@ -181,13 +171,13 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['clean', 'dist_js', 'dist_css']);
 
-  grunt.registerTask('build', ['clean', 'dist_js', 'dist_css', 'uglify', 'cssmin', 'hashmap']);
+  grunt.registerTask('build', ['clean:tmp', 'dist_js', 'dist_css', 'uglify', 'cssmin', 'clean:hash', 'hashmap']);
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-stylus');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  //grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
 
   grunt.loadNpmTasks('grunt-hashmap');

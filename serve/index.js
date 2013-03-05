@@ -35,7 +35,6 @@ module.exports = function(app, central) {
 
     tasks.interest.collect_book({
       user: user, 
-      force: true,
       success: function(people) {
         tasks.compute({
           user: people,
