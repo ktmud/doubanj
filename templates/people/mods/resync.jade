@@ -2,4 +2,5 @@ if people.last_synced_status !== 'ing'
   form(action="/queue", method="post")
     input(type="hidden", name="_csrf", value=_csrf)
     input(type="hidden", name="uid", value=people.uid)
+    input(type="hidden", name="force", value=1)
     button.btn.btn-mini.btn-danger(type="submit") 重新从豆瓣同步数据

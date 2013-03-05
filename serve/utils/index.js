@@ -3,17 +3,20 @@ var User = require(cwd + '/models/user').User;
 
 var reg_uid = /\/people\/([^\/]+)/;
 
+function url2uid(url) {
+  var m = url.match(reg_uid);
+  if (m) uid = m[1];
+  return m && m[1] || url;
+
+}
 function matchPeople(req) {
   var uid = req.body.uid || req.query.uid || req.params.uid;
-
-  var m = uid.match(reg_uid);
-  if (m) uid = m[1];
-
-  return uid;
+  return url2uid(uid);
 }
 
 module.exports = {
   errorHandler: require('./errorHandler'),
+  url2uid: url2uid,
   getUser: function(opts) {
     opts = opts || {};
     var redir = opts.redir;
@@ -37,7 +40,7 @@ module.exports = {
       User.get(uid, function(err, people) {
         c.err = err;
         c.people = people;
-        c.title = people.name + '的豆瓣酱';
+        if (people) c.title = people.name + '的豆瓣酱';
         next();
       });
     };

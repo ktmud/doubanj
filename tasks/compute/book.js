@@ -10,6 +10,10 @@ var error = debug('dbj:task:compute:book:error');
 var AggStream = common.AggStream;
 var conf_interest = common.conf_interest;
 
+var consts = require(process.cwd() + '/models/consts');
+
+var interest_statuses = consts.INTEREST_STATUS_ORDERED.book;
+
 var conf_book = {
   // count by appearence
   top: ['tags', 'author', 'translator', 'publisher'],
@@ -76,7 +80,7 @@ module.exports = function(db, user, cb, ondata) {
     cb && cb(err);
   };
 
-  var n_phrase = 5;
+  var n_phrase = 1;
 
   function tick() {
     var percent = Object.keys(results).length / n_phrase * 100;
@@ -87,13 +91,13 @@ module.exports = function(db, user, cb, ondata) {
     }
   }
   function finish() {
-    var n_book = results.total = results.all.total
-      , n_done = results.n_done = results.done.total
-      , n_wish = results.n_wish = results.wish.total
-      , n_ing = results.n_ing = results.ing.total
-      , ratio_done = results.ratio_done = (n_done / n_book * 100).toFixed(2)
-      , ratio_wish = results.ratio_wish = (n_wish / n_book * 100).toFixed(2)
-      , ratio_ing = results.ratio_ing = (n_ing / n_book * 100).toFixed(2);
+    var total = results.total = results.all.total;
+    interest_statuses.forEach(function(item) {
+      var n = results[item];
+      n = n && n.total || 0;
+      results['n_' + item] = n;
+      results['ratio_' + item] = (n / total * 100).toFixed(2);
+    });
     cb(null, results);
   }
 
@@ -118,6 +122,8 @@ module.exports = function(db, user, cb, ondata) {
 
       log('Agg %s book for %s...', i_status, uid);
 
+      n_phrase++;
+
       var agger = new AggStream({
         uid: uid,
         params: agg_param_book,
@@ -135,21 +141,25 @@ module.exports = function(db, user, cb, ondata) {
 
       agger.run();
     }
-    for (var s in by_status) {
-      agg_by_status(s);
-    }
+
+    for (var s in by_status) agg_by_status(s);
+
+    calcInterests();
   });
 
-  var iagger = new AggStream({
-    uid: uid,
-    params: agg_param_interest,
-    collection: col_i,
-    prefilter: { $match: ifilter } 
-  });
-  iagger.on('error', err_cb);
-  iagger.once('close', function() {
-    results['interest'] = this.results;
-    tick();
-  });
-  iagger.run();
+  function calcInterests() {
+    var iagger = new AggStream({
+      uid: uid,
+      params: agg_param_interest,
+      collection: col_i,
+      prefilter: { $match: ifilter } 
+    });
+    iagger.on('error', err_cb);
+    iagger.once('close', function() {
+      results['interest'] = this.results;
+      tick();
+    });
+    log('Agg book interests for %s...', uid);
+    iagger.run();
+  }
 };

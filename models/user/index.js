@@ -36,6 +36,9 @@ User.prototype.kind = User.prototype._collection = USER_COLLECTION;
 User.getFromMongo = function(uid, cb) {
   if (uid instanceof User) return cb(null, uid);
   log('getting user obj for %s', uid)
+
+  uid = String(uid).toLowerCase();
+
   mongo(function(db) {
     var collection = db.collection(USER_COLLECTION);
     collection.findOne({
@@ -62,6 +65,8 @@ User.getFromMongo = function(uid, cb) {
   });
 };
 User.get = function(uid, cb) {
+  uid = String(uid).toLowerCase();
+
   User.getFromMongo(uid, function(err, u) {
     if (err) return cb(err);
     // got a 404
@@ -86,12 +91,15 @@ User.prototype.pull = function(cb) {
   task.api(function(oauth2) {
     oauth2.clientFromToken().request('GET', '/v2/user/' + uid, function(err, data) {
       if (err) {
-        error('get douban info for %s failed: %s', uid, err);
+        error('get douban info for %s failed: %s', uid, JSON.stringify(err));
         // no such user in douban
         if (err.statusCode == 404) {
           self.invalid = 'NO_USER';
         }
         return cb(err);
+      }
+      if (data.uid) {
+        data.uid = String(data.uid).toLowerCase();
       }
       data['$upsert'] = true;
       data.created = new Date(data.created);
@@ -104,7 +112,7 @@ User.prototype.pull = function(cb) {
         cb(err, self);
       });
     });
-  });
+  }, 0);
 };
 
 

@@ -52,14 +52,15 @@ AggStream.prototype.run = function(agg_id) {
     //log(JSON.stringify(param));
     if (err) {
       error('%s failed: %s', agg_id, err);
-      //error('params: %s', JSON.stringify(param));
+      error('params: %s', JSON.stringify(param));
       self.emit('error', err);
       self.failures[agg_id] = err;
     }
-    //if (!result || !result.length) {
-      //log('%s for %s got empty results.', agg_id, self.uid);
-    //}
+    if (!result || !result.length) {
+      log('%s for %s got empty results.', agg_id, self.uid);
+    }
     self.results[agg_id] = result;
+
     if (self.percent() >= 100) self.drain();
   });
 };
@@ -75,10 +76,15 @@ AggStream.prototype.drain = function() {
 AggStream.prototype.percent = function() {
   var params = this.params;
   var dones = this.results;
+  var failures = this.failures;
   var whole = Object.keys(params).length;
   var percent = 0;
   for (var k in this.params) {
-    if (k in dones) percent++;
+    if (k in dones) {
+      percent++;
+    } else if (k in failures) {
+      percent++;
+    }
   }
   return (percent / whole * 100);
 };

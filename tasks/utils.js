@@ -125,7 +125,7 @@ function parse_date(d) {
 }
 function parse_pubdate(d) {
   d = d || '';
-  d = d.replace('年', '-').replace('月', '-').replace('日', ' ').replace('第一版', '');
+  d = d.replace('年', '-').replace('月', '-').replace('日', ' ').replace(/[\-\s]*第.*版/g, '');
   return parse_date(d);
 }
 function parse_publisher(p) {

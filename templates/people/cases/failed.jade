@@ -3,10 +3,10 @@
 
 if people.stats_status == 'ing'
   p.muted 数据同步已成功，正在重新计算... 已重试 #{people.stats_fail} 次
-else if people.stats_fail
+else if people.stats_fail > 2
   p.muted 已重试 <strong>#{people.stats_fail}</strong> 次，仍然失败了
 else
-  p.muted 你也可以在当前 url 后添加 <em>?recount</em> 重新尝试计算
+  p.muted 你可以在当前 url 后添加 <em>?recount</em> 重新尝试计算
 
 // compute failed 5 times more
 if people.stats_fail > 5

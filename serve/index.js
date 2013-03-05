@@ -15,7 +15,7 @@ module.exports = function(app, central) {
     res.render('index');
   });
   app.post('/', function(req, res, next) {
-    var uid = req.body.uid;
+    var uid = utils.url2uid(req.body.uid);
     if (!uid) res.redirec('/');
     res.redirect('/people/' + uid + '/');
   });
@@ -34,6 +34,7 @@ module.exports = function(app, central) {
     var uid = user.uid || user.id;
 
     tasks.interest.collect_book({
+      force: 'force' in req.body,
       user: user, 
       success: function(people) {
         tasks.compute({
@@ -45,6 +46,7 @@ module.exports = function(app, central) {
 
     user.update({
       book_n: 999999,
+      last_synced: new Date(),
       last_synced_status: 'ing'
     }, function() {
       res.redirect('/people/' + uid + '/');

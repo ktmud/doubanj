@@ -1,6 +1,24 @@
 module.exports = function(grunt) {
   'use strict';
 
+  var getHash = require('./lib/assets').getHash;
+
+  var hash_cache = {};
+  try {
+    hash_cache = grunt.file.readJSON('static/source_hash.json');
+  } catch (e) {}
+
+
+  function hash_check(f) {
+    f = f.replace('static/dist/', '');
+    // old hash !== new hash
+    if (hash_cache[f] == getHash(f, true, null, 'utf-8')) {
+      grunt.log.writeln('Skipping ' + f.cyan + ' ..');
+      return false;
+    }
+    return true;
+  }
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     meta: {
@@ -28,7 +46,8 @@ module.exports = function(grunt) {
             expand: true,
             cwd: 'static/dist/js/',
             src: ['**/*.js', '!**/*_*.js'],
-            dest: 'tmp/static/js/'
+            dest: 'tmp/static/js/',
+            filter: hash_check,
           }
         ]
       }
@@ -117,6 +136,7 @@ module.exports = function(grunt) {
             cwd: 'static/dist/css/',
             src: ['**/*.css', '!**/*_*.css'],
             dest: 'tmp/static/css/',
+            filter: hash_check,
           }
         ]
       },
@@ -125,6 +145,16 @@ module.exports = function(grunt) {
       options: {
         output: 'static/hash.json',
         merge: true,
+      },
+      source_hash: {
+        options: {
+          output: 'static/source_hash.json',
+          encoding: 'utf-8',
+          rename: false,
+          merge: false,
+        },
+        cwd: 'static/dist/',
+        src: ['**/*.js', '!**/*_*.js', '**/*.css', '!**/*_*.css'],
       },
       js: {
         cwd: 'tmp/static/',

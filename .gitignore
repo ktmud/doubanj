@@ -9,6 +9,7 @@ var/*.log
 conf/*
 tmp/
 static/hash.json
+static/source_hash.json
 static/build
 static/dist
 static/*.html

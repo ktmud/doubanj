@@ -16,7 +16,7 @@ var utils = require('./utils');
 var API_REQ_DELAY = task.API_REQ_DELAY;
 
 // request stream
-function FetchStream(arg, oauth2) {
+function FetchStream(arg) {
   this.ns = arg.ns;
   this.user = arg.user;
   this.perpage = arg.perpage || 100;
@@ -24,9 +24,7 @@ function FetchStream(arg, oauth2) {
   this.fetched = 0;
   this.status = 'ready';
 
-  this.oauth2 = oauth2;
-
-  this.api_uri = 'https://api.douban.com/v2/' + arg.ns + '/user/' + arg.user.uid + '/collections';
+  this.api_uri = '/v2/' + arg.ns + '/user/' + arg.user.uid + '/collections';
   return this;
 }
 
@@ -79,7 +77,7 @@ FetchStream.prototype._fetch_cb = function() {
     };
 
     self.total = total;
-    self.fetched += data.count;
+    self.fetched += self.perpage;
 
     if (self.fetched >= total) {
       self.fetched = total;
@@ -101,37 +99,26 @@ FetchStream.prototype.fetch = function(start, cb) {
   var self = this;
 
   setTimeout(function() {
-    log('fetching %s~%s...', start, start + self.perpage);
+    task.api(function(oauth2, next) {
+      log('fetching %s~%s...', start, start + self.perpage);
 
-    // TODO: use oauth2 client to request,
-    // so we can collect private interests
-    request.get({
-      uri: self.api_uri,
-      qs: {
-        client_id: douban_key,
-        count: self.perpage,
-        start: start
-      }
-    }, function(err, res, body) {
-      if (err) return self.emit('error', err);
+      var client = oauth2.clientFromToken(self.token);
+      client.request('GET', self.api_uri, { count: self.perpage, start: start }, function(err, ret, res) {
+        next();
 
-      if (res.statusCode != 200) {
-        var err_code = ERRORS[String(res.statusCode)];
-        self.user.invalid = err_code || 1;
-        return self.emit('error', err_code || new Error('douban api response with ' + res.statusCode)); 
-      }
+        var code = err && err.statusCode || res.statusCode;
+        if (code !== 200) {
+          var err_code = ERRORS[String(code)];
+          self.user.invalid = err_code || 1;
+          return self.emit('error', err_code || new Error('douban api responded with ' + code)); 
+        }
+        if (err) {
+          return self.emit('error', err);
+        }
 
-      var data;
-
-      try {
-        data = JSON.parse(body);
-      } catch (e) {
-        return self.emit('error', new Error('parse api response failed: ' + body)); 
-      }
-
-      self.emit('fetched', data);
-
-      self.write(data, cb);
+        self.emit('fetched', ret);
+        self.write(ret, cb);
+      });
     });
   }, API_REQ_DELAY);
 };
@@ -231,53 +218,48 @@ FetchStream.prototype.updateUser = function(cb) {
 
 var collect, _collect;
 
-collect = task.api_pool.pooled(_collect = function(oauth2, arg, next) {
-  function do_collect(arg, next) {
-    if (!arg.user) return arg.error && arg.error('NO_USER');
+collect = user_ensured(function(user, arg) {
+  if (!user) return arg.error && arg.error('NO_USER');
 
-    var user = arg.user;
-    var collector = new FetchStream(arg, oauth2);
+  var collector = new FetchStream(arg);
 
-    // halt if syncing is already running
-    if (user.last_synced_status === 'ing' && !arg.force) {
-      arg.error && arg.error('RUNNING');
-      return next();
-    }
-
-    collector.on('error', function(err) {
-      error('collecting for %s failed: %s', user.uid, err);
-      collector.status = 'failed';
-      collector.updateUser(function() {
-        collector.end();
-      });
-    });
-
-    collector.on('saved', function(data) {
-      collector.updateUser();
-    });
-
-    collector.once('end', function() {
-      // wait for the really ends
-      setTimeout(function() {
-        if (collector.status == 'succeed' && arg.success) {
-          arg.success.call(collector, user);
-        } else if (arg.error) {
-          arg.error.call(collector, user);
-        }
-      }, 2000);
-    });
-
-    collector.once('close', next);
-
-    collector.run();
+  // halt if syncing is already running
+  if (user.last_synced_status === 'ing' && !arg.force) {
+    error('collect interests exists for %s dur to runing', user.uid);
+    arg.error && arg.error('RUNNING');
+    return;
   }
-  user_ensured(do_collect)(arg, next);
+
+  collector.on('error', function(err) {
+    error('collecting for %s failed: %s', user.uid, err);
+    collector.status = 'failed';
+    collector.updateUser(function() {
+      collector.end();
+    });
+  });
+
+  collector.on('saved', function(data) {
+    collector.updateUser();
+  });
+
+  collector.once('end', function() {
+    // wait for the really ends
+    setTimeout(function() {
+      if (collector.status == 'succeed' && arg.success) {
+        arg.success.call(collector, user);
+      } else if (arg.error) {
+        arg.error.call(collector, user);
+      }
+    }, 2000);
+  });
+
+  collector.run();
 });
 
 function collect_in_namespace(ns) {
   return function(arg) {
     arg.ns = ns;
-    collect(arg);
+    collect(arg.user, arg);
   };
 }
 

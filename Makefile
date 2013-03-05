@@ -1,11 +1,11 @@
+start:
+	@export DEBUG="dbj:*" && forever -w -d app.js
+
 grunt:
 	@export DEBUG="dbj:*" && grunt
 
 build:
 	@export DEBUG="dbj:*" && grunt build
-
-start:
-	@export DEBUG="dbj:*" && forever -w -d app.js
 
 watch:
 	@export DEBUG="dbj:*" && grunt watch

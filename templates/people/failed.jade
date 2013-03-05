@@ -1,0 +1,9 @@
+extend ../500
+
+block message
+  if err && err.statusCode !== 404
+    h1 OH, NO!
+    p 获取用户出错了
+  else
+    h1 OH, NO!
+    p 找不到此用户

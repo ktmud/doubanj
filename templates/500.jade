@@ -3,9 +3,20 @@ extend layout/message
 - title = '服务器错误'
 
 block message
-  if locals.stack
-    pre.code
-      !{stack}
-  else
+  if !conf.debug
     h1 Oops...
     p 服务器出错了，呵呵呵...
+
+block stack
+  if conf.debug
+    - stack = locals.stack || locals.err && locals.err.stack
+    if stack
+      pre.code
+        !{stack}
+    else
+      - err = locals.err
+      pre
+        dl.dl-horizontal
+          each v, k in err
+            dt #{k}
+            dd #{v}

@@ -23,14 +23,14 @@ module.exports = function(app, central) {
 
   app.get('/people/:uid/', function(req, res, next) {
     if (!res.data || !res.data.people || res.data.people.invalid == 'NO_USER') {
-      res.statusCode = 404;
-      return res.render('people/404');
+      res.statusCode = res.data.err ? (res.data.err.statusCode || 500) : 404;
+      return res.render('people/failed', res.data);
     }
 
     var people = res.data.people;
     var sleep = false;
     var recount = 'recount' in req.query;
-    if (!people.stats_p || recount) {
+    if ((!people.stats_p && people.last_synced_status === 'succeed') || recount) {
       //try compute the results
       tasks.compute({
         user: people,
@@ -44,9 +44,10 @@ module.exports = function(app, central) {
       } else {
         next();
       }
-    }, sleep ? 100 : 0);
+    }, sleep ? 70 : 0);
   }, function(req, res, next) {
     var people = res.data.people;
+    if (!people.stats) return res.render('people', res.data);
     Interest.findByUser('book', people.uid, { limit: 7 }, function(err, ilist) {
       res.data.latest_interests = ilist;
       res.render('people', res.data);
