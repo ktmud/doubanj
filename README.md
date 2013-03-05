@@ -1,4 +1,4 @@
-# 豆瓣酱
+# [豆瓣酱](http://www.doubanj.com)
 
 [豆瓣](http://www.douban.com) 私人收藏数据可视化。
 
