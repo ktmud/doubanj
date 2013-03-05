@@ -7,10 +7,10 @@ var utils = require('../utils');
 module.exports = function(app, central) {
   var tasks = require(central.cwd + '/tasks');
 
-  app.get(/^(\/api)?\/people\/\w+$/, function(req, res, next) {
+  app.get(/^(\/api)?\/people\/[^\/]+$/, function(req, res, next) {
     return res.redirect(301, req._parsedUrl.pathname + '/');
   });
-  app.get(/^(\/api)?\/people\/(\w+)\/.*$/, utils.getUser({
+  app.get(/^(\/api)?\/people\/([^\/]+)\/.*$/, utils.getUser({
     fn: function(req) { return req.params[1]; }
   }), function(req, res, next) {
     var people = res.data.people;
@@ -23,7 +23,7 @@ module.exports = function(app, central) {
 
   app.get('/people/:uid/', function(req, res, next) {
     if (!res.data || !res.data.people || res.data.people.invalid == 'NO_USER') {
-      res.statusCode = res.data.err ? (res.data.err.statusCode || 500) : 404;
+      res.statusCode = (res.data && res.data.err) ? (res.data.err.statusCode || 500) : 404;
       return res.render('people/failed', res.data);
     }
 

@@ -23,6 +23,9 @@ block main
       else if people.stats_fail
         .vmiddle
           include ./cases/failed
+      else if people.book_n === 0
+        .vmiddle
+          include ./cases/zero
       else if !people.stats
         .vmiddle
           include ./cases/wait

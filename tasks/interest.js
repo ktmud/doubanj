@@ -67,7 +67,11 @@ FetchStream.prototype._fetch_cb = function() {
     var total = data.total;
 
     // no data
-    if (!total) return self.end();
+    if (!total) {
+      log('no data at all');
+      self.status = 'succeed';
+      return self.end();
+    }
 
     if (self.total && total != self.total) {
       self.total = total;
@@ -131,6 +135,12 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
     , total = data.total
     , items = data.collections
     , subjects = [];
+
+  if (!items.length) {
+    cb && cb(null, data);
+    self.emit('saved', data);
+    return;
+  }
 
   // pick up subjects
   items.forEach(function(item, i) {

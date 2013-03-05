@@ -6,8 +6,9 @@ section
   p.muted
     ... 更多功能正在紧张开发中，欢迎随时回来看看
 
-hr
-include ../mods/resync
+if people.last_synced_status !== 'ing'
+  hr
+  include ../mods/resync
 
 include ./stats_js
 
