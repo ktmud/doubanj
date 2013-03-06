@@ -62,6 +62,7 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
     };
     var succeed_cb = function() {
       arg.success && arg.success();
+      next();
     };
 
     if (!user) return error_cb('NO_USER');
