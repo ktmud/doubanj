@@ -32,17 +32,20 @@ function parse_pages(pages) {
   if (isNaN(n)) raven.message('invalid page %s', pages, { tags: { parsing: 'pages' }, level: 'warn' });
   return n;
 }
+function isDigit(str) {
+  return /^\d+$/.test(str);
+}
 function parse_date(d) {
   d = d || '';
-  d = d.replace(/[\s\-、\,—]+/, '-', 2);
+  d = d.replace(/[\s\-、\,—]+/, '-', 2).trim();
 
-  if (String(parseInt(r)) === r) {
-    r = [r.slice(0, 4), r.slice(4, 6), r.slice(6)].join('-');
-    console.log(r);
+  if (isDigit(d)) {
+    d = [d.slice(0, 4), d.slice(4, 6) || 1, d.slice(6) || 1].join('-');
   }
 
   var r = new Date(d);
-  if (r && isNaN(+r)) {
+  if (d && isNaN(+r)) {
+    console.log('invalid date %s', d);
     raven.message('invalid date %s', d, { tags: { parsing: 'date' }, level: 'warn' });
   }
   return r;

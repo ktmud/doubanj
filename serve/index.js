@@ -34,8 +34,8 @@ module.exports = function(app, central) {
     var uid = user.uid || user.id;
 
     tasks.interest.collect_book({
-      force: 'force' in req.body,
       user: user, 
+      force: 'force' in req.body,
       success: function(people) {
         tasks.compute({
           user: people,

@@ -70,11 +70,25 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
     };
 
     if (!user) return error_cb('NO_USER');
+
+    if (user.last_synced_status !== 'succeed') {
+      // ten minutes have passed, try recollect.
+      if (new Date() - user.last_synced > 60000) {
+        // reset user data
+        raven.message('timeout for collect.', { tags: { task: 'compute' } });
+        user.update({
+          invalid: 0,
+          last_synced_status: 'timeout',
+        });
+        return error_cb('TIMEOUT');
+      }
+      return error_cb('NOT_READY');
+    }
+
     // already running
     if (user.stats_status == 'ing' && !arg.force) return error_cb('RUNNING');
     // not ready
     if (user.invalid) return error_cb(user.invalid);
-    if (user.last_synced_status !== 'succeed') return error_cb('NOT_READY');
 
     var stats = user.stats || {}; // save last stats date
     var all_results = {

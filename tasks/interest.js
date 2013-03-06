@@ -4,6 +4,8 @@
 var debug = require('debug');
 var verbose = debug('dbj:task:interest:verbose');
 
+var central = require(process.cwd() + '/lib/central');
+
 var task = central.task;
 var request = central.request;
 var mongo = central.mongo;
@@ -212,7 +214,8 @@ FetchStream.prototype.close = FetchStream.prototype.end = function(arg) {
 FetchStream.prototype.updateUser = function(cb) {
   var self = this;
   var ns = self.ns;
-  var obj = {};
+  var obj = { invalid: 0 };
+
   obj[ns + '_n'] = self.total;
   obj[ns + '_synced_n'] = self.fetched;
   obj['last_synced'] = obj[ns +'_last_synced'] = new Date();
@@ -285,19 +288,31 @@ central.DOUBAN_APPS.forEach(function(item) {
 });
 
 // collect all the interest
-exports.collect_all = function(user, succeed_cb, error_cb) {
-  if (!user) return error_cb('NO_USER');
+exports.collect_all = function(user, succeed_cb, error) {
+  var called = false;
+  var error_cb = function(err) {
+    if (called) return;
+    called = true;
+    err.name = err.name || 'collect fail';
+    raven.error(err, { tags: { task: 'collect' }, extra: { uid: user && user.uid || user }  });
+    error && error(err);
+  }
+  if (!user) return error_cb && error_cb('NO_USER');
 
   var apps = central.DOUBAN_APPS;
   var collectors = [];
   (function run(i) {
     var ns = apps[i];
     // all apps proceeded
-    if (!ns) succeed_cb(collectors);
-    exports['collect_' + item](user, function(collectors) {
-      collectors.push(collector);
-      run(i+1);
-    }, error_cb);
+    if (!ns) succeed_cb && succeed_cb(collectors);
+    exports['collect_' + item]({
+      user: user, 
+      success: function(collectors) {
+        collectors.push(collector);
+        run(i+1);
+      },
+      error: error_cb
+    });
   })(0);
 };
 exports.collect = collect;

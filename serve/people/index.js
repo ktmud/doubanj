@@ -44,7 +44,7 @@ module.exports = function(app, central) {
       } else {
         next();
       }
-    }, sleep ? 70 : 0);
+    }, sleep ? 100 : 0);
   }, function(req, res, next) {
     var people = res.data.people;
     if (!people.stats) return res.render('people', res.data);
