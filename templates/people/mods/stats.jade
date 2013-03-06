@@ -6,9 +6,8 @@ section
   p.muted
     ... 更多功能正在紧张开发中，欢迎随时回来看看
 
-if people.last_synced_status !== 'ing'
+if people.last_synced_status !== 'ing' || (new Date() - people.last_synced > 120000)
   hr
   include ../mods/resync
 
 include ./stats_js
-
