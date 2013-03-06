@@ -4,7 +4,8 @@ var debug = require('debug');
 var log = debug('dbj:aggregate:log');
 var error = debug('dbj:aggregate:error');
 
-var extend = require(process.cwd() + '/lib/utils').extend;
+var raven = require('../../lib/raven');
+var extend = require('../../lib/utils').extend;
 
 var conf_interest = {
   top: ['tags'],
@@ -57,7 +58,7 @@ AggStream.prototype.run = function(agg_id) {
       self.failures[agg_id] = err;
     }
     if (!result || !result.length) {
-      log('%s for %s got empty results.', agg_id, self.uid);
+      raven.message('%s for %s got empty results.', agg_id, self.uid, { level: 'warn' });
     }
     self.results[agg_id] = result;
 

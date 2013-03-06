@@ -3,13 +3,13 @@
 */
 var debug = require('debug');
 var log = debug('dbj:task:compute:info');
-var error = debug('dbj:task:compute:error');
 
 var cwd = process.cwd();
 
 var consts = require(cwd + '/models/consts');
 var task = require(cwd + '/lib/task');
 var mongo = require(cwd + '/lib/mongo');
+var raven = require(cwd + '/lib/raven');
 
 var user_ensured = require(cwd + '/models/user').ensured;
 var Interest = require(cwd + '/models/interest').Interest;
@@ -41,14 +41,17 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
         called = true;
         return;
       }
-      if (err.stack) { console.log(err.stack); }
 
-      error('compute for %s failed: %s', user.uid, err);
+      if (typeof error == 'string') {
+        err = new Error(err);
+        //console.log(err, err.type, err.message);
+      }
+      err.name = err.name || 'compute fail';
+      raven.error(err, { extra: { uid: user.id }, tags: { task: 'compute' } });
 
       if (called) return;
       called = true;
 
-      arg.error && arg.error(err);
       if (err !== 'RUNNING') {
         var stats_fail = user.stats_fail || 0;
         // reset user's stats data if error happens
@@ -58,6 +61,7 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
           stats_status: err,
         });
       }
+      arg.error && arg.error(err);
       next();
     };
     var succeed_cb = function() {
@@ -83,7 +87,6 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
     var jobs_percent = {};
 
     function runJob(ns, done_percent) {
-
       var job = require('./' + ns);
 
       jobs_percent[ns] = 0;
@@ -149,7 +152,6 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
           };
           user.update(obj);
         });
-
       });
     }
 

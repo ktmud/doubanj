@@ -29,12 +29,12 @@ function parse_pages(pages) {
   if (!pages || pages.search('册') > -1) return null;
   pages = pages.replace(/^\s*大?约\s*/, '');
   var n = parseInt(pages, 10);
-  if (isNaN(n)) raven.message('invalid page %s', pages, { tags: { parsing: 'parges' }, level: 'warn' });
+  if (isNaN(n)) raven.message('invalid page %s', pages, { tags: { parsing: 'pages' }, level: 'warn' });
   return n;
 }
 function parse_date(d) {
   d = d || '';
-  d = d.replace(/[\s\-]+/, '-', 2);
+  d = d.replace(/[\s\-、\,—]+/, '-', 2);
 
   if (String(parseInt(r)) === r) {
     r = [r.slice(0, 4), r.slice(4, 6), r.slice(6)].join('-');
@@ -49,7 +49,7 @@ function parse_date(d) {
 }
 function parse_pubdate(d) {
   d = d || '';
-  d = d.replace('年', '-').replace('月', '-').replace('日', ' ').replace(/[\-\s]*第.*版/g, '');
+  d = d.replace('年', '-').replace('月', '-').replace('日', ' ').replace(/[\-\s]*(第.*版|版|重印|第.*次印刷)/g, '');
   return parse_date(d);
 }
 function parse_publisher(p) {
