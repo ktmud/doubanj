@@ -37,7 +37,7 @@ function isDigit(str) {
 }
 function parse_date(d) {
   d = d || '';
-  d = d.replace(/[\s\-、\,—]+/, '-', 2).trim();
+  d = d.replace(/[\s\-、\,－]+/, '-', 2).replace(/[^0-9\-\s\:a-zA-Z]/g, '').trim();
 
   if (isDigit(d)) {
     d = [d.slice(0, 4), d.slice(4, 6) || 1, d.slice(6) || 1].join('-');

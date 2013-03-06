@@ -15,7 +15,7 @@ Do.ready(function() {
           }, 500);
         } else {
           updateProgress(d);
-          check((d[0] || 0) >= 70 ? 300 : 2000);
+          check((d[0] || 0) >= 70 ? 300 : 2500);
         }
       });
     }, dur || 1000);
