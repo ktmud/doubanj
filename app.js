@@ -10,6 +10,7 @@
   //next && next();
 //});
 
+var mo_url = require('url');
 var express = require('express');
 var central = require('./lib/central');
 var serve = require('./serve');
@@ -38,12 +39,17 @@ module.exports.boot = function() {
   app.use(express.bodyParser());
   app.use(express.csrf());
 
+  app.locals(central.template_helpers);
+
   app.use(function(req, res, next) {
     res.locals._csrf = req.session._csrf;
+    req.is_ssl = req.headers['x-forwarded-proto'] === 'https';
+    res.locals.static = function(url) {
+      if (req.is_ssl) return mo_url.resolve(central.conf.https_root, url);
+      return central.assets.fileUrl(url);
+    },
     next();
   });
-
-  app.locals(central.template_helpers);
 
   serve(app, central);
   app.listen(central.conf.port);

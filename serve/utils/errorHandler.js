@@ -1,6 +1,8 @@
 var debug = require('debug');
 var error = debug('dbj:error');
 
+var raven = require(process.cwd() + '/lib/raven');
+
 module.exports = function(options) {
   options = options || {};
 
@@ -37,6 +39,8 @@ module.exports = function(options) {
       res.end();
       return;
     }
+
+    raven.error(err);
 
     res.statusCode = 500;
     res.render('500', {

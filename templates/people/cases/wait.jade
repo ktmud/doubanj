@@ -3,7 +3,7 @@
   p.muted
     正在准备数据，请耐心等待
 
-if people.stats_fail > 5
+if people.last_synced_status !== 'ing' || (new Date() - people.last_synced > 240000)
   hr
   include ../mods/resync
 

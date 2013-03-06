@@ -29,13 +29,21 @@ function parse_pages(pages) {
   if (!pages || pages.search('册') > -1) return null;
   pages = pages.replace(/^\s*大?约\s*/, '');
   var n = parseInt(pages, 10);
-  if (isNaN(n)) raven.message('invalid page %s', pages);
+  if (isNaN(n)) raven.message('invalid page %s', pages, { tags: { parsing: 'parges' }, level: 'warn' });
   return n;
 }
 function parse_date(d) {
+  d = d || '';
+  d = d.replace(/[\s\-]+/, '-', 2);
+
+  if (String(parseInt(r)) === r) {
+    r = [r.slice(0, 4), r.slice(4, 6), r.slice(6)].join('-');
+    console.log(r);
+  }
+
   var r = new Date(d);
-  if (isNaN(+r)) {
-    raven.message('invalid date: %s', d);
+  if (r && isNaN(+r)) {
+    raven.message('invalid date %s', d, { tags: { parsing: 'date' }, level: 'warn' });
   }
   return r;
 }

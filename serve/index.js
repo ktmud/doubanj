@@ -57,8 +57,8 @@ module.exports = function(app, central) {
     require('./' + item)(app, central);
   });
 
-  var raven = require('raven');
-  app.use(raven.middleware.express(central.conf.raven));
+  //var raven = require('raven');
+  //app.use(raven.middleware.express(central.raven.client));
   app.use(utils.errorHandler({ dump: central.conf.debug }));
   app.use(utils.errorHandler.notFound);
 };
