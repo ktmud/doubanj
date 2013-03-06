@@ -1,97 +1,12 @@
-var debug = require('debug');
-var log = debug('dbj:task:log');
-var error = debug('dbj:task:error');
-
-function count(items, col, k) {
-  if (!items || !col) return;
-
-  var get_key;
-  switch(typeof k) {
-    case 'function':
-      get_key = k;
-      break;
-    case 'undefined':
-      get_key = function(item) { return item };
-      break
-    default:
-      get_key = function(item) { return item[k.toString()] };
-  }
-
-  function c(t) {
-    t = get_key(t);
-    col[t] = col[t] || 0;
-    col[t]++;
-  }
-
-  if (items instanceof Array) {
-    items.forEach(c);
-  } else {
-    c(items);
-  }
-}
-function count_length(item, col, k, uniq_key) {
-  if (!item || !item[k]) return;
-  col[item[uniq_key || 'id']] = item[k].length;
-}
-function count_max(item, col, k, parser, uniq_key) {
-  if (!item || !item[k]) return;
-  col[item[uniq_key || 'id']] = parser(item[k]);
-}
-
-function tops(col) {
-  var ks = Object.keys(col);
-  ks = ks.sort(function(a, b) {
-    return col[b] - col[a];
-  });
-  ks = ks.slice(0, 20);
-  return ks.map(function(item) {
-    return {
-      name: item,
-      count: col[item]
-    }
-  });
-}
-
-function analyzeInterests(ns, interests) {
-  var subjects = interests.map(function(i) { return i.subject; });
-  var ret = analyze(subjects, configs[ns].subjects);
-  var iret = analyze(interests, configs[ns].interests || common.config.interests);
-  for (var k in iret) {
-    ret[k] = iret[k];
-  }
-  return ret;
-}
-
-/**
-* @param {Array} list - the list of interests
-* @param {Object} ptop - which props will be counted for most appearence
-* @param {Object} pmax - which props will be counted for for max value
-* @param {Object} pgroup - which props will count in group appearence
-*/
-function analyze(list, opts) {
-  var ptop = opts.ptop;
-  var pmax = opts.pmax;
-  var pgroup = opts.pgroup;
-
-  var r = { 
-    total: interests.length
-  };
-
-  list.forEach(function(item) {
-    var s = item.subject;
-
-  });
-  //console.log(r);
-  return r;
-}
+var raven = require('../lib/raven');
 
 var currency_trans = [
-  [/^\s*(USD?\$?|\$)\s*/i, 6.23],
-  [/^\s*(HKD?\$?|港币)\s*/i, 0.8],
+  [/^\s*(USD?\$?|\$)[\.\s]*/i, 6.23],
+  [/^\s*(HKD?\$?|港币)[\.\s]*/i, 0.8],
   [/^\s*CNY\s*/i, 1],
-  [/^\s*(GBP?\£?|\£)\s*/i, 9.44],
-  [/^\s*(NTD?\$?)\s*/i, 0.21],
-  [/^\s*(CDN|CAD)\s*\$?\s*/i, 6.1]
+  [/^\s*(GBP?\£?|\£)[\.\s]*/i, 9.44],
+  [/^\s*(NTD?\$?)[\.\s]*/i, 0.21],
+  [/^\s*(CDN|CAD)[\.\s]*\$?\s*/i, 6.1]
 ];
 function parse_price(price) {
   if (!price) return NaN;
@@ -112,14 +27,15 @@ function parse_price(price) {
 }
 function parse_pages(pages) {
   if (!pages || pages.search('册') > -1) return null;
+  pages = pages.replace(/^\s*大?约\s*/, '');
   var n = parseInt(pages, 10);
-  if (isNaN(n)) log('invalid page %s', pages);
+  if (isNaN(n)) raven.message('invalid page %s', pages);
   return n;
 }
 function parse_date(d) {
   var r = new Date(d);
   if (isNaN(+r)) {
-    log('invalid date: %s', d);
+    raven.message('invalid date: %s', d);
   }
   return r;
 }

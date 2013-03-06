@@ -1,6 +1,7 @@
 var debug = require('debug');
 var util = require('util');
 var log = debug('dbj:interest:info');
+var verbose = debug('dbj:interest:verbose');
 var error = debug('dbj:interest:error');
 
 var cwd = process.cwd();
@@ -45,7 +46,7 @@ util.inherits(Interest, mongo.Model);
 Interest.prototype.kind = Interest.prototype._collection = INTEREST_COLLECTION;
 
 Interest.get = function(ns, i_id, cb, attach_subject) {
-  log('getting interest obj for %s', i_id)
+  verbose('getting interest obj for %s', i_id)
   mongo(function(db) {
     var collection = db.collection(ns + '_' + INTEREST_COLLECTION);
     collection.findOne({
@@ -80,7 +81,7 @@ Interest.get = function(ns, i_id, cb, attach_subject) {
 };
 
 Interest.findByUser = function(ns, uid, opts, cb) {
-  log('getting interests obj for user %s', uid);
+  verbose('getting interests obj for user %s', uid);
 
   opts = opts || {};
   if (typeof opts === 'function') {
@@ -117,16 +118,16 @@ Interest.findByUser = function(ns, uid, opts, cb) {
         return cb(err);
       }
 
-      log('found %s interests', docs.length);
+      verbose('found %s interests', docs.length);
 
       var ret = docs.map(function(item) {
         var i = new Interest(item);
         return i;
       });
-      log('extended to Interest.');
+      verbose('extended to Interest.');
 
       if (opts.attach_subject === false) {
-        log('no need for attach subject, interests got.');
+        verbose('no need for attach subject, interests got.');
         return cb(null, ret);
       }
 
@@ -134,7 +135,7 @@ Interest.findByUser = function(ns, uid, opts, cb) {
       function tick() {
         n--;
         if (n === 0) {
-          log('all subjects attached.');
+          verbose('all subjects attached.');
           cb(null, ret);
         }
       }
@@ -158,7 +159,7 @@ Interest.findByUser = function(ns, uid, opts, cb) {
           cb(err);
         });
         stream.on('close', function() {
-          log('all subjects attached.');
+          verbose('all subjects attached.');
           cb(null, ret);
         });
       });

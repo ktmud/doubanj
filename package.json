@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "debug": "~0.7.0",
+    "raven": "~0.4.7",
     "strftime": "~0.5.0",
     "express-istatic": "~0.0.9-2",
     "jade": "~0.28.1",

@@ -12,8 +12,9 @@ module.exports = {
 
   site_name: '豆瓣酱',
 
-  site_root: 'http://127.0.0.1:3000/',
-  assets_root: 'http://127.0.0.1:3000/',
+  site_root: 'http://local.test.com/',
+  ssl_root: 'https://local.test.com/',
+  assets_root: 'http://local.test.com/',
 
   // whether to send gzipped content
   gzip: true,
@@ -27,6 +28,10 @@ module.exports = {
   },
 
   salt: 'keyboardcatndog',
+
+  // the Sentry client auth url
+  // neccessray for tracking events in Sentry
+  raven: null,
 
   mongo: {
     dbname: 'doubanj',

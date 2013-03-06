@@ -1,5 +1,6 @@
 var debug = require('debug');
 var util = require('util');
+var verbose = debug('dbj:user:verbose');
 var log = debug('dbj:user:info');
 var error = debug('dbj:user:error');
 
@@ -35,7 +36,7 @@ User.prototype.kind = User.prototype._collection = USER_COLLECTION;
 
 User.getFromMongo = function(uid, cb) {
   if (uid instanceof User) return cb(null, uid);
-  log('getting user obj for %s', uid)
+  verbose('getting user obj for %s', uid)
 
   uid = String(uid).toLowerCase();
 
@@ -82,6 +83,16 @@ User.get = function(uid, cb) {
     }
     return cb(null, u);
   });
+};
+User.getByPass = function(uid, password, cb) {
+  if (!uid || !password) return cb(401);
+  User.getFromMongo(uid, function(err, user) {
+    if (err || !user) return cb(err, user);
+    if (user.verifyPassword(password)) return cb(null, user);
+    return cb(403);
+  });
+};
+User.prototype.verifyPassword = function() {
 };
 
 // pull from douban api, get account info

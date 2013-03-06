@@ -2,12 +2,12 @@
 * aggregate user subject collections (called "interest") 
 */
 var debug = require('debug');
-var log = debug('dbj:task:interest:info');
-var error = debug('dbj:task:interest:error');
+var verbose = debug('dbj:task:interest:verbose');
 
 var task = central.task;
 var request = central.request;
 var mongo = central.mongo;
+var raven = central.raven;
 var douban_key = central.conf.douban.key;
 
 var user_ensured = require(central.cwd + '/models/user').ensured;
@@ -37,7 +37,7 @@ util.inherits(FetchStream, require('events').EventEmitter);
 FetchStream.prototype.run = function() {
   var self = this;
 
-  log('starting...');
+  verbose('starting fetch stream for %s', self.user.uid);
   self.status = 'ing';
 
   // clear first
@@ -49,7 +49,7 @@ FetchStream.prototype.run = function() {
     } else {
       selector = { uid: self.user.uid };
     }
-    log('cleaning old interests...');
+    verbose('cleaning old interests...');
     db.collection(self.ns + '_interest').remove(selector, function(err, r) {
       next();
       self.fetch(0, self._fetch_cb());
@@ -68,14 +68,14 @@ FetchStream.prototype._fetch_cb = function() {
 
     // no data
     if (!total) {
-      log('no data at all');
+      verbose('no data at all');
       self.status = 'succeed';
       return self.end();
     }
 
     if (self.total && total != self.total) {
       self.total = total;
-      log('total number changed');
+      verbose('total number changed');
       // total changed during fetching, run again
       return self.run();
     };
@@ -85,7 +85,7 @@ FetchStream.prototype._fetch_cb = function() {
 
     if (self.fetched >= total) {
       self.fetched = total;
-      log('fetching reached end.');
+      verbose('fetching reached end.');
       self.status = 'succeed';
       self.end();
     } else {
@@ -104,7 +104,7 @@ FetchStream.prototype.fetch = function(start, cb) {
 
   setTimeout(function() {
     task.api(function(oauth2, next) {
-      log('fetching %s~%s...', start, start + self.perpage);
+      verbose('fetching %s~%s...', start, start + self.perpage);
 
       var client = oauth2.clientFromToken(self.token);
       client.request('GET', self.api_uri, { count: self.perpage, start: start }, function(err, ret, res) {
@@ -160,14 +160,14 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
     var save_options = { w: 1, continueOnError: 1 };
 
     // save user interest
-    log('saving interests...');
+    verbose('saving interests...');
     db.collection(ns + '_interest').insert(items, save_options, function(err, r) {
       if (err) {
         if (cb) cb(err);
         return next();
       }
       // save subjects
-      log('saving subjects...');
+      verbose('saving subjects...');
       var col_s = db.collection(ns);
 
       //col_s.insert(subjects, { continueOnError: true }, function(err, res) {
@@ -178,7 +178,7 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
       function save_subject(i) {
         var s = subjects[i];
         if (!s) {
-          log('all subjects in saving queue.');
+          verbose('all subjects in saving queue.');
 
           cb && cb(null, data);
 
@@ -218,7 +218,7 @@ FetchStream.prototype.updateUser = function(cb) {
   obj['last_synced'] = obj[ns +'_last_synced'] = new Date();
   obj['last_synced_status'] = obj[ns +'_last_synced_status'] = self.status;
 
-  log('updating user\'s last synced status... %s: %s, status: %s',
+  verbose('updating user\'s last synced status... %s: %s, status: %s',
       ns, self.total, self.status);
 
   // database option
@@ -231,17 +231,20 @@ var collect, _collect;
 collect = user_ensured(function(user, arg) {
   if (!user) return arg.error && arg.error('NO_USER');
 
+  var uid = user.uid || user.id;
+
+  raven.message('collect interests start', { ns: arg.ns, uid: uid });
+
   var collector = new FetchStream(arg);
 
   // halt if syncing is already running
   if (user.last_synced_status === 'ing' && !arg.force) {
-    error('collect interests exists for %s dur to runing', user.uid);
     arg.error && arg.error('RUNNING');
     return;
   }
 
   collector.on('error', function(err) {
-    error('collecting for %s failed: %s', user.uid, err);
+    raven.error(err, { user: user.uid });
     collector.status = 'failed';
     collector.updateUser(function() {
       collector.end();
@@ -255,10 +258,12 @@ collect = user_ensured(function(user, arg) {
   collector.once('end', function() {
     // wait for the really ends
     setTimeout(function() {
-      if (collector.status == 'succeed' && arg.success) {
-        arg.success.call(collector, user);
-      } else if (arg.error) {
-        arg.error.call(collector, user);
+      if (collector.status == 'succeed') {
+        raven.message('collect interests succeed', { uid: uid }); 
+        arg.success && arg.success.call(collector, user);
+      } else {
+        raven.message('collect interests failed', { uid: uid, status: collector.status }); 
+        arg.error && arg.error.call(collector, user);
       }
     }, 2000);
   });
