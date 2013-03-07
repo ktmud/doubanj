@@ -73,9 +73,9 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
 
     if (user.last_synced_status !== 'succeed') {
       // ten minutes have passed, try recollect.
-      if (new Date() - user.last_synced > 60000) {
+      if (new Date() - user.last_synced > 1200000) {
         // reset user data
-        raven.message('timeout for collect.', { tags: { task: 'compute' } });
+        raven.message('recount found collect timeout.', { tags: { task: 'compute' } });
         user.update({
           invalid: 0,
           last_synced_status: 'timeout',

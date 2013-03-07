@@ -212,7 +212,7 @@ function aggSort(p, desc_asc, limit, fields) {
     };
   });
   // only output the id (which is subject_id or user_id in douban)
-  return [{ $sort: p }, { $match: match_q }, { $limit: limit },  { $project: fields }];
+  return [{ $match: match_q }, { $sort: p }, { $limit: limit },  { $project: fields }];
 }
 function aggTop(p, unwind, limit) {
   limit = limit || 20;

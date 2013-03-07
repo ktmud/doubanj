@@ -30,7 +30,12 @@ module.exports = function(db, next) {
     log('ensuring database "book"...');
     r.ensureIndex({ 'id': 1 }, index_options, function(err, indexname) {
       if (err) return next(err);
-      r.ensureIndex({ 'author': 1, 'publisher': 1, 'isbn10': 1, 'isbn13': 1 }, function(err, indexname) {
+      r.ensureIndex({
+        'author': 1, 'publisher': 1,
+        'pages': 1, 'price': 1,
+        'rated': 1, 'raters': 1,
+        'pubdate': 1,
+      }, function(err, indexname) {
         if (err) return next(err);
         tick();
       });
@@ -40,7 +45,7 @@ module.exports = function(db, next) {
   db.collection('user', function(err, r) {
     assert.equal(null, err);
     log('ensuring database "users"...');
-    r.ensureIndex({ 'uid': 1, 'id': 1 }, index_options, function(err, indexname) {
+    r.ensureIndex({ 'uid': 1, 'id': 1, 'last_statsed': 1 , 'mtime': 1 }, index_options, function(err, indexname) {
       if (err) return next(err);
       tick();
     });

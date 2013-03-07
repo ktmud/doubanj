@@ -6,8 +6,8 @@ Do.ready(function() {
   function check(dur) {
     total += dur;
 
-    // time out after two minutes.
-    if (total > 120000) return;
+    // time out after three minutes.
+    if (total > 180000) return;
 
     setTimeout(function() {
       $.getJSON('/api/people/' + window._uid_ + '/progress', function(d) {
@@ -16,21 +16,21 @@ Do.ready(function() {
 
         updateProgress(d.percents);
 
-        if (d.last_synced_status !== 'ing') {
-          setTimeout(function() {
-            window.location.reload();
-          }, 700);
-          return;
-        }
-
         var remaining = d.remaining;
         updateRemains(remaining);
 
-        if (remaining < 120000) {
-          check(remaining < 5000 ? 400 : 3000);
+        if (d.last_synced_status !== 'ing') {
+          setTimeout(function() {
+            window.location.reload();
+          }, 800);
+          return;
+        }
+
+        if (remaining < 180000) {
+          check(d.interval);
         }
       });
-    }, dur || 2000);
+    }, dur || 3000);
   }
   check();
 
@@ -49,7 +49,7 @@ Do.ready(function() {
       text = '预计还要' + datetime.mili2chinese(t, true) + '左右';
     } else if (t > 5000) {
       text = '只剩下大概' + datetime.mili2chinese(t);
-    } else {
+    } else if (t) {
       text = '马上就好';
     }
     remains.html(text);

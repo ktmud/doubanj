@@ -143,6 +143,7 @@ User.prototype.toObject = function() {
     // local props
     '_id': this['_id'],
     'ctime': this['ctime'] || now,
+    'mtime': this['mtime'],
     'last_synced': this.last_synced,
     'last_synced_status': this.last_synced_status,
     'stats': this.stats,
@@ -202,13 +203,13 @@ User.prototype.remaining = function() {
   var total = user.book_n;
   var synced = user.book_synced_n;
 
-  if (!total) return 0;
+  if (!total) return null;
 
   var perpage = task.API_REQ_PERPAGE;
-  var ret = (task.API_REQ_DELAY + 2000) * Math.ceil((total - synced) / perpage);
+  var ret = (task.API_REQ_DELAY + 4000) * Math.ceil((total - synced) / perpage);
 
   if (user.last_synced_status === 'ing') {
-    ret += 3 * total;
+    ret += 100 * Math.round(Math.sqrt(total));
   }
   return ret;
 };

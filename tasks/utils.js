@@ -35,8 +35,8 @@ function parse_pages(pages) {
 function isDigit(str) {
   return /^\d+$/.test(str);
 }
-function parse_date(d) {
-  d = d || '';
+function parse_date(str) {
+  var d = str || '';
 
   var i = 0;
   d = d.trim().replace(/[\s\-、\,－]+/g, function(m) {

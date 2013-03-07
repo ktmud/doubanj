@@ -1,24 +1,24 @@
 function mili2united(timediff) {
   // strip the miliseconds
-  timediff = timediff / 1000;
+  timediff = Math.round(timediff / 1000);
 
   // get seconds
-  var sec = Math.round(timediff % 60);
+  var sec = timediff % 60;
 
   // remove seconds from the date
-  timediff = timediff / Math.round(60);
+  timediff = Math.floor(timediff / 60);
 
   // get minutes
-  var mi = Math.round(timediff % 60);
+  var mi = timediff % 60;
 
   // remove minutes from the date
-  timediff = timediff / Math.round(60);
+  timediff = Math.floor(timediff / 60);
 
   // get hours
-  var h = Math.round(timediff % 24);
+  var h = timediff % 24;
 
   // remove hours from the date
-  timediff = Math.round(timediff / 24);
+  timediff = Math.floor(timediff / 24);
 
   // the rest of timediff is number of days
   var d = timediff;

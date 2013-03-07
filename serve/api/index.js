@@ -5,8 +5,11 @@ module.exports = function(app, central) {
   app.get('/api/people/:uid/progress', function(req, res, next) {
     var people = res.data.people;
     if (people) {
+      var remaining = people.remaining();
+      var delay = central.task.API_REQ_DELAY;
       res.json({
         r: 0,
+        interval: remaining < delay ? remaining / 5 : delay,
         last_synced: people.last_synced,
         last_synced_status: people.last_synced_status,
         percents: people.progresses(),

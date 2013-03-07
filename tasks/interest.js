@@ -56,9 +56,9 @@ FetchStream.prototype.run = function() {
     // remove user's all interests
     var selector;
     if (self.user.id) {
-      selector = { user_id: self.user.id };
+      selector = { user_id: self.user.id, $isolated: 1 };
     } else {
-      selector = { uid: self.user.uid };
+      selector = { uid: self.user.uid, $isolated: 1 };
     }
     verbose('cleaning old interests...');
     db.collection(self.ns + '_interest').remove(selector, function(err, r) {
@@ -173,10 +173,12 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
     // save user interest
     verbose('saving interests...');
     db.collection(ns + '_interest').insert(items, save_options, function(err, r) {
+
       if (err) {
-        if (cb) cb(err);
-        return next();
+        console.error(err);
+        error(err);
       }
+
       // save subjects
       verbose('saving subjects...');
       var col_s = db.collection(ns);
@@ -258,6 +260,7 @@ collect = user_ensured(function(user, arg) {
 
   collector.on('error', function(err) {
 
+    console.error(err);
     error(err, raven_extra);
 
     collector.status = 'failed';
