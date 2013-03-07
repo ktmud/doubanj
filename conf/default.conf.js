@@ -40,8 +40,8 @@ module.exports = {
 
   douban: {
     limit: 20, // request limit per minute
-    key: 'appkey',
-    secret: 'secret'
+    key: '',
+    secret: ''
   },
 
   // google analytics id

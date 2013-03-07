@@ -52,13 +52,16 @@ AggStream.prototype.run = function(agg_id) {
   col.aggregate(param, function(err, result) {
     //log(JSON.stringify(param));
     if (err) {
-      error('%s failed: %s', agg_id, err);
-      error('params: %s', JSON.stringify(param));
+      raven.error(err, {
+        message: 'aggregation failed',
+        tags: { task: 'aggregate' },
+        extra: { agg_id: agg_id, uid: self.uid }
+      });
       self.emit('error', err);
       self.failures[agg_id] = err;
     }
     if (!result || !result.length) {
-      raven.message('%s for %s got empty results.', agg_id, self.uid, { level: 'warn' });
+      log('%s for %s got empty results.', agg_id, self.uid);
     }
     self.results[agg_id] = result;
 
