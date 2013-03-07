@@ -4,15 +4,17 @@ module.exports = function(grunt) {
   var getHash = require('./lib/assets').getHash;
 
   var hash_cache = {};
+  var dist_hash_cache = {};
   try {
     hash_cache = grunt.file.readJSON('static/source_hash.json');
+    dist_hash_cache = grunt.file.readJSON('static/hash.json');
   } catch (e) {}
 
 
   function hash_check(f) {
     f = f.replace('static/dist/', '');
     // old hash !== new hash
-    if (hash_cache[f] == getHash(f, true, null, 'utf-8')) {
+    if (f in dist_hash_cache && hash_cache[f] == getHash(f, true, null, 'utf-8')) {
       grunt.log.writeln('Skipping ' + f.cyan + ' ..');
       return false;
     }
