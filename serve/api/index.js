@@ -5,7 +5,13 @@ module.exports = function(app, central) {
   app.get('/api/people/:uid/progress', function(req, res, next) {
     var people = res.data.people;
     if (people) {
-      res.json(people.progresses());
+      res.json({
+        r: 0,
+        last_synced: people.last_synced,
+        last_synced_status: people.last_synced_status,
+        percents: people.progresses(),
+        remaining: people.remaining()
+      });
     } else {
       res.statusCode = 404;
       res.json({

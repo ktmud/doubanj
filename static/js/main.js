@@ -7,4 +7,8 @@ require.register("main", function(exports, require, module) {
   window.Sizzle = $.find;
   // @import ../components/ktmud-bootstrap/docs/assets/js/bootstrap.js
 });
+require.register("utils/datetime", function(exports, require, module) {
+  // @import ./utils/datetime.js
+});
+
 require('main');

@@ -1,9 +1,13 @@
+- need_resync = people.last_synced_status !== 'ing' || new Date() - people.last_synced > people.remaining()
 .vmiddle
-  include ../mods/progress
-  p.muted
-    正在准备数据，请耐心等待
+  if need_resync
+    .alert.alert-error 上一次同步数据似乎出错了，重试一下吧
+  else
+    include ../mods/progress
+    p#remains.muted
+      正在准备数据，请耐心等待
 
-if conf.debug || people.last_synced_status !== 'ing' || (new Date() - people.last_synced > 30000)
+if need_resync
   hr
   include ../mods/resync
 

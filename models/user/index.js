@@ -186,6 +186,14 @@ User.prototype.progresses = function() {
   ps[1] = ps[0] >= 80 ? (user.stats_p || 0) * 0.2 : 0;
   return ps;
 };
+// expected remaing time for finish collectng job
+User.prototype.remaining = function() {
+  var user = this;
+  var total = user.book_n;
+  var synced = user.book_synced_n;
+  var perpage = task.API_REQ_PERPAGE;
+  return task.API_REQ_DELAY * Math.ceil((total - synced) / perpage);
+};
 
 /**
 * To prepare stats csv

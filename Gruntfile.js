@@ -199,7 +199,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['clean', 'dist_js', 'dist_css']);
 
-  grunt.registerTask('build', ['clean:tmp', 'dist_js', 'dist_css', 'uglify', 'cssmin', 'clean:hash', 'hashmap']);
+  grunt.registerTask('build', ['clean:tmp', 'dist_js', 'dist_css', 'uglify', 'cssmin', 'hashmap']);
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-stylus');

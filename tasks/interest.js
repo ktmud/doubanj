@@ -30,7 +30,7 @@ function message(err, extra) {
 function FetchStream(arg) {
   this.ns = arg.ns;
   this.user = arg.user;
-  this.perpage = arg.perpage || 100;
+  this.perpage = arg.perpage || task.API_REQ_PERPAGE;
   this.total = 0;
   this.fetched = 0;
   this.status = 'ready';
