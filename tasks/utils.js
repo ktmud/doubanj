@@ -37,13 +37,20 @@ function isDigit(str) {
 }
 function parse_date(d) {
   d = d || '';
-  d = d.replace(/[\s\-、\,－]+/, '-', 2).replace(/[^0-9\-\s\:a-zA-Z]/g, '').trim();
+  d = d.trim().replace(/[\s\-、\,－]+/, '-', 2).replace(/[^0-9\-\s\:a-zA-Z]/g, '');
 
+  var r;
   if (isDigit(d)) {
-    d = [d.slice(0, 4), d.slice(4, 6) || 1, d.slice(6) || 1].join('-');
+    var _d = [d.slice(0, 4), d.slice(4, 6) || 1, d.slice(6) || 1].join('-');
+    r = new Date(_d);
+    if (isNaN(+r)) {
+      d = [d.slice(0, 4), d.slice(4, 5) || 1, d.slice(5) || 1].join('-');
+    } else {
+      d = _d;
+    }
   }
 
-  var r = new Date(d);
+  r = new Date(d);
   if (d && isNaN(+r)) {
     console.log('invalid date %s', d);
     raven.message('invalid date %s', d, { tags: { parsing: 'date' }, level: 'warn' });
