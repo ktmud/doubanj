@@ -155,6 +155,7 @@ function aggParam(conf) {
   if ('most' in conf) {
     var pmost = conf.most;
     var pmost_limit = conf.$most_limit;
+    // by default, only output the id (which is subject_id or user_id in douban)
     var pmost_fields = conf.$most_fields || { 'id': 1, '_id': 0 };
 
     function get_fields(p) {
@@ -223,7 +224,7 @@ function aggSort(p, desc_asc, limit, fields) {
       }
     };
   });
-  // only output the id (which is subject_id or user_id in douban)
+  // limit subject number to escape Mongodb memory exceed error
   return [{ $match: match_q }, { $limit: 8000 }, { $sort: p }, { $limit: limit }, { $project: fields }];
 }
 function aggTop(p, unwind, limit) {
