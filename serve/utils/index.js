@@ -14,37 +14,39 @@ function matchPeople(req) {
   return url2uid(uid);
 }
 
+function getUser(opts) {
+  opts = opts || {};
+  var redir = opts.redir;
+  var fn = opts.fn || matchPeople;
+  return function(req, res, next) {
+    var uid = fn(req);
+    var c = res.data = {
+      qs: req.query,
+      title: uid + '的豆瓣酱',
+      uid: uid
+    };
+
+    if (!uid) {
+      if (redir) {
+        if (typeof redir === 'function') redir = redir(req);
+        return res.redirect(redir);
+      }
+      return next();
+    }
+
+    User.get(uid, function(err, people) {
+      c.err = err;
+      c.people = people;
+      if (people) c.title = people.name + '的豆瓣酱';
+      next();
+    });
+  };
+}
+
 module.exports = {
   errorHandler: require('./errorHandler'),
   url2uid: url2uid,
-  getUser: function(opts) {
-    opts = opts || {};
-    var redir = opts.redir;
-    var fn = opts.fn || matchPeople;
-    return function(req, res, next) {
-      var uid = fn(req);
-      var c = res.data = {
-        qs: req.query,
-        title: uid + '的豆瓣酱',
-        uid: uid
-      };
-
-      if (!uid) {
-        if (redir) {
-          if (typeof redir === 'function') redir = redir(req);
-          return res.redirect(redir);
-        }
-        return next();
-      }
-
-      User.get(uid, function(err, people) {
-        c.err = err;
-        c.people = people;
-        if (people) c.title = people.name + '的豆瓣酱';
-        next();
-      });
-    };
-  },
+  getUser: getUser,
   navbar: function navbar(req, res, next) {
     var links = [{
       href: central.conf.site_root,

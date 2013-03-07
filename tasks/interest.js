@@ -10,12 +10,21 @@ var task = central.task;
 var request = central.request;
 var mongo = central.mongo;
 var raven = central.raven;
+
+
 var douban_key = central.conf.douban.key;
 
 var user_ensured = require(central.cwd + '/models/user').ensured;
 var utils = require('./utils');
 
 var API_REQ_DELAY = task.API_REQ_DELAY;
+
+function error(err, extra) {
+  raven.error(err, { tags: { task: 'collect' }, extra: extra  });
+}
+function message(err, extra) {
+  raven.message(err, { tags: { task: 'collect' }, extra: extra  });
+}
 
 // request stream
 function FetchStream(arg) {
@@ -236,7 +245,8 @@ collect = user_ensured(function(user, arg) {
 
   var uid = user.uid || user.id;
 
-  raven.message('collect interests start', { ns: arg.ns, uid: uid });
+  var raven_extra = { ns: arg.ns, uid: uid };
+  message('collect interests start', raven_extra);
 
   var collector = new FetchStream(arg);
 
@@ -247,7 +257,9 @@ collect = user_ensured(function(user, arg) {
   }
 
   collector.on('error', function(err) {
-    raven.error(err, { user: user.uid });
+
+    error(err, raven_extra);
+
     collector.status = 'failed';
     collector.updateUser(function() {
       collector.end();
@@ -262,10 +274,10 @@ collect = user_ensured(function(user, arg) {
     // wait for the really ends
     setTimeout(function() {
       if (collector.status == 'succeed') {
-        raven.message('collect interests succeed', { uid: uid }); 
+        message('collect interests succeed', raven_extra); 
         arg.success && arg.success.call(collector, user);
       } else {
-        raven.message('collect interests failed', { uid: uid, status: collector.status }); 
+        message('collect interests failed', { uid: uid, status: collector.status, ns: arg.ns }); 
         arg.error && arg.error.call(collector, user);
       }
     }, 2000);
@@ -288,16 +300,14 @@ central.DOUBAN_APPS.forEach(function(item) {
 });
 
 // collect all the interest
-exports.collect_all = function(user, succeed_cb, error) {
+exports.collect_all = function(user, succeed_cb, error_cb) {
   var called = false;
-  var error_cb = function(err) {
+  var error_next = function(err) {
     if (called) return;
     called = true;
-    err.name = err.name || 'collect fail';
-    raven.error(err, { tags: { task: 'collect' }, extra: { uid: user && user.uid || user }  });
-    error && error(err);
+    error_cb && error_cb(err);
   }
-  if (!user) return error_cb && error_cb('NO_USER');
+  if (!user) return error_next('NO_USER');
 
   var apps = central.DOUBAN_APPS;
   var collectors = [];
@@ -311,7 +321,7 @@ exports.collect_all = function(user, succeed_cb, error) {
         collectors.push(collector);
         run(i+1);
       },
-      error: error_cb
+      error: error_next
     });
   })(0);
 };

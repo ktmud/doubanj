@@ -3,9 +3,9 @@ var consts = require('../consts');
 var INTEREST_STATUS_ORDERED = consts.INTEREST_STATUS_ORDERED;
 var INTEREST_STATUS_LABELS = consts.INTEREST_STATUS_LABELS;
 
-function labelsList(ns) {
+function labelsList(ns, ss) {
   var labels = INTEREST_STATUS_LABELS[ns];
-  var statuses = INTEREST_STATUS_ORDERED[ns];
+  var statuses = ss || INTEREST_STATUS_ORDERED[ns];
   return statuses.map(function(item) {
     return labels[item];
   }).join(',');
@@ -27,10 +27,10 @@ var common_csvs = {
     });
     return ret.join('\n');
   },
-  by_updated_month: function(ns, d, a, b) {
-    var th = '月,' + ns_labels[ns];
+  by_updated_month: function(ns, d, ss, a, b) {
+    var th = '月,' + labelsList(ns, ss);
     var ret = [th];
-    var statuses = INTEREST_STATUS_ORDERED[ns];
+    var statuses = ss || INTEREST_STATUS_ORDERED[ns];
 
     a = a || 0;
 
@@ -102,5 +102,8 @@ function export_csv(ns) {
 }
 
 module.exports = {
+  notReady: function() {
+    return this.stats_fail || this.invalid || this.stats_status !== 'succeed';
+  },
   book_csv: export_csv('book'),
 };

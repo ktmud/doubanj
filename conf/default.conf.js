@@ -12,9 +12,9 @@ module.exports = {
 
   site_name: '豆瓣酱',
 
-  site_root: 'http://local.test.com/',
-  ssl_root: 'https://local.test.com/',
-  assets_root: 'http://local.test.com/',
+  site_root: 'http://local.test.com',
+  ssl_root: 'https://local.test.com',
+  assets_root: 'http://local.test.com',
 
   // whether to send gzipped content
   gzip: true,

@@ -1,3 +1,19 @@
+if people.progress() == 100
+  p.alert.alert-success
+    | 上次同步于&nbsp;
+    time #{strftime(FULL_TIME, people.book_last_synced)}
+    | ，报表生成于 
+    time #{strftime(FULL_TIME, people.stats.book)}
+else
+  .alert(style="padding: 10px;")
+    .row
+      .span8
+        正在同步最新数据，以下是基于同步于 #{strftime(FULL_TIME, people.book_last_synced)} 的数据生成的结果
+      .span3
+        include ../mods/progress
+      .span1
+        a.btn.btn-mini.btn-warning.pull-right(href=".") 刷新
+
 section
   include ../stats/book
 
@@ -6,7 +22,7 @@ section
   p.muted
     ... 更多功能正在紧张开发中，欢迎随时回来看看
 
-if people.last_synced_status !== 'ing' || (new Date() - people.last_synced > 120000)
+if people.last_synced_status !== 'ing' || (new Date() - people.last_synced > 60000)
   hr
   include ../mods/resync
 

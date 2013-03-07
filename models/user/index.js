@@ -78,8 +78,7 @@ User.get = function(uid, cb) {
     }
     // haven't got douban account info yet
     if (!u.name) {
-      u.pull(cb);
-      return;
+      return u.pull(cb);
     }
     return cb(null, u);
   });
@@ -211,7 +210,7 @@ Object.defineProperty(User.prototype, 'isAdmin', {
 });
 
 User.prototype.url = function() {
-  return [conf.site_root, this.kind, this.uid || this.id].join('/') + '/';
+  return [conf.site_root, 'people', this.uid || this.id].join('/') + '/';
 };
 User.prototype.db_url = function(ns) {
   ns = ns || 'www';

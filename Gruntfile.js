@@ -82,9 +82,8 @@ module.exports = function(grunt) {
     //},
     includes: {
       options: {
-        regex: /^\s*(\/\/|\/\*)?\s*[\@\#]*(include|import)\s+[\"\'\(]*([^\"\'\)]+)[\"\'\)]*\s*(\*\/)?$/,
-        nodup: true,
-        pos: 3
+        includeRegexp: /^\s*(?:\/\/|\/\*)?\s*[\@\#]*(?:include|import)\s+[\"\'\(]*([^\"\'\)]+)[\"\'\)]*\s*(?:\*\/)?$/,
+        duplicates: false,
       },
       js: {
         cwd: 'static/js/',
@@ -212,7 +211,7 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-hashmap');
 
-  grunt.loadNpmTasks('grunt-includes-ktmud');
+  grunt.loadNpmTasks('grunt-includes');
   //grunt.loadNpmTasks('grunt-istatic');
 
   var path = require('path');

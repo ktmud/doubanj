@@ -1,11 +1,12 @@
-extend layout/basic
+extend ../layout/basic
+include ./mixins/interest
 
 block main 
   if !interests
     p.alert 此用户的数据还未准备好，请过一会儿再回来
   else 
     .people-info
-      h1 用户 #{people.screen_name || people.uid} 的#{app_names[ns]}收藏
+      h1 用户 #{people.screen_name || people.uid} 的#{ns_name}收藏
         if people.last_synced_status === 'ing'
           span.alert.badge-syncing 正在同步
     if interests.book
@@ -22,23 +23,21 @@ mixin book
   ol.interests-list
     each i in interests.book
       li 
-        div.status #{i.istatus()}
-            mixin stars(i.rating)
-        &nbsp;
-        if i.book
-          div.pic
-            a(href=i.book.url)
-              img(src=i.book.images.medium)
-          p.title
-            a(href=i.book.url) #{i.book.title}
-          p.meta
-            span.authors #{i.book.author.join(', ')}
-            &nbsp;
-            | -
-            &nbsp;
-            span.publisher #{i.book.publisher}
-        else
-          a(href="http://book.douban.com/subject/#{i.book_id}/") book:#{i.book_id}
+        a(href="http://book.douban.com/subject/#{i.book_id}/") 
+          div.status #{i.istatus()}
+              mixin stars(i.rating)
+          &nbsp;
+          if i.book
+            .row
+              .span5
+                img.img-rounded(src=i.book.images.medium)
+              .span7
+                p.title #{i.book.title}
+                p.meta.authors #{i.book.author.join(', ')}
+                if i.book.publisher
+                  p.meta.publisher #{i.book.publisher}
+          else
+            book:#{i.book_id}
 
 mixin movie
 

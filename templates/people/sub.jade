@@ -1,0 +1,11 @@
+extend ./index
+
+block article
+  ul.breadcrumb
+    li
+      a(href=people.url()) #{name}的豆瓣酱
+    li.active
+      | #{istatus.name}
+  h1 #{title}
+  include ./stats/book
+  include ./mods/stats_js.jade

@@ -1,52 +1,25 @@
 include ../mixins/interest
 
-h2 #{people.name} 的读书酱
-  a.btn.btn-mini.btn-compact(href=people.db_url('book'), target="db-profile")   读书主页 ⇗
-
-.pull-right
-if people.progress() == 100
-  p.alert.alert-success
-    | 上次同步于&nbsp;
-    time #{strftime(FULL_TIME, people.book_last_synced)}
-    | ，报表生成于 
-    time #{strftime(FULL_TIME, people.stats.book)}
+if istatus
+  - s = people[istatus.ns + '_stats']
+  - coll = s[istatus.status]
 else
-  .alert(style="padding: 10px;")
-    .row
-      .span8
-        正在同步最新数据，以下是基于同步于 #{strftime(FULL_TIME, people.book_last_synced)} 的数据生成的结果
-      .span3
-        include ../mods/progress
-      .span1
-        a.btn.btn-mini.btn-warning.pull-right(href=".") 刷新
+  - s = people.book_stats
+  - coll = s.all
 
-- s = people.book_stats
-- st = 'all'
-- coll = s[st]
-if st == 'all'
+if !istatus
+  h2 #{people.name} 的读书酱
+    a.btn.btn-mini.btn-compact(href=people.db_url('book'), target="db-profile")   读书主页 ⇗
+    .pull-right
+      a.btn.btn-mini.btn-info(href=people.url() + 'read') 只看读过
   include ./book/general
-hr
-.row.mod
-  - locals.ns = 'book'
-  .span3
-    h4 个人标注
-    mixin tagcloud(s.interest.top_tags)
-  .span5
-    h4 全部热门
-    mixin tagcloud(coll.top_tags)
-  .span4
-    h4 作者
-    mixin searchcloud(coll.top_author.slice(0,5))
-    h4 译者
-    mixin searchcloud(coll.top_translator.slice(0,8))
-  .span12
-    h4 出版社
-    mixin searchcloud(coll.top_publisher.slice(0,6))
+  hr
+  include ./book/tags
 hr
 .row.mod
   .span12
     h3 阅读编年史
-  .span12.chart.chart-bar#d-by_updated(data-bar=people.book_csv('by_updated_month'), data-y="本", data-periodic="true")
+  .span12.chart.chart-bar#d-by_updated(data-bar=people.book_csv('by_updated_month', istatus && [istatus.status]), data-y="本", data-periodic="true")
     .caption 每月阅读量
   .span12.chart.chart-bar#d-by_pubdate(data-legend='false', data-bar=people.book_csv('by_pubdate_decades'), data-y="本")
     .caption 收藏图书的出版年代

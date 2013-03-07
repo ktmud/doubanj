@@ -1,43 +1,39 @@
 extend ../layout/basic
 
 block main 
-  name = people.name || people.uid
   .row
     .span9
-      h1 #{name} 的豆瓣酱
-      if people.desc
-        mixin people_info(people)
-      if people.invalid && !people.last_synced
-        p.vmiddle.alert.alert-error 获取用户信息不小心失败了，休息一会再重试看看吧
-      else if !people.last_synced
-        // 根本没有同步过
-        form(method="post", action="/queue")
-          input(type="hidden", name="_csrf", value=_csrf)
-          input(type="hidden", name="uid", value=uid)
-          p.vmiddle
-            button.btn.btn-primary 开始为 #{name} 制造美味豆瓣酱
-      else if people.last_synced_status == 'timeout'
-        .vmiddle
-          p.alert.alert-error 抱歉，同步数据超时了，重试看看吧
-          hr
-          include ./mods/resync 
-      else if people.last_synced_status === 'ing' && !people.stats
-        .vmiddle
-          include ./cases/wait
-      else if people.book_n === 0
-        .vmiddle
-          include ./cases/zero
-      else if people.stats
-        include ./mods/stats
-      else if people.stats_fail
-        .vmiddle
-          include ./cases/failed
-      else
-        .vmiddle
-          include ./cases/wait
-    .span3.people-intro
-      if people.created
-        include ./mods/intro
-
-mixin people_info(people)
-  .people-info
+      block article
+        h1 #{name} 的豆瓣酱
+        if people.invalid && !people.last_synced
+          p.vmiddle.alert.alert-error 获取用户信息不小心失败了，休息一会再重试看看吧
+        else if !people.last_synced
+          // 根本没有同步过
+          form(method="post", action="/queue")
+            input(type="hidden", name="_csrf", value=_csrf)
+            input(type="hidden", name="uid", value=uid)
+            p.vmiddle
+              button.btn.btn-primary 开始为 #{name} 制造美味豆瓣酱
+        else if people.last_synced_status == 'timeout'
+          .vmiddle
+            p.alert.alert-error 抱歉，同步数据超时了，重试看看吧
+            hr
+            include ./mods/resync 
+        else if people.last_synced_status === 'ing' && !people.stats
+          .vmiddle
+            include ./cases/wait
+        else if people.book_n === 0
+          .vmiddle
+            include ./cases/zero
+        else if people.stats
+          include ./mods/stats
+        else if people.stats_fail
+          .vmiddle
+            include ./cases/failed
+        else
+          .vmiddle
+            include ./cases/wait
+    .span3
+      block sidebar
+        if people.created
+          include ./mods/intro

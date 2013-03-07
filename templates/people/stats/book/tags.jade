@@ -1,0 +1,17 @@
+.row.mod
+  - locals.ns = 'book'
+  .span3
+    h4 个人标注
+    mixin tagcloud(s.interest.top_tags)
+  .span5
+    h4 全部热门
+    mixin tagcloud(coll.top_tags)
+  .span4
+    h4 作者
+    mixin searchcloud(coll.top_author.slice(0,5))
+    h4 译者
+    mixin searchcloud(coll.top_translator.slice(0,8))
+  .span12
+    h4 出版社
+    mixin searchcloud(coll.top_publisher.slice(0,6))
+

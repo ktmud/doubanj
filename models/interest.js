@@ -106,7 +106,8 @@ Interest.findByUser = function(ns, uid, opts, cb) {
         { 'user_id': uid }
       ]
     }, {
-      limit: opts.limit,
+      limit: opts.limit || 20,
+      start: opts.start || 0,
       sort: sort
     }).toArray(function(err, docs) {
       if (err) {

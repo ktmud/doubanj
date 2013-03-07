@@ -172,7 +172,7 @@ Bar.prototype.drawText = function(delay) {
     .duration(delay)
     .delay(function(d, i) { return i * 10; })
     .attr('x', function(d) { return x(d.x) + rb; })
-    .attr('dx', function(d) { return -(String(d.x).length / 4) - 0.2 + 'em'; })
+    .attr('dx', function(d) { return -(String(d.x).length / 4) + 'em'; })
     .attr('dy', function(d) { return y(d.y + d.y0) - 5; })
     .text(function(d) { return d.y || ''; });
 };
