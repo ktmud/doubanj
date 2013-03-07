@@ -18,10 +18,21 @@ function readConfig() {
 
   conf.__proto__ = defaultConf;
 
+  removeTailingSlash(conf, 'assets_root');
+  removeTailingSlash(conf, 'site_root');
+  removeTailingSlash(conf, 'ssl_root');
+
   // cryptokey for session
   conf.secret = createRandomString();
 
   return conf;
+}
+
+function removeTailingSlash(conf, k) {
+  var str = conf[k];
+  if (str && str[str.length - 1] == '/') {
+    conf[k] = str.slice(0, -1);
+  }
 }
 
 /**
