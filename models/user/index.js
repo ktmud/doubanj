@@ -160,6 +160,15 @@ User.prototype.toObject = function() {
   };
 };
 
+User.prototype.reset = function(cb) {
+  this.update({
+    book_n: null,
+    book_synced_n: 0,
+    last_synced: new Date(),
+    last_synced_status: 'ing'
+  }, cb);
+};
+
 // the percentage of generating progress
 User.prototype.progress = function() {
   var ps = this.progresses();
@@ -176,9 +185,10 @@ User.prototype.progresses = function() {
   if (user.created) ps[0] = 5;
   // starting to sync
   if (user.last_synced) ps[0] = 10;
+
   if (user.book_n === 0) {
     ps[0] = 80;
-  } else if (user.book_synced_n) {
+  } else if (user.book_n && user.book_synced_n) {
     // only book for now
     ps[0] = 5 + (user.book_synced_n / user.book_n) * 75;
   }
@@ -191,8 +201,16 @@ User.prototype.remaining = function() {
   var user = this;
   var total = user.book_n;
   var synced = user.book_synced_n;
+
+  if (!total) return 0;
+
   var perpage = task.API_REQ_PERPAGE;
-  return task.API_REQ_DELAY * Math.ceil((total - synced) / perpage);
+  var ret = (task.API_REQ_DELAY + 2000) * Math.ceil((total - synced) / perpage);
+
+  if (user.last_synced_status === 'ing') {
+    ret += 3 * total;
+  }
+  return ret;
 };
 
 /**

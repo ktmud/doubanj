@@ -1,4 +1,4 @@
-- need_resync = people.last_synced_status !== 'ing' || new Date() - people.last_synced > people.remaining()
+- need_resync = people.last_synced_status !== 'ing'
 .vmiddle
   if need_resync
     .alert.alert-error 上一次同步数据似乎出错了，重试一下吧

@@ -14,20 +14,20 @@ Do.ready(function() {
         // failed, retry after 10 secs
         if (!d || d.r) return check(10000);
 
+        updateProgress(d.percents);
+
         if (d.last_synced_status !== 'ing') {
           setTimeout(function() {
             window.location.reload();
-          }, 500);
+          }, 700);
           return;
         }
-
-        updateProgress(d.percents);
 
         var remaining = d.remaining;
         updateRemains(remaining);
 
         if (remaining < 120000) {
-          check(remaining < 30000 ? 300 : 3000);
+          check(remaining < 5000 ? 400 : 3000);
         }
       });
     }, dur || 2000);

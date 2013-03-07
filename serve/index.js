@@ -44,11 +44,7 @@ module.exports = function(app, central) {
       }
     });
 
-    user.update({
-      book_n: 999999,
-      last_synced: new Date(),
-      last_synced_status: 'ing'
-    }, function() {
+    user.reset(function() {
       res.redirect('/people/' + uid + '/');
     });
   });
