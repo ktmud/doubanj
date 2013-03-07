@@ -10,7 +10,9 @@ var error = debug('dbj:task:compute:book:error');
 var AggStream = common.AggStream;
 var conf_interest = common.conf_interest;
 
-var consts = require(process.cwd() + '/models/consts');
+var cwd = process.cwd();
+var raven = require(cwd + '/lib/raven');
+var consts = require(cwd + '/models/consts');
 
 var interest_statuses = consts.INTEREST_STATUS_ORDERED.book;
 
@@ -73,14 +75,15 @@ module.exports = function(db, user, cb, ondata) {
   };
 
   var results = {};
+  var last_err = null;
 
   var called = false;
   var err_cb = function(err) {
+    last_err = err;
     error('Aggregation failed: %s', err);
-    console.trace(err);
-    if (called) return;
-    called = true;
-    cb && cb(err);
+    //if (called) return;
+    //called = true;
+    //cb && cb(err);
   };
 
   var n_phrase = 1;
@@ -101,12 +104,20 @@ module.exports = function(db, user, cb, ondata) {
       results['n_' + item] = n;
       results['ratio_' + item] = (n / total * 100).toFixed(2);
     });
-    cb(null, results);
+    cb(last_err, results);
   }
 
   // find out all collected books by user
   col_i.find(ifilter, { fields: { subject_id: 1, status: 1 } }).toArray(function(err, docs) {
-    if (err) return err_cb(err);
+    if (err) {
+      raven.error(err, {
+        message: 'getting interests failed',
+        tags: { task: 'aggregate' },
+        extra: { stage: 'getting interest', uid: uid }
+      });
+      cb && cb(err);
+      return;
+    }
 
     // filter out subject ids by status
     var all_sids = [];
@@ -134,10 +145,13 @@ module.exports = function(db, user, cb, ondata) {
         prefilter: { $match: { id: { $in: sids } }, }
       });
 
-      agger.on('error', err_cb);
+      agger.once('error', err_cb);
       agger.once('close', function() {
+        this.fillup();
+
         var r = this.results;
         r.total = sids.length;
+
         results[i_status || 'all'] = r;
         tick();
       });
@@ -157,8 +171,9 @@ module.exports = function(db, user, cb, ondata) {
       collection: DB_INTEREST,
       prefilter: { $match: ifilter } 
     });
-    iagger.on('error', err_cb);
+    iagger.once('error', err_cb);
     iagger.once('close', function() {
+      this.fillup();
       results['interest'] = this.results;
       tick();
     });

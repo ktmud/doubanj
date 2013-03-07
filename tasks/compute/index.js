@@ -109,11 +109,11 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
         // timeout
         timeouts[ns] = setTimeout(function() {
           error_cb('TIMEOUT');
-        }, 80000);
+        }, 180000);
 
         // rung single job
         job(db, user, function(err, results) {
-          if (err) {
+          if (err && !results) {
             error_cb(err);
             return next();
           }
@@ -125,6 +125,7 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
 
           stats[ns] = new Date();
           all_results[ns + '_stats'] = results; 
+          all_results[ns + '_stats_error'] = err && err.name || err; 
 
           var stats_p = all_results.stats_p;
 

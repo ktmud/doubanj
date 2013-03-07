@@ -57,14 +57,12 @@ AggStream.prototype.run = function(agg_id) {
       next();
 
       if (err) {
-        console.trace(err);
         raven.error(err, {
           message: 'aggregation failed',
           tags: { task: 'aggregate' },
           extra: { agg_id: agg_id, uid: self.uid }
         });
         self.emit('error', err);
-        self.failures[agg_id] = err;
       }
       if (!result || !result.length) {
         verbose('%s for %s got empty results.', agg_id, self.uid);
@@ -98,6 +96,13 @@ AggStream.prototype.percent = function() {
     }
   }
   return (percent / whole * 100);
+};
+AggStream.prototype.fillup = function() {
+  var dones = this.results;
+  var failures = this.failures;
+  for (var k in failures) {
+    dones = dones[k] || failures[k];
+  }
 };
 AggStream.prototype.hasFailure = function() {
   return Object.keys(this.failures).length > 0;
@@ -219,7 +224,7 @@ function aggSort(p, desc_asc, limit, fields) {
     };
   });
   // only output the id (which is subject_id or user_id in douban)
-  return [{ $sort: p }, { $match: match_q }, { $limit: limit }, { $project: fields }];
+  return [{ $match: match_q }, { $limit: 8000 }, { $sort: p }, { $limit: limit }, { $project: fields }];
 }
 function aggTop(p, unwind, limit) {
   limit = limit || 20;

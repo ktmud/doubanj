@@ -4,10 +4,12 @@ Do.ready(function() {
 
   var total = 0;
   function check(dur) {
-    total += dur;
+    total++;
 
-    // time out after three minutes.
-    if (total > 180000) return;
+    // stop after 100 request
+    if (total > 100) return;
+
+    if (dur < 500) dur = 500;
 
     setTimeout(function() {
       $.getJSON('/api/people/' + window._uid_ + '/progress', function(d) {
