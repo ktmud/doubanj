@@ -1,9 +1,10 @@
 var util = require('util');
 
 var debug = require('debug');
-var log = debug('dbj:aggregate:log');
+var verbose = debug('dbj:aggregate:verbose');
 var error = debug('dbj:aggregate:error');
 
+var mongo = require('../../lib/mongo');
 var raven = require('../../lib/raven');
 var extend = require('../../lib/utils').extend;
 
@@ -42,31 +43,37 @@ AggStream.prototype.run = function(agg_id) {
   if (!(agg_id in params)) return;
 
   var self = this;
-  var col = self.collection;
   var param = params[agg_id];
   if (self.prefilter instanceof Array) {
     param = self.prefilter.concat(param);
   } else if (self.prefilter) {
     param = [self.prefilter].concat(param);
   };
-  col.aggregate(param, function(err, result) {
-    //log(JSON.stringify(param));
-    if (err) {
-      raven.error(err, {
-        message: 'aggregation failed',
-        tags: { task: 'aggregate' },
-        extra: { agg_id: agg_id, uid: self.uid }
-      });
-      self.emit('error', err);
-      self.failures[agg_id] = err;
-    }
-    if (!result || !result.length) {
-      log('%s for %s got empty results.', agg_id, self.uid);
-    }
-    self.results[agg_id] = result;
+  mongo.queue(function(db, next) {
+    var col = db.collection(self.collection);
 
-    if (self.percent() >= 100) self.drain();
-  });
+    //verbose('starting %s aggregation for %s', agg_id, self.uid);
+    col.aggregate(param, function(err, result) {
+      next();
+
+      if (err) {
+        console.trace(err);
+        raven.error(err, {
+          message: 'aggregation failed',
+          tags: { task: 'aggregate' },
+          extra: { agg_id: agg_id, uid: self.uid }
+        });
+        self.emit('error', err);
+        self.failures[agg_id] = err;
+      }
+      if (!result || !result.length) {
+        verbose('%s for %s got empty results.', agg_id, self.uid);
+      }
+      self.results[agg_id] = result;
+
+      if (self.percent() >= 100) self.drain();
+    });
+  }, 2);
 };
 AggStream.prototype.close = function() {
   this.emit('end');
@@ -212,7 +219,7 @@ function aggSort(p, desc_asc, limit, fields) {
     };
   });
   // only output the id (which is subject_id or user_id in douban)
-  return [{ $match: match_q }, { $sort: p }, { $limit: limit },  { $project: fields }];
+  return [{ $sort: p }, { $match: match_q }, { $limit: limit }, { $project: fields }];
 }
 function aggTop(p, unwind, limit) {
   limit = limit || 20;

@@ -208,8 +208,8 @@ User.prototype.remaining = function() {
   var perpage = task.API_REQ_PERPAGE;
   var ret = (task.API_REQ_DELAY + 4000) * Math.ceil((total - synced) / perpage);
 
-  if (user.last_synced_status === 'ing') {
-    ret += 100 * Math.round(Math.sqrt(total));
+  if (user.last_synced_status === 'ing' || user.stats_status === 'ing') {
+    ret += Math.round(Math.sqrt(total)) * (user.stats_p || 100);
   }
   return ret;
 };

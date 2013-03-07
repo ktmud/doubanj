@@ -58,9 +58,11 @@ var conf_book = {
 var agg_param_book = common.aggParam(conf_book);
 var agg_param_interest = common.agg_param_interest;
 
+var DB_INTEREST = 'book_interest';
+var DB_BOOK = 'book';
 module.exports = function(db, user, cb, ondata) {
-  var col_s = db.collection('book');
-  var col_i = db.collection('book_interest');
+  var col_s = db.collection(DB_BOOK);
+  var col_i = db.collection(DB_INTEREST);
 
   var uid = user.uid || user.id;
   var ifilter = {
@@ -75,6 +77,7 @@ module.exports = function(db, user, cb, ondata) {
   var called = false;
   var err_cb = function(err) {
     error('Aggregation failed: %s', err);
+    console.trace(err);
     if (called) return;
     called = true;
     cb && cb(err);
@@ -127,7 +130,7 @@ module.exports = function(db, user, cb, ondata) {
       var agger = new AggStream({
         uid: uid,
         params: agg_param_book,
-        collection: col_s,
+        collection: DB_BOOK,
         prefilter: { $match: { id: { $in: sids } }, }
       });
 
@@ -151,7 +154,7 @@ module.exports = function(db, user, cb, ondata) {
     var iagger = new AggStream({
       uid: uid,
       params: agg_param_interest,
-      collection: col_i,
+      collection: DB_INTEREST,
       prefilter: { $match: ifilter } 
     });
     iagger.on('error', err_cb);

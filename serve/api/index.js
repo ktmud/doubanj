@@ -7,14 +7,17 @@ module.exports = function(app, central) {
     if (people) {
       var remaining = people.remaining();
       var delay = central.task.API_REQ_DELAY;
-      res.json({
+      var ret = {
         r: 0,
-        interval: remaining < delay ? remaining / 5 : delay,
+        interval: remaining < delay ? remaining / 5 : delay + 30000,
         last_synced: people.last_synced,
         last_synced_status: people.last_synced_status,
+        stats_status: people.stats_status,
         percents: people.progresses(),
         remaining: people.remaining()
-      });
+      };
+      //console.log(ret);
+      res.json(ret);
     } else {
       res.statusCode = 404;
       res.json({

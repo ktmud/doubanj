@@ -19,7 +19,7 @@ Do.ready(function() {
         var remaining = d.remaining;
         updateRemains(remaining);
 
-        if (d.last_synced_status !== 'ing') {
+        if (d.last_synced_status !== 'ing' && d.stats_status !== 'ing') {
           setTimeout(function() {
             window.location.reload();
           }, 800);
