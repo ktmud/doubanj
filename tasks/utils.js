@@ -37,7 +37,15 @@ function isDigit(str) {
 }
 function parse_date(d) {
   d = d || '';
-  d = d.trim().replace(/[\s\-、\,－]+/, '-', 2).replace(/[^0-9\-\s\:a-zA-Z]/g, '');
+
+  var i = 0;
+  d = d.trim().replace(/[\s\-、\,－]+/g, function(m) {
+    i++;
+    if (i > 2) {
+      return ' ';
+    }
+    return '-';
+  }).replace(/[^0-9\-\s\:a-zA-Z]/g, '');
 
   var r;
   if (isDigit(d)) {
