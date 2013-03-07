@@ -182,9 +182,6 @@ module.exports = function(grunt) {
       tmp: {
         src: ['tmp/static/js', 'tmp/static/css']
       },
-      hash: {
-        src: ['static/hash.json']
-      },
       js: {
         src: ['static/dist/js/']
       },
