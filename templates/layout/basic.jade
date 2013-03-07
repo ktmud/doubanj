@@ -10,6 +10,8 @@ html
     script(src=static('/js/do.js'), data-cfg-corelib='main', data-cfg-root=static('/'))
     script
       Do.urls(!{urlmap('main')});
+    if !conf.debug
+      include ../common/track
   body
     block header
       block navbar
