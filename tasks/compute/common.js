@@ -71,7 +71,7 @@ AggStream.prototype.run = function(agg_id) {
 
       if (self.percent() >= 100) self.drain();
     });
-  }, 2);
+  });
 };
 AggStream.prototype.close = function() {
   this.emit('end');
