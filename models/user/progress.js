@@ -48,7 +48,7 @@ exports.progresses = function() {
     ps[0] = 80;
   } else if (user.book_n && user.book_synced_n) {
     // only book for now
-    ps[0] = 5 + (user.book_synced_n / user.book_n) * 75;
+    ps[0] = 10 + (user.book_synced_n / user.book_n) * 70;
   }
   // 20% percent is for computing
   ps[1] = ps[0] >= 80 ? (user.stats_p || 0) * 0.2 : 0;
@@ -58,7 +58,7 @@ exports.progresses = function() {
 * interval for checking progress
 */
 exports.progressInterval = function(remaining, delay) {
-  return (remaining && remaining < delay + 3000) ? Math.max(remaining / 5, 600) : delay + 3000;
+  return (remaining && remaining < delay + 3000) ? Math.max(remaining / 5, 1000) : delay + 3000;
 };
 
 exports.isEmpty = function(ns) {

@@ -10,6 +10,7 @@ module.exports = function(app, central) {
       var ret = {
         r: 0,
         interval: people.progressInterval(remaining, delay),
+        is_ing: people.isIng(),
         last_synced: people.last_synced,
         last_synced_status: people.last_synced_status,
         stats_status: people.stats_status,
