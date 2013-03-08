@@ -95,7 +95,7 @@ module.exports = function(app, central) {
 
     res.data.title = people.name + istatus.name;
 
-    if (people.notReady()) {
+    if (people.notReady() || people.isEmpty(istatus.ns)) {
       return res.redirect('/people/' + req.params.uid + '/');
     }
 
