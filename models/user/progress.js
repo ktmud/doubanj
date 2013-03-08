@@ -83,7 +83,7 @@ exports.statsRemaining = function() {
   if (total === null) return null;
 
   if (user.stats_status === 'ing') {
-    return Math.round(Math.sqrt(total)) * (user.stats_p || 100);
+    return Math.round(Math.sqrt(total)) * (100 - (user.stats_p || 0)) * 10;
   }
   if (user.stats) return 0;
   return null;
