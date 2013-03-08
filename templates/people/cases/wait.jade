@@ -1,4 +1,4 @@
-- need_resync = people.last_synced_status !== 'ing' && people.stats_status !== 'ing'
+- need_resync = people.last_synced_status !== 'ing' && people.stats_status !== 'ing' || new Date() - people.last_synced > 1800000
 .vmiddle
   if need_resync
     .alert.alert-error 上一次同步数据似乎出错了，重试一下吧
