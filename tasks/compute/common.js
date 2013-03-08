@@ -101,7 +101,7 @@ AggStream.prototype.fillup = function() {
   var dones = this.results;
   var failures = this.failures;
   for (var k in failures) {
-    dones = dones[k] || failures[k];
+    dones = dones[k] || [];
   }
 };
 AggStream.prototype.hasFailure = function() {
@@ -248,8 +248,15 @@ function aggRange(p, dots) {
       $cond: [ { $lt: ['$' + p, n] }, n, addcond(items) ]
     }
   }
-  return [
-    {
+  var match_q = {};
+  match_q[p] = {
+    $not: {
+      $type: 10
+    }
+  };
+  return [ {
+      $match: match_q
+    }, {
       $project: {
         range: addcond(dots)
       }
@@ -302,7 +309,16 @@ function aggDate(p, period, group_by) {
       };
     });
   }
+  var match_q = {};
+  match_q[p] = {
+    $not: {
+      $type: 10
+    }
+  };
+
   var ret = [{
+    $match: match_q
+  }, {
     $project: prj
   }, {
     $group: grp 

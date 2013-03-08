@@ -11,8 +11,10 @@ var currency_trans = [
 function parse_price(price) {
   if (!price) return NaN;
 
+  price = dbc2sbc(price);
+
   var n = parseFloat(price, 10);
-  if (!isNaN(n)) return n;
+  if (!isNaN(n)) return null;
 
   for (var i = 0, l = currency_trans.length; i < l; i++) {
     var item = currency_trans[i];
@@ -28,8 +30,9 @@ function parse_price(price) {
 function parse_pages(pages) {
   if (!pages || pages.search('册') > -1) return null;
   pages = pages.replace(/^\s*大?约\s*/, '');
+  pages = dbc2sbc(pages);
   var n = parseInt(pages, 10);
-  if (isNaN(n)) raven.message('invalid page %s', pages, { tags: { parsing: 'pages' }, level: 'warn' });
+  if (isNaN(n)) return null;
   return n;
 }
 function isDigit(str) {
@@ -37,6 +40,8 @@ function isDigit(str) {
 }
 function parse_date(str) {
   var d = str || '';
+
+  d = dbc2sbc(d);
 
   var i = 0;
   d = d.trim().replace(/[\s\-、\,－]+/g, function(m) {
@@ -59,10 +64,7 @@ function parse_date(str) {
   }
 
   r = new Date(d);
-  if (d && isNaN(+r)) {
-    console.log('invalid date %s', d);
-    raven.message('invalid date %s', d, { tags: { parsing: 'date' }, level: 'warn' });
-  }
+  if (isNaN(+r)) return null;
   return r;
 }
 function parse_pubdate(d) {
@@ -103,10 +105,21 @@ function norm_subject(s, ns) {
   } else if ('book_id' in s) {
     s.type = book;
   }
-  for (var k in parsers) {
+  var k, oril
+  for (k in parsers) {
     if (k in s) {
-      s['ori_' + k] = s[k]; // backup original value
+      ori = s['ori_' + k] = s[k]; // backup original value
       s[k] = parsers[k](s[k]);
+      if (s[k] && ori && s[k] === null) {
+        console.log('invalid %s %s', k, ori); 
+        raven.message('invalid %s %s', k, ori, {
+          tags: { parsing: k },
+          extra: {
+            subject: s.id
+          },
+          level: 'warn'
+        });
+      }
     }
   }
   if (s.rating) {
@@ -121,6 +134,10 @@ function norm_interest(i) {
   i.commented = i.comment && i.comment.length || 0;
   i['updated'] = parse_date(i['updated']);
   return i;
+}
+
+function dbc2sbc(str) {
+  return str.replace(/[\uff01-\uff5e]/g,function(a){return String.fromCharCode(a.charCodeAt(0)-65248);}).replace(/\u3000/g," ");
 }
 
 module.exports = {
