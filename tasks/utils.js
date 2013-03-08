@@ -59,6 +59,10 @@ function parse_date(str) {
     if (isNaN(+r)) {
       d = [d.slice(0, 4), d.slice(4, 5) || 1, d.slice(5) || 1].join('-');
     } else {
+      if　(r.getFullYear() > 3000) {
+        // 890606
+        d = [d.slice(0,2), d.slice(2,4) || 1, d.slice(4, 6) || 1].join('-');
+      }
       d = _d;
     }
   }
