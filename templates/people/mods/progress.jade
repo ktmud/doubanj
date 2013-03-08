@@ -3,7 +3,7 @@
   each p, i in people.progresses()
     - color = progress_colors[i]
     div(class="progress-bar progress-bar-#{color}", style="width:#{p}%")
-if people.last_synced_status === 'ing' || !people.stats_fail
+if people.isIng()
   script
     window._uid_ = '#{people.uid}';
     !{istatic('js/people/progress.js')}

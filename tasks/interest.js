@@ -31,7 +31,7 @@ function FetchStream(arg) {
   this.ns = arg.ns;
   this.user = arg.user;
   this.perpage = arg.perpage || task.API_REQ_PERPAGE;
-  this.total = 0;
+  this.total = null;
   this.fetched = 0;
   this.status = 'ready';
 
@@ -78,9 +78,14 @@ FetchStream.prototype._fetch_cb = function() {
     var total = data.total;
 
     // no data
-    if (!total) {
+    if (total === 0) {
       verbose('no data at all');
+      self.total = 0;
       self.status = 'succeed';
+      return self.end();
+    } else if (!total) {
+      // invalid total
+      self.status = 'failed';
       return self.end();
     }
 
@@ -227,7 +232,7 @@ FetchStream.prototype.updateUser = function(cb) {
   var ns = self.ns;
   var obj = { invalid: 0 };
 
-  obj[ns + '_n'] = self.total || null;
+  obj[ns + '_n'] = self.total;
   obj[ns + '_synced_n'] = self.fetched;
   obj['last_synced'] = obj[ns +'_last_synced'] = new Date();
   obj['last_synced_status'] = obj[ns +'_last_synced_status'] = self.status;

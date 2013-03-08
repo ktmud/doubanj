@@ -6,7 +6,6 @@ var error = debug('dbj:user:error');
 
 var cwd = central.cwd;
 var conf = central.conf;
-var task = central.task;
 
 var mongo = require(cwd + '/lib/mongo');
 var utils = require(cwd + '/lib/utils');
@@ -30,7 +29,15 @@ function User(info) {
 
 util.inherits(User, mongo.Model);
 
+/**
+* output stats as csv
+*/
 utils.extend(User.prototype, require('./stats'));
+
+/**
+* calculate syncing stage
+*/
+utils.extend(User.prototype, require('./progress'));
 
 User.prototype.kind = User.prototype._collection = USER_COLLECTION;
 
@@ -83,17 +90,6 @@ User.get = function(uid, cb) {
     return cb(null, u);
   });
 };
-User.getByPass = function(uid, password, cb) {
-  if (!uid || !password) return cb(401);
-  User.getFromMongo(uid, function(err, user) {
-    if (err || !user) return cb(err, user);
-    if (user.verifyPassword(password)) return cb(null, user);
-    return cb(403);
-  });
-};
-User.prototype.verifyPassword = function() {
-};
-
 // pull from douban api, get account info
 User.prototype.pull = function(cb) {
   var self = this;
@@ -124,6 +120,16 @@ User.prototype.pull = function(cb) {
     });
   }, 0);
 };
+User.getByPass = function(uid, password, cb) {
+  if (!uid || !password) return cb(401);
+  User.getFromMongo(uid, function(err, user) {
+    if (err || !user) return cb(err, user);
+    if (user.verifyPassword(password)) return cb(null, user);
+    return cb(403);
+  });
+};
+User.prototype.verifyPassword = function() {
+};
 
 
 User.prototype.toObject = function() {
@@ -151,8 +157,8 @@ User.prototype.toObject = function() {
     'stats_p': this.stats_p, // stats percentage
     'stats_fail': this.stats_fail,
     'book_stats': this.book_stats,
-    'book_n': this.book_n || 0,
-    'book_synced_n': this.book_synced_n || 0,
+    'book_n': this.book_n,
+    'book_synced_n': this.book_synced_n,
     'book_last_synced': this.book_last_synced,
     'book_last_synced_status': this.book_last_synced_status,
     'movie_n': this.movie_n || 0,
@@ -160,81 +166,6 @@ User.prototype.toObject = function() {
     'atime': now
   };
 };
-
-User.prototype.reset = function(cb) {
-  this.update({
-    book_n: null,
-    book_synced_n: 0,
-    last_synced: new Date(),
-    last_synced_status: 'ing'
-  }, cb);
-};
-
-// the percentage of generating progress
-User.prototype.progress = function() {
-  var ps = this.progresses();
-  var n = 0;
-  ps.forEach(function(item) {
-    n += item;
-  });
-  return n;
-};
-User.prototype.progresses = function() {
-  var ps = [0, 0];
-  var user = this;
-  // got douban account info
-  if (user.created) ps[0] = 5;
-  // starting to sync
-  if (user.last_synced) ps[0] = 10;
-
-  if (user.book_n === 0) {
-    ps[0] = 80;
-  } else if (user.book_n && user.book_synced_n) {
-    // only book for now
-    ps[0] = 5 + (user.book_synced_n / user.book_n) * 75;
-  }
-  // 20% percent is for computing
-  ps[1] = ps[0] >= 80 ? (user.stats_p || 0) * 0.2 : 0;
-  return ps;
-};
-// expected remaing time for finish collectng job
-User.prototype.remaining = function() {
-  var user = this;
-  var total = user.book_n;
-  var synced = user.book_synced_n;
-
-  if (!total) return null;
-
-  var perpage = task.API_REQ_PERPAGE;
-  var ret = (task.API_REQ_DELAY + 4000) * Math.ceil((total - synced) / perpage);
-
-  if (user.last_synced_status === 'ing' || user.stats_status === 'ing') {
-    ret += Math.round(Math.sqrt(total)) * (user.stats_p || 100);
-  }
-  return ret;
-};
-
-/**
-* To prepare stats csv
-*/
-
-Object.defineProperty(User.prototype, 'is', {
-  get: function() {
-    return function(role) {
-      var roles = this.roles || [];
-      // admin is everything...
-      return ~roles.indexOf(role) || ~roles.indexOf('admin');
-    };
-  },
-  enumerable: false
-});
-
-Object.defineProperty(User.prototype, 'isAdmin', {
-  get: function() {
-    return this.is('admin');
-  },
-  enumerable: false
-});
 
 User.prototype.url = function() {
   return [conf.site_root, 'people', this.uid || this.id].join('/') + '/';

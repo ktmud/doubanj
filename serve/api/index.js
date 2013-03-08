@@ -9,7 +9,7 @@ module.exports = function(app, central) {
       var delay = central.task.API_REQ_DELAY;
       var ret = {
         r: 0,
-        interval: remaining < delay + 3000 ? Math.max(remaining / 5, 300) : delay + 3000,
+        interval: people.progressInterval(remaining, delay),
         last_synced: people.last_synced,
         last_synced_status: people.last_synced_status,
         stats_status: people.stats_status,

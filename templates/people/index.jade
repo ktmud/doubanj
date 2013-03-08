@@ -14,17 +14,17 @@ block main
             input(type="hidden", name="uid", value=uid)
             p.vmiddle
               button.btn.btn-primary 开始为 #{name} 制造美味豆瓣酱
-        else if people.last_synced_status == 'timeout'
+        else if people.syncTimeout()
           .vmiddle
             p.alert.alert-error 抱歉，同步数据超时了，重试看看吧
             hr
             include ./mods/resync 
-        else if people.last_synced_status === 'ing' && !people.stats
-          .vmiddle
-            include ./cases/wait
-        else if people.book_n === 0
+        else if people.isEmpty('book')
           .vmiddle
             include ./cases/zero
+        else if people.isIng() && !people.stats
+          .vmiddle
+            include ./cases/wait
         else if people.stats
           include ./mods/stats
         else if people.stats_fail
