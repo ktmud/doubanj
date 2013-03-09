@@ -5,8 +5,9 @@
     if most_commented
       ol.comments-list
         each i in most_commented
-          li(id="comment-#{i.id}")
-            mixin comment_item(i)
+          if i.comment
+            li(id="comment-#{i.id}")
+              mixin comment_item(i)
     else
       .vmiddle
         p.muted 收藏时写的短评会出现在这里
@@ -15,8 +16,6 @@
       a.btn.btn-small(href="http://#{ns}.douban.com/people/#{uid}/reviews", target="db-review") 去看#{people.name}的长评 ⇗
 
 mixin comment_item(i)
-  if !i.comment
-    - return ''
   small.muted.datetime.pull-right #{strftime('%Y-%m-%d', i.updated)}
   p 评《
     mixin subject_link(i)
