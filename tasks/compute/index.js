@@ -137,6 +137,7 @@ compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
           // all works done, safe to save.
           if (stats_p >= 100) {
             stats_p = 100;
+            all_results.last_statsed = stats[ns];
             all_results.stats = stats;
             all_results.stats_p = stats_p;
             all_results.stats_status = 'succeed';

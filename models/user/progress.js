@@ -49,10 +49,10 @@ exports.progresses = function() {
     ps[0] = 80;
   } else if (user.book_n && user.book_synced_n) {
     // only book for now
-    ps[0] = 10 + (user.book_synced_n / user.book_n) * 70;
+    ps[0] = 10 + Math.ceil((user.book_synced_n / user.book_n) * 70);
   }
   // 20% percent is for computing
-  ps[1] = ps[0] >= 80 ? (user.stats_p || 0) * 0.2 : 0;
+  ps[1] = ps[0] >= 80 ? Math.ceil((user.stats_p || 0) * 0.2) : 0;
   return ps;
 };
 /**
@@ -102,15 +102,18 @@ exports.syncRemaining = function() {
   var perpage = task.API_REQ_PERPAGE;
   return (task.API_REQ_DELAY + 4000) * Math.ceil((total - synced) / perpage);
 }
+exports.isSyncing = function() {
+  return this.last_synced_status === 'ing'
+}
 
 /**
-* syncing timeout
+* is syncing timeout
 */
 exports.syncTimeout = function() {
   var sync_remaining = this.syncRemaining();
   // 30 minutes by default
-  if (sync_remaining) sync_remaining = 1800000;
-  return new Date() > this.last_synced + sync_remaining;
+  if (!sync_remaining) sync_remaining = 1800000;
+  return new Date() - this.last_synced > sync_remaining;
 };
 
 /**

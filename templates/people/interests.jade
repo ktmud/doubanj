@@ -20,24 +20,7 @@ mixin book
   .alert.alert-success
     p 共 #{people.book_n} 条图书记录，已同步 #{people.book_synced_n} 条，上次同步于&nbsp;
       time #{strftime(FULL_TIME, people.book_last_synced)}
-  ol.interests-list
-    each i in interests.book
-      li 
-        a(href="http://book.douban.com/subject/#{i.book_id}/") 
-          div.status #{i.istatus()}
-              mixin stars(i.rating)
-          &nbsp;
-          if i.book
-            .row
-              .span5
-                img.img-rounded(src=i.book.images.medium)
-              .span7
-                p.title #{i.book.title}
-                p.meta.authors #{i.book.author.join(', ')}
-                if i.book.publisher
-                  p.meta.publisher #{i.book.publisher}
-          else
-            book:#{i.book_id}
+  mixin interests_list(interests.book)
 
 mixin movie
 

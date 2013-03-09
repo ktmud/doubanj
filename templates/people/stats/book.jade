@@ -7,56 +7,21 @@ else
   - s = people.book_stats
   - coll = s.all
 
-if !istatus
+if istatus.status == 'all'
   h2 #{people.name} 的读书酱
     a.btn.btn-mini.btn-compact(href=people.db_url('book'), target="db-profile")   读书主页 ⇗
     .pull-right
       a.btn.btn-mini.btn-info(href=people.url() + 'read') 只看读过
   include ./book/general
-  hr
-  include ./book/tags
-hr
-.row.mod
-  .span12
-    h3 阅读编年史
-  .span12.chart.chart-bar#d-by_updated(data-bar=people.book_csv('by_updated_month', istatus && [istatus.status]), data-y="本", data-periodic="true")
-    .caption 每月阅读量
-  .span12.chart.chart-bar#d-by_pubdate(data-legend='false', data-bar=people.book_csv('by_pubdate_decades'), data-y="本")
-    .caption 收藏图书的出版年代
-hr
-.row.mod
-  .span12
-    h3 阅读之最
-  .span3
-    h4 最厚的书
-    mixin small_list(coll.most_pages.slice(0,5), 'pages', '页')
-  .span3
-    h4 最薄的书
-    mixin small_list(coll.least_pages.slice(0,5), 'pages', '页')
-  .span3
-    h4 最贵的书
-    mixin small_list(coll.most_price.slice(0,5), 'ori_price')
-  .span3
-    h4 最便宜的书
-    mixin small_list(coll.least_price.slice(0,5), 'ori_price')
-.row.mod
-  .span3
-    h4 豆瓣评分最高
-    mixin small_list(coll.most_rated.slice(0,10), 'rated')
-  .span3
-    h4 豆瓣评分最低
-    mixin small_list(coll.least_rated.slice(0,10), 'rated')
-  .span3
-    h4 最多人看过
-    mixin small_list(coll.most_raters.slice(0,10), 'raters')
-  .span3
-    h4 最少人看过
-    mixin small_list(coll.least_raters.slice(0,10), 'raters')
 
-mixin small_list(items, prop, suffix)
-  - suffix = suffix || ''
-  ol.muted.list-small
-    each b in items
-      li
-        a(href="http://book.douban.com/subject/#{b.id}/", target="db-book") #{trunc(b.title, 8)}
-        span.label-compact #{b[prop]}#{suffix}
+hr
+include ./book/hots
+hr
+include ./book/history
+hr
+include ./book/tops
+
+if locals.most_commented
+  include ./book/quote
+if locals.highest_ratings
+  include ./book/favs

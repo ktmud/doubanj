@@ -13,7 +13,7 @@ var currency_trans = [
   [/^\s*(CDN|CAD)[\.\s]*\$?\s*/i, 6.1]
 ];
 function parse_price(price) {
-  if (!price) return NaN;
+  if (!price) return null;
 
   price = dbc2sbc(price).replace(/[,，]/g, '');
 
@@ -120,11 +120,14 @@ var date_formats = [
 function parse_pubdate(d) {
   d = normalize_date(d);
 
+  if (!d) return null;
+
   var i = 0, l = date_formats.length;
   var ret = null, f, mo, y;
   for (;i < l;i++) {
     f = date_formats[i];
     mo = moment(d, f);
+    if (!mo) return null;
     y = mo.year();
     if (mo.isValid() && y > 800 && y < 2100) {
       if (y > 2020) {

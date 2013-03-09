@@ -42,7 +42,7 @@ function norm_subject(s, ns) {
 }
 function norm_interest(i) {
   i.status = normalize_status[i.status];
-  i.commented = i.comment && i.comment.length || 0;
+  i.commented = i.comment && i.comment.length || null;
   i['updated'] = new Date(i['updated']);
   return i;
 }

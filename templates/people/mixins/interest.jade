@@ -22,17 +22,17 @@ mixin searchcloud(tags, ns)
 mixin stars(star)
   if !star || !star.value
     - return
-  - var n = star.max, s = '';
+  - var n = star.max || 5, s = '';
   - star = star.value
   while n > 0
     - star--
     - n --
-    - s += star > 0 ? '&#10029;' : '&#10025'
+    - s += star >= 0 ? '&#10029;' : '&#10025'
   span.stars !{s}
 
 mixin interest_item(i, trimto)
   trimto = trimto || 100
-  span.label.label-status #{i.istatus()}
+  span.label.label-status #{i.status_cn()}
   &nbsp;
   if i.book
     a(href="http://book.douban.com/subject/#{i.book_id}/",
@@ -42,3 +42,21 @@ mixin interest_item(i, trimto)
   else
     a(href="http://book.douban.com/subject/#{i.book_id}/", target="_blank")
       | #{i.book_id}
+
+
+mixin interests_list(items)
+  ol.interests-list
+    each i in items
+      li 
+        a(href="http://book.douban.com/subject/#{i.book_id}/", target="db-#{i.subject_type}") 
+          div.status #{i.status_cn()}
+              mixin stars(i.rating)
+          if i.book
+            .pic
+              img(src=i.book.images.medium)
+            p.title #{i.book.title}
+            p.meta.authors !{i.book.author.join(', ')}
+            if i.book.publisher
+              p.meta.publisher #{i.book.publisher}
+          else
+            book:#{i.book_id}

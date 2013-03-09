@@ -8,7 +8,6 @@ var log = debug('dbj:task:compute:book:info');
 var error = debug('dbj:task:compute:book:error');
 
 var AggStream = common.AggStream;
-var conf_interest = common.conf_interest;
 
 var cwd = process.cwd();
 var raven = require(cwd + '/lib/raven');

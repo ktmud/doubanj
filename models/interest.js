@@ -29,11 +29,14 @@ function Interest(info) {
     //this[i] = info[i];
   //}
 
-  for (var i = 0, l = DOUBAN_APPS.length; i < l; i++) {
-    var ns = DOUBAN_APPS[i];
-    if (info[ns + '_id']) {
-      self[ns + '_id'] = self['subject_id'] = info[ns + '_id'];
-      self.subject_type = self.subject_type = ns;
+  if (!self.subject_type) {
+    for (var i = 0, l = DOUBAN_APPS.length; i < l; i++) {
+      var ns = DOUBAN_APPS[i];
+      if (info[ns + '_id']) {
+        self[ns + '_id'] = self['subject_id'] = info[ns + '_id'];
+        self.subject_type = self.subject_type = ns;
+        break;
+      }
     }
   }
   if (!self.subject_type) throw new Error('invalid interest details');
@@ -79,9 +82,7 @@ Interest.get = function(ns, i_id, cb, attach_subject) {
     });
   });
 };
-
-Interest.findByUser = function(ns, uid, opts, cb) {
-  verbose('getting interests obj for user %s', uid);
+Interest.find = function(ns, query, opts, cb) {
 
   opts = opts || {};
   if (typeof opts === 'function') {
@@ -98,14 +99,7 @@ Interest.findByUser = function(ns, uid, opts, cb) {
       obj[sort] = opts.asc ? 1 : -1;
       sort = obj;
     }
-    collection.find({
-      '$or': [
-        // douban id
-        { 'uid': uid },
-        // local id
-        { 'user_id': uid }
-      ]
-    }, {
+    collection.find(query, {
       limit: opts.limit || 20,
       start: opts.start || 0,
       sort: sort
@@ -114,16 +108,15 @@ Interest.findByUser = function(ns, uid, opts, cb) {
         error('get interests failed: %s', err);
         return cb(err);
       }
-      if (docs.length === 0) {
-        log('get interests failed: %s', 'none result');
+      if (!docs || docs.length === 0) {
+        log('get interests failed: ', 'no result');
         return cb(err);
       }
 
       verbose('found %s interests', docs.length);
 
       var ret = docs.map(function(item) {
-        var i = new Interest(item);
-        return i;
+        return new Interest(item);
       });
       verbose('extended to Interest.');
 
@@ -131,42 +124,70 @@ Interest.findByUser = function(ns, uid, opts, cb) {
         verbose('no need for attach subject, interests got.');
         return cb(null, ret);
       }
-
-      var n = ret.length;
-      function tick() {
-        n--;
-        if (n === 0) {
-          verbose('all subjects attached.');
-          cb(null, ret);
-        }
-      }
-      var sids = {};
-      ret.forEach(function(i) {
-        sids[i.subject_id] = i;
-        //log('try getting interest\'s subject %s..', i.subject_id);
-        //Subject.get(ns, i.subject_id, function(err, s) {
-          //if (s) i.subject = i[ns] = s;
-          //tick();
-        //}); 
-      });
-      Subject.stream(ns, Object.keys(sids), function(stream) {
-        stream.on('data', function(item) {
-          s = Subject(item);
-          var i = sids[s.id];
-          i.subject = i[ns] = s;
-        });
-        stream.once('error', function(err) {
-          error('getting subjects failed: %s', err);
-          cb(err);
-        });
-        stream.on('close', function() {
-          verbose('all subjects attached.');
-          cb(null, ret);
-        });
-      });
+      attachSubject(ns, ret, cb);
     });
   });
 };
+Interest.findByUser = function(ns, uid, opts, cb) {
+  verbose('getting interests obj for user %s', uid);
+
+  var query = opts.query || {};
+  query.uid = uid;
+  return Interest.find(ns, query, opts, cb);
+};
+Interest.gets = function(ns, ids, opts, cb) {
+  var query = {
+    'id': {
+      '$in': ids
+    },
+  };
+  return Interest.find(ns, query, opts, cb);
+};
+
+function attachSubject(ns, ret, next) {
+
+  var called = false;
+  function cb(err, ret) {
+    if (called) return;
+    next && next(err, ret);
+    called = true;
+  }
+
+  var n = ret.length;
+  function tick() {
+    n--;
+    if (n === 0) {
+      verbose('all subjects attached.');
+      cb(null, ret);
+    }
+  }
+
+  var by_ids = {};
+  ret.forEach(function(i) {
+    by_ids[i.subject_id] = i;
+  });
+
+  var last_err = null;
+  Subject.stream(ns, Object.keys(by_ids), function(stream) {
+    stream.on('data', function(item) {
+      s = Subject(item);
+      var i = by_ids[s.id];
+      i.subject = i[ns] = s;
+    });
+    stream.once('error', function(err) {
+      last_err = err;
+      error('getting subjects failed: %s', err);
+    });
+    stream.once('close', function() {
+      cb(last_err, ret);
+    });
+  });
+
+  // time out for stream
+  setTimeout(function() {
+    cb('TIMEOUT', ret);
+  }, 12000);
+}
 
 Interest.prototype.toObject = function() {
   var self = this;
@@ -185,10 +206,12 @@ Interest.prototype.toObject = function() {
   ret[s_key] = self[s_key];
   return ret;
 };
-
-Interest.prototype.istatus = function(ns, unknown) {
+Interest.prototype.subject_ns = function() {
+  return this.subject_type;
+};
+Interest.prototype.status_cn = function(unknown) {
   unknown = '' || unknown;
-  return INTEREST_STATUS_LABELS[ns || 'book'][this.status] || unknown;
+  return INTEREST_STATUS_LABELS[this.ns || 'book'][this.status] || unknown;
 };
 
 module.exports = function(uid) {

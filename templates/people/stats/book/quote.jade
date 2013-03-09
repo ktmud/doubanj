@@ -1,0 +1,31 @@
+.row.mod
+  .span12
+    h4 最有话说
+       small.muted (不包括长篇评论)
+    if most_commented
+      ol.comments-list
+        each i in most_commented
+          li(id="comment-#{i.id}")
+            mixin comment_item(i)
+    else
+      .vmiddle
+        p.muted 收藏时写的短评会出现在这里
+    hr
+    .pull-right
+      a.btn.btn-small(href="http://#{ns}.douban.com/people/#{uid}/reviews", target="db-review") 去看#{people.name}的长评 ⇗
+
+mixin comment_item(i)
+  if !i.comment
+    - return ''
+  small.muted.datetime.pull-right #{strftime('%Y-%m-%d', i.updated)}
+  p 评《
+    mixin subject_link(i)
+    |》
+    mixin stars(i.rating)
+  blockquote
+    - c = i.comment.split('\n\n')
+    each p in c
+      p #{p.replace('\n', '&nbsp;&nbsp')}
+
+mixin subject_link(i)
+  a(href="http://#{i.subject_ns()}.douban.com/subject/#{i.subject_id}/", target="db-#{i.subject_type}") #{i.subject.title}

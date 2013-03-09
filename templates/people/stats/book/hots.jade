@@ -2,7 +2,11 @@
   - locals.ns = 'book'
   .span3
     h4 个人标注
-    mixin tagcloud(s.interest.top_tags)
+    - top_tags = s.interest.top_tags
+    if top_tags && top_tags.length
+      mixin tagcloud(top_tags)
+    else
+      p.muted 懒到没有打过标签
   .span5
     h4 全部热门
     mixin tagcloud(coll.top_tags)
@@ -13,5 +17,4 @@
     mixin searchcloud(coll.top_translator.slice(0,8))
   .span12
     h4 出版社
-    mixin searchcloud(coll.top_publisher.slice(0,6))
-
+    mixin searchcloud(coll.top_publisher.slice(0,12))

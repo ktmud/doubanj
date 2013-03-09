@@ -10,7 +10,10 @@ var extend = require('../../lib/utils').extend;
 
 var conf_interest = {
   top: ['tags'],
-  most: [{ 'commented': -1 }],
+  most: [{
+    'commented': -1,
+    $name: 'most_commented',
+  }],
   date: {
     'updated': {
       periods: ['year', 'month', 'year_month', 'dayOfMonth', 'dayOfWeek'],

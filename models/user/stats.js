@@ -28,15 +28,16 @@ var common_csvs = {
     return ret.join('\n');
   },
   by_updated_month: function(ns, d, ss, a, b) {
+    ss  = ss && ss[0] !== 'all' ? ss : INTEREST_STATUS_ORDERED[ns];
+
     var th = '月,' + labelsList(ns, ss);
     var ret = [th];
-    var statuses = ss || INTEREST_STATUS_ORDERED[ns];
 
     a = a || 0;
 
     d.interest.n_by_updated_year_month.slice(a, b).forEach(function(item) {
       var l = [[item._id.year, item._id.month].join('-')];
-      statuses.forEach(function(s) {
+      ss.forEach(function(s) {
         l.push(item['status_' + s] || 0);
       });
       ret.push(l.join(','))

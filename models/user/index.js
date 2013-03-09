@@ -4,6 +4,8 @@ var verbose = debug('dbj:user:verbose');
 var log = debug('dbj:user:info');
 var error = debug('dbj:user:error');
 
+var central = require('../../lib/central');
+
 var cwd = central.cwd;
 var conf = central.conf;
 
@@ -152,6 +154,7 @@ User.prototype.toObject = function() {
     'mtime': this['mtime'],
     'last_synced': this.last_synced,
     'last_synced_status': this.last_synced_status,
+    'last_statsed': this.last_statsed,
     'stats': this.stats,
     'stats_status': this.stats_status,
     'stats_p': this.stats_p, // stats percentage

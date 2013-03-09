@@ -4,6 +4,16 @@ var Interest = require(cwd + '/models/interest').Interest;
 
 var utils = require('../utils');
 
+function attach(context_name, fn) {
+  return function(req, res, next) {
+    fn(req, res, function(err, data) {
+      res.data[context_name + '_err'] = err;
+      res.data[context_name] = data;
+      next();
+    });
+  }
+}
+
 module.exports = function(app, central) {
   var tasks = require(central.cwd + '/tasks');
 
@@ -32,6 +42,57 @@ module.exports = function(app, central) {
     next();
   });
 
+  var attach_latest = attach('latest_interests', function(req, res, cb) {
+    var istatus = res.data.istatus;
+    Interest.findByUser(istatus.ns, res.data.people.uid, { limit: 7 }, cb);
+  });
+  var attach_most_commented = attach('most_commented', function(req, res, cb) {
+    var people = res.data.people;
+    var istatus = res.data.istatus;
+    Interest.findByUser(istatus.ns, people.uid, {
+      sort: {
+        commented: -1
+      },
+      limit: 20
+    }, cb);
+  });
+  var attach_highest_ratings = attach('highest_ratings', function(req, res, cb) {
+    var people = res.data.people;
+    var istatus = res.data.istatus;
+    var query;
+    if (istatus.status !== 'all') query = { status: istatus.status };
+    Interest.findByUser(istatus.ns, people.uid, {
+      query: query,
+      sort: {
+        'rating.value': -1
+      },
+      limit: 18
+    }, cb);
+  });
+  var do_render = function(tmpl) {
+    return function(req, res, next) {
+      res.render(tmpl, res.data);
+    }
+  };
+
+  var availables = {
+    'all': {
+      'ns': 'book',
+      'name': '全部',
+      'status': 'all'
+    },
+    'read': {
+      'ns': 'book',
+      'name': '读过的书',
+      'status': 'done'
+    },
+    'wish': {
+      'ns': 'book',
+      'name': '想读的书',
+      'status': 'wish'
+    }
+  };
+
   app.get('/people/:uid/', function(req, res, next) {
     var people = res.data.people;
     var sleep = false;
@@ -52,33 +113,14 @@ module.exports = function(app, central) {
       }
     }, sleep ? 100 : 0);
   }, function(req, res, next) {
-
-    res.data.istatus = null;
-
     var people = res.data.people;
+
+    res.data.istatus = availables.all;
 
     if (!people.stats) return res.render('people', res.data);
 
-    Interest.findByUser('book', people.uid, { limit: 7 }, function(err, ilist) {
-
-      res.data.latest_interests = ilist;
-
-      res.render('people', res.data);
-    });
-  }); 
-
-  var availables = {
-    'read': {
-      'ns': 'book',
-      'name': '读过的书',
-      'status': 'done'
-    },
-    'wish': {
-      'ns': 'book',
-      'name': '想读的书',
-      'status': 'done'
-    }
-  };
+    next();
+  }, attach_latest, do_render('people'));
 
   app.get('/people/:uid/:istatus', function(req, res, next) {
     var istatus = req.params.istatus;
@@ -98,9 +140,9 @@ module.exports = function(app, central) {
     if (people.notReady() || people.isEmpty(istatus.ns)) {
       return res.redirect('/people/' + req.params.uid + '/');
     }
-
-    res.render('people/sub', res.data);
-  });
+    next();
+  }, attach_most_commented,
+  attach_highest_ratings , do_render('people/sub'));
 
   app.get('/people/:uid/books', function(req, res, next) {
     var people = res.data.people;

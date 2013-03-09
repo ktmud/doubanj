@@ -11,15 +11,67 @@
 .interests-list
   margin 0
   a
+    display: block;
+    padding: 10px
+    border 1px solid #e0e0e0
     color: #333;
+    font-size: 12px;
+    border-radius(3px)
+
     &:hover
       text-decoration: none;
+      background: #fffdfa;
+      border-color: #f98;
     .title
       color: #33b;
+      font-size: 15px;
+      margin: 0.8em 0 0;
+
+  p
+    width: 100px;
+    margin: 0.5em 0 0.3em;
+    line-height: 1.3em
+
+  .pic
+    width: 100px;
+    margin: 0.6em auto;
+    img
+      border-radius(2px)
+
   li
     list-style: decimal
     vertical-align: top;
     display inline-block
-    padding: 10px
-    border 1px solid #e0e0e0
-    margin 10px
+    margin 10px 10px 40px
+
+.comments-list
+  list-style: decimal inside;
+  margin: 0;
+
+  li
+    padding: 30px 20px;
+    border-top: 1px dotted #ddd;
+
+    &:hover
+      background: #fafff9;
+
+  blockquote
+    border-left: 0
+    margin: 1em 1em;
+    padding-left: 1em;
+    
+    &:before, &:after
+      content: '\201C';
+      color: #eaeaea;
+      font-size: 3em;
+      line-height: 0;
+      vertical-align: bottom;
+      font-weight: bold;
+      font-family: Arial, Helvetica, sans-serif;
+    &:before
+      margin-left: -.5em;
+    &:after
+      content: '\201d';
+      float: right;
+      margin-right: -0.3em;
+      vertical-align: bottom;
