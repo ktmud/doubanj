@@ -24,7 +24,7 @@ function parse_price(price) {
     var item = currency_trans[i];
     if (item[0].test(price)) {
       var replaced = price.replace(item[0], '');
-      console.log('%s replaced to %s', price, replaced);
+      //console.log('%s replaced to %s', price, replaced);
       return parseFloat(replaced, 10) * item[1];
     }
   }
@@ -106,16 +106,16 @@ function normalize_date(d) {
 var date_formats = [
   'YYYY-MM-DD',
   'YYYYMMDD',
-  'YYYY-MM',
-  'YYYY',
   'MM/DD/YYYY',
   'DD/MM/YYYY',
+  'YYYY-MM',
   'YY-MM-DD',
   'YYMMDD',
-  'YY-MM',
-  'YYMM',
   'DD/MM/YY',
   'MM/DD/YY',
+  'YYYY',
+  'YY-MM',
+  'YYMM',
   'YY'
 ];
 function parse_pubdate(d) {
@@ -130,11 +130,12 @@ function parse_pubdate(d) {
     mo = moment(d, f);
     if (!mo) return null;
     y = mo.year();
-    if (mo.isValid() && y > 800 && y < 2100) {
+    if (mo.isValid() && y > 800 && y < 2060) {
       if (y > 2020) {
         console.log('Possible invalid date', d, f, mo.toDate());
       }
       ret = mo.toDate();
+      //console.log(d, f, ret);
       break;
     }
   }
