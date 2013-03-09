@@ -18,16 +18,17 @@ function parse_price(price) {
   price = dbc2sbc(price).replace(/[,，]/g, '');
 
   var n = parseFloat(price, 10);
-  if (!isNaN(n)) return null;
+  if (!isNaN(n)) return n;
 
   for (var i = 0, l = currency_trans.length; i < l; i++) {
     var item = currency_trans[i];
     if (item[0].test(price)) {
       var replaced = price.replace(item[0], '');
-      //log('%s replaced to %s', price, replaced);
+      console.log('%s replaced to %s', price, replaced);
       return parseFloat(replaced, 10) * item[1];
     }
   }
+  if (isNaN(n)) return n;
 
   return n;
 }

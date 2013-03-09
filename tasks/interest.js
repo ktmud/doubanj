@@ -178,7 +178,6 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
     // save user interest
     verbose('saving interests...');
     db.collection(ns + '_interest').insert(items, save_options, function(err, r) {
-
       if (err) {
         console.error(err);
         error(err);
@@ -264,7 +263,6 @@ collect = user_ensured(function(user, arg) {
   }
 
   collector.on('error', function(err) {
-
     console.error(err);
     error(err, raven_extra);
 
