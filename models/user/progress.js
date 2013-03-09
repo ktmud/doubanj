@@ -74,7 +74,12 @@ exports.remaining = function() {
   var ret = this.syncRemaining();
   if (ret === null) return null;
 
-  return ret + this.statsRemaining();
+  var sr = this.statsRemaining();
+
+  // 20 seconds for stats by default
+  if (ret && sr === null) sr = 20000;
+
+  return ret + sr;
 };
 exports.statsRemaining = function() {
   var user = this;
@@ -110,10 +115,11 @@ exports.isSyncing = function() {
 * is syncing timeout
 */
 exports.syncTimeout = function() {
-  var sync_remaining = this.syncRemaining();
+  var remaining = this.remaining();
   // 30 minutes by default
-  if (!sync_remaining) sync_remaining = 1800000;
-  return new Date() - this.last_synced > sync_remaining;
+  if (remaining === null) remaining = 1800000;
+
+  return new Date() - this.last_synced > remaining;
 };
 
 /**
