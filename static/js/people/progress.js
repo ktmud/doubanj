@@ -16,8 +16,6 @@ Do.ready(function() {
         // failed, retry after 10 secs
         if (!d || d.r) return check(10000);
 
-        console.log(d);
-
         updateProgress(d.percents);
 
         var remaining = d.remaining;
