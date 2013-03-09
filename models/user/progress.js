@@ -8,6 +8,7 @@ var exports = module.exports;
 */
 exports.reset = function(cb) {
   this.update({
+    stats_p: 0,
     book_n: null,
     book_synced_n: 0,
     last_synced: new Date(),
@@ -83,7 +84,7 @@ exports.statsRemaining = function() {
   if (total === null) return null;
 
   if (user.stats_status === 'ing') {
-    return Math.round(Math.sqrt(total)) * (100 - (user.stats_p || 0)) * 10;
+    return Math.round(Math.sqrt(total)) * (100 - (user.stats_p || 0)) * 20;
   }
   if (user.stats) return 0;
   return null;

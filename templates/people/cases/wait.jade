@@ -7,7 +7,7 @@
     p#remains.muted
       正在准备数据，请耐心等待
 
-if need_resync
+if conf.debug || need_resync
   hr
   include ../mods/resync
 
