@@ -1,7 +1,8 @@
 #most-commented.row.mod
   .span12
     h4 最有话说
-       small.muted (不包括长篇评论)
+      small.muted (不包括长篇评论)
+      a.anchor(href="#most-commented") #
     if most_commented
       ol.comments-list
         each i in most_commented

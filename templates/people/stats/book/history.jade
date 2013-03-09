@@ -1,6 +1,7 @@
 #history.row.mod
   .span12
     h3 阅读编年史
+      a.anchor(href="#history") #
   .span12.chart.chart-bar#d-by_updated(data-bar=people.book_csv('by_updated_month', istatus && [istatus.status]), data-y="本", data-periodic="true")
     .caption 每月阅读量
   .span12.chart.chart-bar#d-by_pubdate(data-legend='false', data-bar=people.book_csv('by_pubdate_decades'), data-y="本")

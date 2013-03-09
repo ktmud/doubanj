@@ -12,7 +12,8 @@ if istatus.status == 'all'
     a.btn.btn-mini.btn-compact(href=people.db_url('book'), target="db-profile")   读书主页 ⇗
     .pull-right
       a.btn.btn-mini.btn-info(href=people.url() + 'read') 只看读过
-  include ./book/general
+  hr
+  include ./book/overview
 
 hr
 include ./book/hots

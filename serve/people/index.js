@@ -49,7 +49,9 @@ module.exports = function(app, central) {
   var attach_most_commented = attach('most_commented', function(req, res, cb) {
     var people = res.data.people;
     var istatus = res.data.istatus;
+    if (istatus.status !== 'all') query = { status: istatus.status };
     Interest.findByUser(istatus.ns, people.uid, {
+      query: query,
       sort: {
         commented: -1
       },
