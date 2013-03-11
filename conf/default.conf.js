@@ -4,28 +4,15 @@ var util = require('util');
  * some default settings
  */
 module.exports = {
-  worker: 4,
-  // the port of the root server
-  port: 3000,
-
   debug: true,
 
   site_name: '豆瓣酱',
 
-  site_root: 'http://local.test.com',
-  ssl_root: 'https://local.test.com',
-  assets_root: 'http://local.test.com',
-
-  // whether to send gzipped content
-  gzip: true,
-  super_cache: true,
-
-  sessionStore: {
-    memcached: true,
-    dbname: 'sessions',
-    // save session storage to file system every 30 minutes
-    sync_time: 30
-  },
+  // the port of the root server
+  port: 3000,
+  site_root: 'http://localhost:3000',
+  ssl_root: 'https://localhost:3000',
+  assets_root: 'http://localhost:3000',
 
   salt: 'keyboardcatndog',
 
