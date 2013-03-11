@@ -118,6 +118,9 @@ var date_formats = [
   'YYMM',
   'YY'
 ];
+var this_year = (new Date()).getFullYear();
+var next_decade = this_year + 10;
+var next_year = this_year + 1;
 function parse_pubdate(d) {
   d = normalize_date(d);
 
@@ -130,8 +133,8 @@ function parse_pubdate(d) {
     mo = moment(d, f);
     if (!mo) return null;
     y = mo.year();
-    if (mo.isValid() && y > 800 && y < 2060) {
-      if (y > 2020) {
+    if (mo.isValid() && y > 800 && y < next_decade) {
+      if (y > next_year) {
         console.log('Possible invalid date', d, f, mo.toDate());
       }
       ret = mo.toDate();

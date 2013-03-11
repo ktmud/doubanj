@@ -8,10 +8,10 @@ var central = require('../../lib/central');
 
 var cwd = central.cwd;
 var conf = central.conf;
-
-var mongo = require(cwd + '/lib/mongo');
-var utils = require(cwd + '/lib/utils');
-var task = require(cwd + '/lib/task');
+var redis = central.redis;
+var mongo = central.mongo;
+var utils = central.utils;
+var task = central.task;
 
 var consts = require('../consts');
 
@@ -26,20 +26,12 @@ function User(info) {
   central.DOUBAN_APPS.forEach(function(ns) {
     this[ns + '_n'] = this[ns + '_n'] || 0;
   });
+
   return this;
 };
 
 util.inherits(User, mongo.Model);
-
-/**
-* output stats as csv
-*/
-utils.extend(User.prototype, require('./stats'));
-
-/**
-* calculate syncing stage
-*/
-utils.extend(User.prototype, require('./progress'));
+utils.extend(User, mongo.Model);
 
 User.prototype.kind = User.prototype._collection = USER_COLLECTION;
 
@@ -74,9 +66,11 @@ User.getFromMongo = function(uid, cb) {
     });
   });
 };
+// User as an available constructor
+redis.cached.register(User);
+
 User.get = function(uid, cb) {
   uid = String(uid).toLowerCase();
-
   User.getFromMongo(uid, function(err, u) {
     if (err) return cb(err);
     // got a 404
@@ -92,6 +86,8 @@ User.get = function(uid, cb) {
     return cb(null, u);
   });
 };
+//User.get = redis.cached.wrap(User.get, 'user-{0}');
+
 // pull from douban api, get account info
 User.prototype.pull = function(cb) {
   var self = this;
@@ -195,32 +191,20 @@ User.prototype.interests = function(ns, cb) {
 });
 User.prototype.wishes = User.prototype.wishs;
 
-module.exports = function(uid) {
-  return new User(uid);
-};
-// the uid to user decorator
-module.exports.ensured = function(fn) {
-  var self = this;
-  return function() {
-    var args = arguments;
-    var uid = args[0];
+/**
+* output stats as csv
+*/
+utils.extend(User.prototype, require('./stats'));
 
-    if (uid instanceof User || (uid && uid.user instanceof User)) return fn.apply(self, args);
+/**
+* calculate syncing stage
+*/
+utils.extend(User.prototype, require('./progress'));
 
-    if (typeof uid === 'string' || typeof uid === 'number') {
-      // fn(12346);
-      User.get(uid, function(err, user) {
-        args[0] = user;
-        fn.apply(self, args);
-      });
-    } else {
-      // some fn like:
-      // fn({ user: xxx });
-      User.get(uid.user, function(err, user) {
-        args[0].user = user;
-        fn.apply(self, args);
-      });
-    }
-  };
-};
+/**
+* predefined interests collection
+*/
+utils.extend(User.prototype, require('./interest'));
+
+module.exports = User;
 module.exports.User = User;

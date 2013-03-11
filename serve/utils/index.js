@@ -34,7 +34,8 @@ function getUser(opts) {
       return next();
     }
 
-    User.get(uid, function(err, people) {
+    User.get(uid, function getUserCallback(err, people) {
+
       c.err = err;
       c.people = people;
       if (people) c.title = people.name + '的豆瓣酱';

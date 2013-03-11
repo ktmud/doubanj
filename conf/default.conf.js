@@ -38,6 +38,14 @@ module.exports = {
     servers: ['127.0.0.1:27017']
   },
 
+  redis: {
+    port: '6379',
+    host: '127.0.0.1',
+    prefix: 'doubanj_',
+    // only set default ttl when there is a memory limit 
+    ttl: 7 * 24 * 60 * 60, // in seconds
+  },
+
   douban: {
     limit: 20, // request limit per minute
     key: '',

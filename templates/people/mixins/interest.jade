@@ -31,32 +31,34 @@ mixin stars(star)
   span.stars !{s}
 
 mixin interest_item(i, trimto)
+  if !i
+    - return
   trimto = trimto || 100
   span.label.label-status #{i.status_cn()}
   &nbsp;
-  if i.book
-    a(href="http://book.douban.com/subject/#{i.book_id}/",
+  if i.subject
+    a(href="http://#{i.subject_ns()}.douban.com/subject/#{i.subject_id}/",
       target="_blank",
-      title="#{i.book.title} - #{i.book.author.join(', ')}")
-      | #{trunc(i.book.title, 8)}
+      title="#{i.subject.title} - #{i.subject.author.join(', ')}")
+      | #{trunc(i.subject.title, 8)}
   else
-    a(href="http://book.douban.com/subject/#{i.book_id}/", target="_blank")
-      | #{i.book_id}
+    a(href="http://#{i.subject_ns()}.douban.com/subject/#{i.subject_id}/", target="_blank")
+      | #{i.subject_id}
 
 
 mixin interests_list(items)
   ol.interests-list
     each i in items
       li 
-        a(href="http://book.douban.com/subject/#{i.book_id}/", target="db-#{i.subject_type}") 
+        a(href="http://#{i.subject_ns()}.douban.com/subject/#{i.subject_id}/", target="db-#{i.subject_type}") 
           div.status #{i.status_cn()}
               mixin stars(i.rating)
-          if i.book
+          if i.subject
             .pic
-              img(src=i.book.images.medium)
-            p.title #{i.book.title}
-            p.meta.authors !{i.book.author.join(', ')}
-            if i.book.publisher
-              p.meta.publisher #{i.book.publisher}
+              img(src=i.subject.images.medium)
+            p.title #{i.subject.title}
+            p.meta.authors !{i.subject.author.join(', ')}
+            if i.subject.publisher
+              p.meta.publisher #{i.subject.publisher}
           else
-            book:#{i.book_id}
+            | #{i.subject_type}:#{i.subject_id}

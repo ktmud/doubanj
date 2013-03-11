@@ -14,7 +14,7 @@ var raven = central.raven;
 
 var douban_key = central.conf.douban.key;
 
-var user_ensured = require(central.cwd + '/models/user').ensured;
+var User = require(central.cwd + '/models/user');
 var utils = require('./utils');
 
 var API_REQ_DELAY = task.API_REQ_DELAY;
@@ -206,7 +206,9 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
 
         //log('updating subject %s', s.id);
         // we just don't care whether it will succeed.
-        col_s.update({ 'id': s.id }, s, { upsert: true, w: -1 });
+        process.nextTick(function() {
+          col_s.update({ 'id': s.id }, s, { upsert: true, w: -1 });
+        });
         //, function(err, r) {
           //if (err) {
             //if (cb) return cb(err);
@@ -246,7 +248,7 @@ FetchStream.prototype.updateUser = function(cb) {
 
 var collect, _collect;
 
-collect = user_ensured(function(user, arg) {
+collect = User.ensured(function(user, arg) {
   if (!user) return arg.error && arg.error('NO_USER');
 
   var uid = user.uid || user.id;

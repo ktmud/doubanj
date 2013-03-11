@@ -11,14 +11,13 @@ var task = require(cwd + '/lib/task');
 var mongo = require(cwd + '/lib/mongo');
 var raven = require(cwd + '/lib/raven');
 
-var user_ensured = require(cwd + '/models/user').ensured;
-var Interest = require(cwd + '/models/interest').Interest;
+var User = require(cwd + '/models/user');
 
 var book_task = require('./book');
 
 var compute, _compute;
 compute = task.compute_pool.pooled(_compute = function(computings, arg, next) {
-  user_ensured(function(arg) {
+  User.ensured(function(arg) {
     var user = arg.user;
 
     var called = false;

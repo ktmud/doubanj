@@ -1,9 +1,9 @@
 - last_statsed = people.last_statsed || people.stats.book
 if !people.isIng()
-  if !last_statsed || last_statsed < central.boot_time - 3600000 * 24
-    .alert
-      p 自从你上次访问后可能有功能更新，
-        a(href="?recount") 点此重新生成报表
+  - if (!last_statsed || last_statsed < central.boot_time - 3600000 * 72)
+      .alert
+        p 自从你上次访问后可能有功能更新，
+          a(href="?recount") 点此重新生成报表
   p.alert.alert-success
     | 上次同步于&nbsp;
     time #{strftime(FULL_TIME, people.book_last_synced)}
@@ -36,7 +36,7 @@ hr
   p.muted
     ... 更多功能正在紧张开发中，欢迎随时回来看看
 
-if people.last_synced_status !== 'ing' || (new Date() - people.last_synced > 60000)
+if conf.debug || people.last_synced_status !== 'ing' || (new Date() - people.last_synced > 60000)
   include ../mods/resync
 
 

@@ -59,7 +59,7 @@ exports.progresses = function() {
 * interval for checking progress
 */
 exports.progressInterval = function(remaining, delay) {
-  return (remaining && remaining < delay + 3000) ? Math.max(remaining / 5, 1000) : delay + 3000;
+  return remaining < 10000 ? 2000 : delay + 2000;
 };
 
 exports.isEmpty = function(ns) {
@@ -88,10 +88,10 @@ exports.statsRemaining = function() {
 
   if (total === null) return null;
 
-  if (user.stats_status === 'ing') {
-    return Math.round(Math.sqrt(total)) * (100 - (user.stats_p || 0)) * 20;
+  if (user.isIng()) {
+    return Math.round(Math.sqrt(total) * (100 - (user.stats_p || 0)) * 2);
   }
-  if (user.stats) return 0;
+  if (user.stats && !user.isSyncing()) return 0;
   return null;
 };
 /**

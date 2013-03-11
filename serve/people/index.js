@@ -44,32 +44,17 @@ module.exports = function(app, central) {
 
   var attach_latest = attach('latest_interests', function(req, res, cb) {
     var istatus = res.data.istatus;
-    Interest.findByUser(istatus.ns, res.data.people.uid, { limit: 7 }, cb);
+    res.data.people[istatus.ns + '_latest'](istatus.status, 7, cb);
   });
   var attach_most_commented = attach('most_commented', function(req, res, cb) {
     var people = res.data.people;
     var istatus = res.data.istatus;
-    if (istatus.status !== 'all') query = { status: istatus.status };
-    Interest.findByUser(istatus.ns, people.uid, {
-      query: query,
-      sort: {
-        commented: -1
-      },
-      limit: 20
-    }, cb);
+    res.data.people[istatus.ns + '_most_commented'](istatus.status, 30, cb);
   });
   var attach_highest_ratings = attach('highest_ratings', function(req, res, cb) {
     var people = res.data.people;
     var istatus = res.data.istatus;
-    var query;
-    if (istatus.status !== 'all') query = { status: istatus.status };
-    Interest.findByUser(istatus.ns, people.uid, {
-      query: query,
-      sort: {
-        'rating.value': -1
-      },
-      limit: 18
-    }, cb);
+    res.data.people[istatus.ns + '_highest_ratings'](istatus.status, 18, cb);
   });
   var do_render = function(tmpl) {
     return function(req, res, next) {
