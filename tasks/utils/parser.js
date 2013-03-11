@@ -108,6 +108,8 @@ var date_formats = [
   'YYYYMMDD',
   'MM/DD/YYYY',
   'DD/MM/YYYY',
+  'MMM DD, YYYY',
+  'DD MMM, YYYY',
   'YYYY-MM',
   'YY-MM-DD',
   'YYMMDD',

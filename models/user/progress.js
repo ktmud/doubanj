@@ -119,7 +119,7 @@ exports.syncTimeout = function() {
   // 30 minutes by default
   if (remaining === null) remaining = 1800000;
 
-  return new Date() - this.last_synced > remaining;
+  return new Date() - this.last_synced > remaining + 60000;
 };
 
 /**

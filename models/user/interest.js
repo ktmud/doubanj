@@ -1,6 +1,6 @@
 var Interest = require('../interest');
 
-var redis = central.redis;
+//var redis = central.redis;
 
 function sorted_list(ns, k, sort) {
 

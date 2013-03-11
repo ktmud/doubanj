@@ -6,7 +6,7 @@ var error = debug('dbj:interest:error');
 
 var conf = central.conf;
 var mongo = central.mongo;
-var redis = central.redis;
+//var redis = central.redis;
 var utils = central.utils;
 
 var Subject = require('../subject');
@@ -41,7 +41,7 @@ Interest.prototype.subject_type = 'general';
 
 Interest._cache_ttl = 36000;
 Interest._default_sort = { 'updated': -1 };
-Interest.get = redis.cached.wrap(mongo.Model.get);
+//Interest.get = redis.cached.wrap(mongo.Model.get);
 
 Interest.findByUser = function(uid, opts, cb) {
   verbose('getting interests obj for user %s', uid);

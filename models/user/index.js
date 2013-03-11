@@ -8,7 +8,7 @@ var central = require('../../lib/central');
 
 var cwd = central.cwd;
 var conf = central.conf;
-var redis = central.redis;
+//var redis = central.redis;
 var mongo = central.mongo;
 var utils = central.utils;
 var task = central.task;
@@ -67,7 +67,7 @@ User.getFromMongo = function(uid, cb) {
   });
 };
 // User as an available constructor
-redis.cached.register(User);
+//redis.cached.register(User);
 
 User.get = function(uid, cb) {
   uid = String(uid).toLowerCase();
