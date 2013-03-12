@@ -1,9 +1,11 @@
 #history.row.mod
+  - statuses = [istatus.status]
+  - legend = istatus.status === 'all'
   .span12
-    h3 阅读编年史
+    h3 阅读编年史 #{legend}
       a.anchor(href="#history") #
-  .span12.chart.chart-bar#d-by_updated(data-bar=people.book_csv('by_updated_month', istatus && [istatus.status]), data-y="本", data-periodic="true")
+  .span12.chart.chart-bar#d-by_updated(data-legend=legend, data-bar=people.book_csv('by_updated_month', statuses), data-y="本", data-periodic="true")
     .caption 每月阅读量
-  .span12.chart.chart-bar#d-by_pubdate(data-legend='false', data-bar=people.book_csv('by_pubdate_decades'), data-y="本")
+  .span12.chart.chart-bar#d-by_pubdate(data-legend=legend, data-bar=people.book_csv('by_pubdate_decades', statuses), data-y="本")
     .caption 收藏图书的出版年代
 

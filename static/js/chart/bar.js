@@ -52,7 +52,7 @@ Bar.prototype.draw = function(data) {
 
   self.drawData();
 
-  if (options.legend) {
+  if (options.legend && self._is_multi) {
     self.drawLegend();
   }
 };
@@ -81,6 +81,8 @@ Bar.prototype._prepare = function(data) {
 
   var multi_keys = self.multi_keys = d3.keys(data[0]);
   var yname = self.yname = multi_keys.shift();
+
+  if (multi_keys.length > 1) this._is_multi = true;
 
   var color = self.color = d3_colors(options.colorCate, options.colors);
 

@@ -46,6 +46,33 @@ var common_csvs = {
   },
 };
 
+function n_by_pubdate_decades(d, st) {
+  st = st || 'all';
+  d = d[st];
+
+  if (!d) return;
+
+  var ret = {};
+  var _y, n = 0, l = d.n_by_pubdate_year.length;
+  d.n_by_pubdate_year.forEach(function(item, i) {
+    var y = item._id.year;
+      y = y >= 2000 ? y : (Math.floor(y / 10) * 10 + 's');
+
+    n += item.count;
+
+    if (i + 1 == l) {
+      ret[y] = n;
+    } else if (!_y || y === _y) {
+      _y = y;
+    } else {
+      ret[_y] = n;
+      _y = y;
+      n = 0;
+    }
+  });
+  return ret;
+}
+
 var ns_csvs = {
   book: {
     by_pubdate: function(d) {
@@ -55,26 +82,39 @@ var ns_csvs = {
       })
       return ret.join('\n');
     },
-    by_pubdate_decades: function(d, st) {
-      st = st || 'all';
-      var ret = ['年代,数量'];
-      var _y, n = 0, l = d[st].n_by_pubdate_year.length;
-      d[st].n_by_pubdate_year.forEach(function(item, i) {
-        var y = item._id.year;
-         y = y >= 2000 ? y : (Math.floor(y / 10) * 10 + 's');
+    by_pubdate_decades: function(data, ss) {
+      ns = 'book';
 
-        n += item.count;
+      ss  = ss && ss[0] !== 'all' ? ss : INTEREST_STATUS_ORDERED[ns];
 
-        if (i + 1 == l) {
-          ret.push(y + ',' + n);
-        } else if (!_y || y === _y) {
-          _y = y;
-        } else {
-          ret.push(_y + ',' + n);
-          _y = y;
-          n = 0;
+      var th = '月,' + labelsList(ns, ss);
+
+      var dict = {};
+      ss.forEach(function(st, i) {
+        var d = n_by_pubdate_decades(data, st);
+        if (!d) return;
+        for (var y in d) {
+          var arr = dict[y] || (dict[y] = []);
+          arr[i] = d[y];
         }
-      })
+      });
+
+      var ret = Object.keys(dict);
+
+      function fillup(r) {
+        ss.forEach(function(item, i) {
+          r[i] = r[i] || 0;
+        });
+      }
+
+      ret = ret.sort().map(function(item) {
+        var r = dict[item];
+        fillup(r);
+        r.unshift(item);
+        return r.join(',');
+      });
+      ret.unshift(th);
+      
       return ret.join('\n');
     }
   },

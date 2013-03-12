@@ -18,7 +18,6 @@ Do('lodash', 'd3', 'chart/all', function(_require) {
     var node = $(item); 
     charts.push([node,
       chart.Bar(item, {
-        legend: node.data('legend'),
         width: node.width(),
         height: node.height()
       })
