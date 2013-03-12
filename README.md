@@ -52,6 +52,12 @@ make 的默认命令是使用 `forever` 执行 `app.js` 。
 
   - static/js/do.core.js 是由豆瓣的 do.js 修改而来的文件加载器
   - 用了 component-build 的一套东西，参看 static/js/do.cmd.js
-  - Gruntfile.js 里定义了对 js 文件包裹 CommonJS require 定义的命令
+  - Gruntfile.js 里定义了对 js 文件包裹 CommonJS `require` 定义的命令
   - 使用模版配套的 `#{urlmap()}` 方法为 Do 生成所需文件的真实地址
-  - 使用 `Do('module1', 'module2', ...` 显式延时加载你需要的文件，在 Do 内部安全地使用 `require('xxx')`
+  - 使用 `Do('module1', 'module2', ...` 显式延时加载你需要的模块，模块名即文件名，在 Do 内部安全地使用 `require('xxx')`
+    具体使用实例参见 static/js/people/booter.js
+
+#### 版本管理
+
+发布上线前执行 `grunt build` ，将为压缩后的文件生成一个 hashmap (即 static/hash.json )，并重命名文件为 static/dist/js/xx\_HASH.js 格式。
+为了保证这套机制的顺利运行，请保证新加的静态文件名中不包括下划线（\_）。

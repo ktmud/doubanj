@@ -47,6 +47,7 @@ module.exports = function(grunt) {
           {
             expand: true,
             cwd: 'static/dist/js/',
+            // filename wish under dash will be ignored
             src: ['**/*.js', '!**/*_*.js'],
             dest: 'tmp/static/js/',
             filter: hash_check,

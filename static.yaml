@@ -1,8 +1,0 @@
-repos:
-  bootstrap:
-    name: twitter/bootstrap
-    commit: 3.0.0-wip
-    file:
-      ./docs/assets/js/bootstrap.js: static/dist/bootstrap.js
-      ./docs/assets/css/bootstrap.css: static/dist/bootstrap.css
-      ./docs/assets/fonts: static/dist/fonts

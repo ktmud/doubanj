@@ -1,9 +1,3 @@
-function auth(req, res, next) {
-  if (~['GET', 'HEAD'].indeOf(req.method.toUpperCase())) {
-    next();
-  }
-}
-
 var utils = require('./utils');
 
 module.exports = function(app, central) {
