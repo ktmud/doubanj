@@ -17,6 +17,16 @@ exports.reset = function(cb) {
 };
 
 /**
+* Mark sync start
+*/
+exports.markSync = function(cb) {
+  this.update({
+    stats_p: 0,
+    last_synced_status: 'ing'
+  }, cb);
+};
+
+/**
 * is syncing or statsing, not finished yet
 */
 exports.isIng = function() {
@@ -76,8 +86,8 @@ exports.remaining = function() {
 
   var sr = this.statsRemaining();
 
-  // 20 seconds for stats by default
-  if (ret && sr === null) sr = 20000;
+  // 10 seconds for stats by default
+  if (ret && sr === null) sr = 10000;
 
   return ret + sr;
 };
@@ -89,9 +99,10 @@ exports.statsRemaining = function() {
   if (total === null) return null;
 
   if (user.isIng()) {
-    return Math.round(Math.sqrt(total) * (100 - (user.stats_p || 0)) * 2);
+    // At least five seconds
+    return Math.round(Math.sqrt(total) * (100 - (user.stats_p || 0)) * 2) + 5000;
   }
-  if (user.stats && !user.isSyncing()) return 0;
+
   return null;
 };
 /**
@@ -106,10 +117,11 @@ exports.syncRemaining = function() {
 
   var perpage = task.API_REQ_PERPAGE;
   return (task.API_REQ_DELAY + 4000) * Math.ceil((total - synced) / perpage);
-}
+};
+
 exports.isSyncing = function() {
   return this.last_synced_status === 'ing'
-}
+};
 
 /**
 * is syncing timeout
@@ -117,7 +129,7 @@ exports.isSyncing = function() {
 exports.syncTimeout = function() {
   var remaining = this.remaining();
   // 30 minutes by default
-  if (remaining === null) remaining = 1800000;
+  if (remaining === null || this.last_synced === null) return false;
 
   return new Date() - this.last_synced > remaining + 60000;
 };

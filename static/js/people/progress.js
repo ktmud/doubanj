@@ -21,10 +21,10 @@ Do.ready(function() {
         var remaining = d.remaining;
         updateRemains(remaining);
 
-        if (!d.is_ing) {
+        if (!remaining) {
           setTimeout(function() {
             window.location.reload();
-          }, 800);
+          }, 1200);
           return;
         }
 
@@ -32,7 +32,7 @@ Do.ready(function() {
           check(d.interval);
         }
       });
-    }, dur || 3000);
+    }, dur || 5000);
   }
   check();
 

@@ -100,7 +100,7 @@ User.prototype.pull = function(cb) {
         if (err.statusCode == 404) {
           self.invalid = 'NO_USER';
         }
-        return cb(err);
+        return cb && cb(err);
       }
       if (data.uid) {
         data.uid = String(data.uid).toLowerCase();
@@ -113,7 +113,7 @@ User.prototype.pull = function(cb) {
           error('save user %s douban info failed: %s', uid, err);
           self.invalid = 1;
         }
-        cb(err, self);
+        cb && cb(err, self);
       });
     });
   }, 0);

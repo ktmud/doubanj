@@ -7,8 +7,6 @@ function auth(req, res, next) {
 var utils = require('./utils');
 
 module.exports = function(app, central) {
-  var tasks = require(central.cwd + '/tasks');
-
   app.all('/*', utils.navbar);
 
   app.get('/', function(req, res, next) {
@@ -20,36 +18,7 @@ module.exports = function(app, central) {
     res.redirect('/people/' + uid + '/');
   });
 
-  app.post('/queue', utils.getUser({
-    redir: '/',
-  }), function(req, res, next) {
-    var uid = res.data.uid;
-    var user = res.data.people;
-
-    if (!user) {
-      res.redirect('/people/' + uid + '/');
-      return;
-    }
-
-    var uid = user.uid || user.id;
-
-    tasks.interest.collect_book({
-      user: user, 
-      force: 'force' in req.body,
-      success: function(people) {
-        tasks.compute({
-          user: people,
-          force: true
-        });
-      }
-    });
-
-    user.reset(function() {
-      res.redirect('/people/' + uid + '/');
-    });
-  });
-
-  ['people', 'api', 'misc'].forEach(function(item) {
+  ['queue', 'people', 'api', 'misc'].forEach(function(item) {
     require('./' + item)(app, central);
   });
 

@@ -1,6 +1,6 @@
 - last_statsed = people.last_statsed || people.stats.book
 if !people.isIng()
-  - if (!last_statsed || last_statsed < central.boot_time - 3600000 * 72)
+  - if (last_statsed < central.boot_time - 3600000 * 72)
       .alert
         p 自从你上次访问后可能有功能更新，
           a(href="?recount") 点此重新生成报表
@@ -26,7 +26,7 @@ else
       .span3
         include ../mods/progress
       .span1
-        a.btn.btn-mini.pull-right(href=".") 刷新
+        a.btn.btn-mini.pull-right(href="?recount") 刷新
 
 section
   include ../stats/book
@@ -37,7 +37,7 @@ hr
     ... 更多功能正在紧张开发中，欢迎随时回来看看
 
 if conf.debug || people.last_synced_status !== 'ing' || (new Date() - people.last_synced > 60000)
-  include ../mods/resync
+  include ../mods/sync
 
 
 include ./stats_js

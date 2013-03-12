@@ -7,7 +7,7 @@ block main
         h1 #{name} 的豆瓣酱
         if people.invalid && !people.last_synced
           p.vmiddle.alert.alert-error 获取用户信息不小心失败了，休息一会再重试看看吧
-        else if !people.last_synced
+        else if !people.last_synced_status
           // 根本没有同步过
           form(method="post", action="/queue")
             input(type="hidden", name="_csrf", value=_csrf)

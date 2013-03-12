@@ -85,10 +85,12 @@ module.exports = function(app, central) {
     var sleep = false;
     var recount = 'recount' in req.query;
     if ((!people.stats_p && people.last_synced_status === 'succeed') || recount) {
-      //try compute the results
-      tasks.compute({
-        user: people,
-        force: recount
+      process.nextTick(function() {
+        //try compute the results
+        tasks.compute.all({
+          user: people,
+          force: recount
+        });
       });
       sleep = true;
     }
@@ -148,5 +150,4 @@ module.exports = function(app, central) {
       res.render('people/interests', c);
     });
   });
-
 };
