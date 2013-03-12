@@ -7,6 +7,8 @@ function Bar(container, options) {
   this.options = options;
   this.container = d3.select(container);
   this.data = options.data || this.container.attr('data-bar');
+
+  this.style = options.multiple;
 }
 
 Bar.defaultOptions = {
@@ -18,8 +20,9 @@ Bar.defaultOptions = {
   data: null,
   sort: null,
   legend: '10x10', // the size of legend bar
+  legendTransform: function(d, i) { return "translate(0," + i * 20 + ")"; },
   showText: true,
-  multiple: 'group',
+  multiple: 'stack',
   xAxis: {
     orient: 'bottom',
     tickSize: 0,
@@ -109,8 +112,8 @@ Bar.prototype._prepare = function(data) {
      .domain(dateparse(data, yname));
   }
 
-  var y = self.y = d3.scale.linear()
-      .domain([0, yStackMax])
+  self.y = d3.scale.linear()
+      .domain([0, self.style === 'grouped' ? yGroupMax : yStackMax])
       .range([height, 0]);
 
   var svg = self.svg = self.container.append("svg")
@@ -126,15 +129,11 @@ Bar.prototype.drawData = function() {
   , container = self.container
   , color = self.color
   , multi_keys = self.multi_keys
-  , svg = self.svg
-  , width = self.width
-  , height = self.height
   , x = self.x
-  , y = self.y
-  , xAxis = self.xAxis
-  , yAxis = self.yAxis;
+  , width = self.width
+  , height = self.height;
 
-  self.layer = svg.selectAll(".layer")
+  self.layer = self.svg.selectAll(".layer")
     .data(self.layers)
   .enter().append("g")
     .attr("class", "layer")
@@ -148,7 +147,7 @@ Bar.prototype.drawData = function() {
     .attr("width", x.rangeBand())
     .attr("height", 0);
 
-  self.stacked();
+  self[self.style + 'ed']();
 };
 
 Bar.prototype.hideText = function() {
@@ -195,6 +194,7 @@ Bar.prototype.grouped = function transitionGrouped() {
     .transition()
       .attr("y", function(d) { return y(d.y); })
       .attr("height", function(d) { return self.height - y(d.y); });
+  return self;
 }
 
 Bar.prototype.stacked = function transitionStacked() {
@@ -220,6 +220,7 @@ Bar.prototype.stacked = function transitionStacked() {
     .transition()
       .attr("x", function(d) { return x(d.x); })
       .attr("width", x.rangeBand());
+  return self;
 }
 
 Bar.prototype.drawAxis = function() {
@@ -255,38 +256,60 @@ Bar.prototype.drawAxis = function() {
   });
 
   if (opt_xAxis) {
-    svg.append("g")
+    self._g_x = svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis);
   }
 
   if (opt_yAxis) {
-    var yunit = container.attr('data-y') || options.yunit;
-
-    var y = svg.append("g")
+    var y = self._g_y = svg.append("g")
       .attr("class", "y axis")
       .call(yAxis);
-    var yt = y.append("text")
-      .attr('dx', "0.2em")
-      .attr("dy", ".71em");
 
-    if (options.yRotate) {
-      var text_x = 0, r = -90;
-      if (opt_yAxis.orient === 'right') {
-        text_x = 8;
-        r = 90;
+    var yunit = container.attr('data-y') || options.yunit;
+
+    if (yunit) {
+      var yt = y.append("text")
+        .attr('dx', "0.2em")
+        .attr("dy", ".71em");
+
+      if (options.yRotate) {
+        var text_x = 0, r = -90;
+        if (opt_yAxis.orient === 'right') {
+          text_x = 8;
+          r = 90;
+        }
+        yt.style("text-anchor", "end")
+          .attr("y", 6)
+          .attr('x', text_x)
+          .attr("transform", 'rotate(' + r + ')');
+      } else {
+        yt.attr('x', 2)
+          .style("text-anchor", "center");
       }
-      yt.style("text-anchor", "end")
-        .attr("y", 6)
-        .attr('x', text_x)
-        .attr("transform", 'rotate(' + r + ')');
-    } else {
-      yt.attr('x', 2)
-        .style("text-anchor", "center");
+      yt.text(yunit);
     }
-    yt.text(yunit);
   }
+};
+
+Bar.prototype.updateX = function() {
+  var self = this;
+  var x = self.x;
+  var xtime = self.xtime;
+  var xAxis = self.xAxis = d3.svg.axis();
+  if (xtime) {
+    xAxis.scale(xtime).tickFormat(customTimeFormat);
+  } else {
+    xAxis.scale(x);
+  }
+  self._g_x.call(xAxis);
+};
+
+Bar.prototype.updateY = function() {
+  var self = this;
+  //var yAxis = self.yAxis = d3.svg.axis().scale(self.y)
+  self._g_y.call(self.yAxis.scale(self.y));
 };
 
 Bar.prototype.drawLegend = function() {
@@ -297,11 +320,11 @@ Bar.prototype.drawLegend = function() {
     , svg = self.svg;
 
   var wh = options.legend.split('x');
-  var legend = svg.selectAll(".legend")
+  var legend = self.legend = svg.selectAll(".legend")
       .data(color.domain().slice())
       .enter().append("g")
       .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+      .attr("transform", options.legendTransform);
 
   legend.append("rect")
     .attr("x", width - wh[0])
@@ -310,9 +333,10 @@ Bar.prototype.drawLegend = function() {
     .style("fill", color);
 
   legend.append("text")
-    .attr("x", width - wh[0] - 6)
+    .attr("x", width + 2)
     .attr("y", wh[1] / 2)
-    .attr("dy", ".35em")
+    .attr("dx", function(d) { return d.length + "em" })
+    .attr("dy", "0.4em")
     .style("text-anchor", "end")
     .text(function(d) { return d; });
 };

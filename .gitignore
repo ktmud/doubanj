@@ -16,3 +16,4 @@ static/*.html
 static/*.txt
 static/.file_etags
 *.min.*
+*.rdb

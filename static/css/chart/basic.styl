@@ -3,6 +3,7 @@ text
 
 .chart
   padding: 10px;
+  margin-bottom: 20px;
   height: 160px; // default height
   position: relative;
 
@@ -13,7 +14,10 @@ text
     text-align: center;
 
 .chart-bar
-  height: 200px;
+  height: 260px;
+
+  .legend
+    fill: #777;
 
 .arc path
   stroke: #fff;
@@ -24,3 +28,10 @@ text
   stroke: #bbb;
   shape-rendering: crispEdges;
 
+.bar-style-toggler
+  line-height: 1;
+  label
+    vertical-align: middle;
+    margin-left: 1em;
+    input
+      margin-right: 3px;

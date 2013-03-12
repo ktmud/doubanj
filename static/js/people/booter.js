@@ -16,12 +16,38 @@ Do('lodash', 'd3', 'chart/all', function(_require) {
   var charts = [];
   $('div.chart-bar').each(function(i, item) {
     var node = $(item); 
-    charts.push([node,
-      chart.Bar(item, {
-        width: node.width(),
-        height: node.height()
-      })
-    ]);
+
+    var w = node.width();
+    var h = node.height();
+    var bar = chart.Bar(item, {
+      margin: [20, 20, 40, 40],
+      legendTransform: function(d, i) {
+        return "translate(" + -(i * 50 + 30) + "," + (h - 30) + ")";
+      },
+      width: w,
+      height: h
+    });
+
+    item._bar = bar;
+
+    charts.push([node, bar]);
+  });
+
+  var lodash = require('lodash');
+
+  $('input[name=bar-style]').bind('change', function(e) {
+    var elem = this;
+    if (elem.checked) {
+      var fn = elem.value;
+      $(elem).closest('.row').find('div.chart-bar').each(function(i, item) {
+        if (item._bar) {
+          item._bar[fn]();
+          setTimeout(function() {
+            item._bar.updateY();
+          }, 1000)
+        }
+      });
+    }
   });
 
   var _t;

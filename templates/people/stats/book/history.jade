@@ -2,7 +2,15 @@
   - statuses = [istatus.status]
   - legend = istatus.status === 'all'
   .span12
-    h3 阅读编年史 #{legend}
+    if legend
+      small.pull-right.bar-style-toggler
+        label
+          input(type="radio", name="bar-style", value="stacked", checked)
+          单条
+        label
+          input(type="radio", name="bar-style", value="grouped")
+          分组
+    h3 阅读编年史
       a.anchor(href="#history") #
   .span12.chart.chart-bar#d-by_updated(data-legend=legend, data-bar=people.book_csv('by_updated_month', statuses), data-y="本", data-periodic="true")
     .caption 每月阅读量
