@@ -78,7 +78,7 @@ function parse_pages(pages) {
   //if (isNaN(+r)) return null;
   //return r;
 //}
-var chinese_nums = '一,二,三,四,五,六,七,八,九,十,十一,十二'.split(',');
+var chinese_nums = '十二 十一 十 九 八 七 六 五 四 三 二 一'.split(' ');
 var reg_chinese = new RegExp(chinese_nums.join('|'));
 var reg_minguo = /民国?(\d+)/;
 function normalize_date(d) {
@@ -86,19 +86,20 @@ function normalize_date(d) {
   d = dbc2sbc(d);
   if (reg_chinese.test(d)) {
     chinese_nums.forEach(function(item, i) {
-      var m = i + 1;
+      var m = 12 - i;
       if (m == 10) {
-        d = d.replace(item + '月', 10);
-        d = d.replace(item + '日', 0);
+        d = d.replace(item + '年', '0年');
+        d = d.replace(item + '月', '10月');
+        d = d.replace(item + '日', '0日');
       } else {
         d = d.replace(new RegExp(item, 'g'), m);
       }
     });
   }
-  // 民国年份需要加上11年
+  // 民国年份需要加上1911年
   if (reg_minguo.test(d)) {
     d = d.replace(reg_minguo, function(p0, p1) {
-      return +p1 + 11;
+      return +p1 + 1911;
     });
   }
   return d;
@@ -124,7 +125,8 @@ var this_year = (new Date()).getFullYear();
 var next_decade = this_year + 10;
 var next_year = this_year + 1;
 function parse_pubdate(d) {
-  d = normalize_date(d);
+  var _d = d;
+  d = normalize_date(_d);
 
   if (!d) return null;
 
@@ -137,7 +139,7 @@ function parse_pubdate(d) {
     y = mo.year();
     if (mo.isValid() && y > 800 && y < next_decade) {
       if (y > next_year) {
-        console.log('Possible invalid date', d, f, mo.toDate());
+        console.log('Possible invalid date', _d, d, f, mo.toDate());
       }
       ret = mo.toDate();
       //console.log(d, f, ret);
