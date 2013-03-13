@@ -109,7 +109,7 @@ module.exports = function(app, central) {
     if (!people.stats) return res.render('people', res.data);
 
     next();
-  }, attach_latest, do_render('people'));
+  }, attach_latest, attach_highest_ratings, do_render('people'));
 
   app.get('/people/:uid/:istatus', function(req, res, next) {
     var istatus = req.params.istatus;
@@ -130,8 +130,7 @@ module.exports = function(app, central) {
       return res.redirect('/people/' + req.params.uid + '/');
     }
     next();
-  }, attach_most_commented,
-  attach_highest_ratings , do_render('people/sub'));
+  }, attach_most_commented, do_render('people/sub'));
 
   app.get('/people/:uid/books', function(req, res, next) {
     var people = res.data.people;
