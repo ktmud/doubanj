@@ -4,11 +4,18 @@ function Bar(container, options) {
   if (!container) throw new Error('Must give a container for Pie chart.');
   if (!(this instanceof Bar)) return new Bar(container, options);
   options = lodash.defaults(options, Bar.defaultOptions);
-  this.options = options;
-  this.container = d3.select(container);
-  this.data = options.data || this.container.attr('data-bar');
 
-  this.style = options.multiple;
+  var self = this;
+
+  self.options = options;
+  self.container = d3.select(container);
+  self.data = options.data || self.container.attr('data-bar');
+
+  self._all_data = d3.csv.parse(self.data);
+
+  d3.rebind(self, self.container, 'on');
+
+  self.style = options.multiple;
 }
 
 Bar.defaultOptions = {
@@ -22,7 +29,7 @@ Bar.defaultOptions = {
   legend: '10x10', // the size of legend bar
   legendTransform: function(d, i) { return "translate(0," + i * 20 + ")"; },
   showText: true,
-  multiple: 'stack',
+  multiple: 'stacked',
   xAxis: {
     orient: 'bottom',
     tickSize: 0,
@@ -45,26 +52,22 @@ Bar.defaultOptions = {
 Bar.prototype.draw = function(data) {
   var self = this, options = self.options;
 
-  self.data = data || self.data;
-
-  if (!self.data) return;
-
-  self._prepare(data);
+  self._prepare(data || self._all_data);
 
   self.drawAxis();
-
-  self.drawData();
 
   if (options.legend && self._is_multi) {
     self.drawLegend();
   }
+
+  self.drawData();
 };
 
 Bar.prototype._n = function() {
-  return this.data.split('\n')[0].split(',').length - 1;
+  return lodash.keys(this._data[0]).length - 1;
 };
 Bar.prototype._m = function() {
-  return this.data.split('\n').length;
+  return this._data.length;
 };
 
 Bar.prototype._prepare = function(data) {
@@ -80,10 +83,18 @@ Bar.prototype._prepare = function(data) {
       width = self.width = options.width - margin[1] - margin[3],
       height = self.height = options.height - margin[0] - margin[2];
 
-  var data = d3.csv.parse(self.data);
+  if (typeof data === 'string') {
+    data = self._data = d3.csv.parse(self.data);
+  } else {
+    self._data = data;
+  }
 
   var multi_keys = self.multi_keys = d3.keys(data[0]);
   var yname = self.yname = multi_keys.shift();
+
+  if (self._filter) {
+    data = self._data = data.filter(self._filter);
+  }
 
   if (multi_keys.length > 1) this._is_multi = true;
 
@@ -91,6 +102,7 @@ Bar.prototype._prepare = function(data) {
 
   var n = self.n = self._n(), // number of layers
       m = self.m = self._m(); // number of samples per layer
+
   var stack = self.stack = d3.layout.stack();
   var layers = bumpLayers(data, multi_keys, yname);
   layers = self.layers = stack(layers);
@@ -103,24 +115,32 @@ Bar.prototype._prepare = function(data) {
 
   var periodic = options.periodic === null ? container.attr('data-periodic') : options.periodic;
 
+  var xdomain = data.map(function(d) { return d[yname]; });
+
   var x = self.x = d3.scale.ordinal()
-      .domain(data.map(function(d) { return d[yname]; }))
+      .domain(xdomain)
       .rangeRoundBands([0, width], .08);
 
   if (periodic) {
     var xtime = self.xtime = d3.time.scale().range([0, width])
-     .domain(dateparse(data, yname));
+     .domain(datedomain(xdomain));
   }
 
   self.y = d3.scale.linear()
       .domain([0, self.style === 'grouped' ? yGroupMax : yStackMax])
       .range([height, 0]);
 
-  var svg = self.svg = self.container.append("svg")
+  self.svg = self.container.select('svg > g');
+      
+  if (self.svg.empty()) {
+    self.svg = self.container.append("svg")
       .attr("width", options.width)
       .attr("height", options.height)
       .append("g")
       .attr("transform", "translate(" + margin[3] + "," + margin[0] + ")");
+  } else {
+    self.svg.selectAll('.layer').remove();
+  }
 };
 
 Bar.prototype.drawData = function() {
@@ -147,7 +167,52 @@ Bar.prototype.drawData = function() {
     .attr("width", x.rangeBand())
     .attr("height", 0);
 
-  self[self.style + 'ed']();
+  self[self.style]();
+};
+
+var one_day = 60000 * 60 * 24;
+var reg_period = /([\+\-])?([\d]+)(\w)/;
+Bar.prototype.time_filter = function(a, b) {
+  var self = this;
+  if (a === 'all') {
+    self._filter = null;
+  } else if ( a === 'last_year') {
+    b = d3.time.year(new Date());
+    a = new Date(b);
+    a.setFullYear(a.getFullYear() - 1);
+  } else if (typeof a === 'string') {
+    b = new Date();
+
+    var m = a.match(reg_period);
+    var punc = m[1], unit = m[3];
+    var n = parseInt(m[2], 10);
+    
+    a = new Date();
+
+    if (punc === '-') {
+      n = -n;
+    }
+
+    // Month
+    if (unit === 'd') {
+      a = +a + one_day * n;
+    } if (unit === 'm') {
+      a = +a + n * one_day * 31 
+    } else if (unit === 'y') {
+      a = a.setFullYear(a.getFullYear() + n);
+    }
+  }
+
+  if (a && b) {
+    self._filter = function(d) {
+      var yname = self.yname;
+      d = new Date(d[yname]);
+      return d >= a && d <= b;
+    };
+  }
+
+  // redraw
+  self.draw();
 };
 
 Bar.prototype.hideText = function() {
@@ -178,7 +243,7 @@ Bar.prototype.drawText = function(delay) {
     .text(function(d) { return d.y || ''; });
 };
 
-Bar.prototype.grouped = function transitionGrouped() {
+Bar.prototype.grouped = function transitionGrouped(dur) {
   var self = this;
   var y = self.y, x = self.x, n = self.n;
 
@@ -186,10 +251,17 @@ Bar.prototype.grouped = function transitionGrouped() {
 
   self.style = 'grouped';
 
-  self.rect.transition()
-      .duration(500)
-      .delay(function(d, i) { return i * 10; })
-      .attr("x", function(d, i, j) { return x(d.x) + x.rangeBand() / n * j; })
+  dur = dur || 400;
+
+  if (self._filter) {
+    dur = 0;
+  }
+
+  var rect = self.rect.transition();
+
+  rect.duration(dur).delay(function(d, i) { return i * 10; })
+
+  rect.attr("x", function(d, i, j) { return x(d.x) + x.rangeBand() / n * j; })
       .attr("width", x.rangeBand() / n)
     .transition()
       .attr("y", function(d) { return y(d.y); })
@@ -197,7 +269,7 @@ Bar.prototype.grouped = function transitionGrouped() {
   return self;
 }
 
-Bar.prototype.stacked = function transitionStacked() {
+Bar.prototype.stacked = function transitionStacked(dur) {
   var self = this;
   var y = self.y, x = self.x;
 
@@ -207,14 +279,17 @@ Bar.prototype.stacked = function transitionStacked() {
 
   self.hideText();
 
+  dur = dur || 400;
+
   if (self.options.showText && self.layers.length === 1) {
-    self.drawText(500);
+    self.drawText(dur);
   }
 
-  self.rect.transition()
-      .duration(500)
-      .delay(function(d, i) { return i * 10; })
-      .attr("y", function(d) { return y(d.y0 + d.y); })
+  var rect = self.rect.transition();
+
+  rect.duration(dur).delay(function(d, i) { return i * 10; })
+
+  rect.attr("y", function(d) { return y(d.y0 + d.y); })
       .attr("height", function(d, i) { return y(d.y0) - y(d.y0 + d.y);
       })
     .transition()
@@ -238,13 +313,7 @@ Bar.prototype.drawAxis = function() {
   var opt_yAxis = options.yAxis;
 
   var xAxis = self.xAxis = d3.svg.axis();
-  var yAxis = self.yAxis = d3.svg.axis().scale(y)
-
-  if (xtime) {
-    xAxis.scale(xtime).tickFormat(customTimeFormat);
-  } else {
-    xAxis.scale(x);
-  }
+  var yAxis = self.yAxis = d3.svg.axis();
 
   lodash.each(['orient', 'tickSize', 'tickPadding'], function(prop) {
     if (opt_xAxis && prop in opt_xAxis) {
@@ -256,40 +325,42 @@ Bar.prototype.drawAxis = function() {
   });
 
   if (opt_xAxis) {
-    self._g_x = svg.append("g")
+    if (!self._g_x) {
+      self._g_x = svg.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
+      .attr("transform", "translate(0," + height + ")");
+    }
+
+    self.updateX();
   }
 
   if (opt_yAxis) {
-    var y = self._g_y = svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis);
+    if (!self._g_y) {
+      var y = self._g_y = svg.append("g").attr("class", "y axis");
+      var yunit = container.attr('data-y') || options.yunit;
+      if (yunit) {
+        var yt = y.append("text")
+          .attr('dx', "0.2em")
+          .attr("dy", ".71em");
 
-    var yunit = container.attr('data-y') || options.yunit;
-
-    if (yunit) {
-      var yt = y.append("text")
-        .attr('dx', "0.2em")
-        .attr("dy", ".71em");
-
-      if (options.yRotate) {
-        var text_x = 0, r = -90;
-        if (opt_yAxis.orient === 'right') {
-          text_x = 8;
-          r = 90;
+        if (options.yRotate) {
+          var text_x = 0, r = -90;
+          if (opt_yAxis.orient === 'right') {
+            text_x = 8;
+            r = 90;
+          }
+          yt.style("text-anchor", "end")
+            .attr("y", 6)
+            .attr('x', text_x)
+            .attr("transform", 'rotate(' + r + ')');
+        } else {
+          yt.attr('x', 2)
+            .style("text-anchor", "center");
         }
-        yt.style("text-anchor", "end")
-          .attr("y", 6)
-          .attr('x', text_x)
-          .attr("transform", 'rotate(' + r + ')');
-      } else {
-        yt.attr('x', 2)
-          .style("text-anchor", "center");
+        yt.text(yunit);
       }
-      yt.text(yunit);
     }
+    self.updateY();
   }
 };
 
@@ -297,7 +368,7 @@ Bar.prototype.updateX = function() {
   var self = this;
   var x = self.x;
   var xtime = self.xtime;
-  var xAxis = self.xAxis = d3.svg.axis();
+  var xAxis = self.xAxis;
   if (xtime) {
     xAxis.scale(xtime).tickFormat(customTimeFormat);
   } else {
@@ -357,11 +428,9 @@ function bumpLayers(data, multi_keys, yname) {
   return ret;
 }
 
-function dateparse(data, yname) {
-  var l = data.length;
+function datedomain(data) {
   var ret = data.map(function(d) {
-    var p = new Date(d[yname]);
-    return p;
+    return new Date(d);
   });
   return d3.extent(ret, function(d) { return d; })
 }

@@ -6,14 +6,26 @@
       small.pull-right.bar-style-toggler
         label
           input(type="radio", name="bar-style", value="stacked", checked)
-          单条
+          堆叠
         label
           input(type="radio", name="bar-style", value="grouped")
           分组
     h3 阅读编年史
       a.anchor(href="#history") #
-  .span12.chart.chart-bar#d-by_updated(data-legend=legend, data-bar=people.book_csv('by_updated_month', statuses), data-y="本", data-periodic="true")
-    .caption 每月阅读量
-  .span12.chart.chart-bar#d-by_pubdate(data-legend=legend, data-bar=people.book_csv('by_pubdate_decades', statuses), data-y="本")
-    .caption 收藏图书的出版年代
-
+  .span12
+    .chart
+      ul.nav.nav-pills.nav-pills-small.chart-filter
+        li.active
+          a(href="time:all") 全部
+        li
+          a(href="time:-2y") 最近两年
+        li
+          a(href="time:-1y") 最近一年 
+        li
+          a(href="time:last_year") 去年
+      .chart-bar#d-by_updated(data-legend=legend, data-bar=people.book_csv('by_updated_month', statuses), data-y="本", data-periodic="true")
+      .caption 每月阅读量
+  .span12
+    .chart
+      .chart-bar#d-by_pubdate(data-legend=legend, data-bar=people.book_csv('by_pubdate_decades', statuses), data-y="本")
+      .caption 收藏图书的出版年代

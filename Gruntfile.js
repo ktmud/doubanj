@@ -102,7 +102,7 @@ module.exports = function(grunt) {
     wrapper: {
       options: {
         // wrap indicator
-        wrap: 'module.exports =',
+        wrap: 'module.exports',
       },
       js: {
         cwd: 'static/dist/js/',

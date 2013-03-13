@@ -4,6 +4,7 @@
     "component/jquery": "*",
     "ktmud/lodash": "*",
     "ktmud/d3": "*",
-    "ktmud/bootstrap": "3.0.0-wip"
+    "ktmud/bootstrap": "3.0.0-wip",
+    "ktmud/crossfilter": "*"
   }
 }
