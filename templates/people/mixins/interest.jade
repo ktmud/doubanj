@@ -39,7 +39,7 @@ mixin interest_item(i, trimto)
   if i.subject
     a(href="http://#{i.subject_ns()}.douban.com/subject/#{i.subject_id}/",
       target="_blank",
-      title="#{i.subject.title} - #{i.subject.author.join(', ')}")
+      title="#{i.subject.title}#{i.subject.author ? ' - ' + i.subject.author.join(', ') : ''}")
       | #{trunc(i.subject.title, 8)}
   else
     a(href="http://#{i.subject_ns()}.douban.com/subject/#{i.subject_id}/", target="_blank")
