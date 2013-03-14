@@ -1,0 +1,14 @@
+mixin comment_item(i)
+  small.muted.datetime.pull-right #{strftime('%Y-%m-%d', i.updated)}
+  p 评《
+    mixin subject_link(i)
+    |》
+    mixin stars(i.rating)
+  blockquote
+    - c = i.comment.split('\n\n')
+    each p in c
+      p #{p.replace('\n', '&nbsp;&nbsp;')}
+
+mixin subject_link(i)
+  a(href="http://#{i.subject_ns()}.douban.com/subject/#{i.subject_id}/", target="db-#{i.subject_type}") #{i.subject && i.subject.title || i.subject_id}
+

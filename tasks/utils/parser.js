@@ -154,9 +154,18 @@ function parse_publisher(p) {
   return p;
 }
 
+function parse_people(people) {
+  if (!people || !people.length) return null;
+  return people.filter(function(item) {
+    return item !== '等';
+  });
+}
+
 module.exports = {
   'publisher': parse_publisher,
   'pubdate': parse_pubdate,
+  'author': parse_people,
+  'translator': parse_people,
   'pages': parse_pages,
   'price': parse_price,
 };

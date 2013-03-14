@@ -1,0 +1,8 @@
+#tags.row.mod
+  .span12
+    h3 偏好
+      a.anchor(href="#tags") #
+    .chart
+      - tree = JSON.stringify(people.book_tags(istatus.status))
+      #d-tags.chart-treemap(data-ns="book", data-tree=tree)
+

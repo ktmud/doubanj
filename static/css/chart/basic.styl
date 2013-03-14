@@ -14,9 +14,44 @@ text
 
 .chart-bar
   height: 260px;
-
   .legend
     fill: #777;
+
+.chart-treemap
+  height: 360px;
+  position: relative;
+
+  .node
+    border: 1px dotted #fff;
+    position: absolute;
+    font-size: 0.8em;
+    line-height: 1.2;
+    z-index: 1;
+
+    transition(0.4s all);
+
+    &:hover
+      box-shadow(0 3px 7px rgba(0,0,0,0.35));
+      border-style: solid;
+      z-index: 10;
+
+  .parent
+    border-style: solid;
+  .parent:hover
+    z-index: 1;
+
+  a
+    display: block;
+    height: 88%;
+    padding: 4% 6%;
+    margin: 1%;
+    color: #444;
+    color: rgba(0,0,0,0.9);
+    overflow: hidden;
+    &:hover
+      text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+      text-decoration: none;
+      color: #000;
 
 .arc path
   stroke: #fff;

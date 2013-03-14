@@ -1,0 +1,23 @@
+include ../mixins/interest
+
+- s = people[istatus.ns + '_stats']
+- coll = s[istatus.status]
+
+include ./book/tags
+
+n_comments = most_commented.length
+most_commented = central.utils.shuffle(most_commented).slice(0,3)
+include ./book/quote
+
+hr
+include ./book/keywords
+
+hr
+include ./book/history
+
+hr
+include ./book/tops
+
+hr
+.mod
+  a.btn.btn-small.btn-primary(href="#{people.url()}") &lt; 返回 #{people.name}的读书酱

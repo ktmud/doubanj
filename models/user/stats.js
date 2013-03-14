@@ -142,9 +142,70 @@ function export_csv(ns) {
   }
 }
 
+/**
+* Keywords treemap JSON 
+*/
+function export_keywords(ns) {
+  return function(status) {
+    status = status || 'all';
+
+    var user = this;
+    var stats = user[ns + '_stats'][status];
+    if (!stats) return {};
+    var ret = {
+      _id: ns + '_' + status,
+      children: []
+    };
+    var kids = ret.children;
+    Object.keys(stats).forEach(function(k) {
+      var tmp = k.split('_');
+      if (tmp[0] === 'top' && tmp[1] !== 'tags') {
+        kids.push({
+          _id: tmp[1],
+          children: stats[k]
+        });
+      }
+    });
+    return ret;
+  }
+}
+
+function export_tags(ns) {
+  return function(status) {
+    status = status || 'all';
+
+    var user = this;
+    var stats = user[ns + '_stats'];
+    if (!stats || !stats[status]) return {};
+
+    var ret = {
+      _id: ns + '_' + status,
+      children: []
+    };
+
+    var kids = ret.children;
+
+    if (stats[status].top_tags) {
+      kids.push({
+        _id: 'public_tags',
+        children: stats[status].top_tags
+      });
+    }
+    if (stats.interest.top_tags) {
+      kids.push({
+        _id: 'personal_tags',
+        children: stats.interest.top_tags
+      });
+    }
+    return ret;
+  }
+}
+
 module.exports = {
   notReady: function() {
     return this.stats_fail || this.invalid || this.stats_status !== 'succeed';
   },
+  book_tags: export_tags('book'),
+  book_keywords: export_keywords('book'),
   book_csv: export_csv('book'),
 };

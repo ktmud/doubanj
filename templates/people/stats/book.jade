@@ -1,32 +1,24 @@
 include ../mixins/interest
 
-if istatus
-  - s = people[istatus.ns + '_stats']
-  - coll = s[istatus.status]
-else
-  - s = people.book_stats
-  - coll = s.all
+- s = people[istatus.ns + '_stats']
+- coll = s[istatus.status]
 
-if istatus.status == 'all'
-  .pull-right
-    include ../mods/share.html
-  h2 #{people.name} 的读书酱
-    a.btn.btn-mini.btn-compact(href=people.db_url('book'), target="db-profile")   读书主页 ⇗
-  hr
-  include ./book/overview
+.pull-right
+  include ../mods/share.html
+h2 #{people.name} 的读书酱
+  a.btn.btn-mini.btn-compact(href=people.db_url('book'), target="db-profile")   读书主页 ⇗
+hr
+include ./book/overview
 
 hr
-include ./book/hots
+- locals.section_title = '阅读关键词'
+include ./book/keywords
 hr
 include ./book/history
 hr
 include ./book/tops
 
-if locals.most_commented
-  include ./book/quote
-if locals.highest_ratings
-  include ./book/favs
+include ./book/favs
 
-if istatus.status == 'all'
-  hr
-  a.pull-right.btn.btn-small.btn-success(href=people.url() + 'read') &gt; 只看读过的书
+hr
+a.pull-right.btn.btn-small.btn-success(href=people.url() + 'read') &gt; 只看读过的书

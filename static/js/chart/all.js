@@ -4,9 +4,11 @@ require.register("chart/all", function(exports, require, module){
 
   // @import ./pie.js
   // @import ./bar.js
+  // @import ./treemap.js
 
   module.exports = {
     Pie: Pie,
+    Treemap: Treemap,
     Bar: Bar,
   };
 });

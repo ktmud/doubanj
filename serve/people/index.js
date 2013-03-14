@@ -111,6 +111,19 @@ module.exports = function(app, central) {
     next();
   }, attach_latest, attach_highest_ratings, do_render('people'));
 
+  app.get('/people/:uid/quote', function(req, res, next) {
+    var people = res.data.people;
+
+    res.data.title = people.name + '的阅读体悟';
+
+    var istatus = res.data.istatus = availables['read'];
+
+    if (people.notReady() || people.isEmpty(istatus.ns)) {
+      return res.redirect('/people/' + req.params.uid + '/');
+    }
+    next();
+  }, attach_most_commented, do_render('people/quote'));
+
   app.get('/people/:uid/:istatus', function(req, res, next) {
     var istatus = req.params.istatus;
 

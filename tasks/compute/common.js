@@ -233,7 +233,14 @@ function aggSort(p, desc_asc, limit, fields) {
 function aggTop(p, unwind, limit) {
   limit = limit || 20;
   var name = '$' + p;
+  var match_q = {};
+  match_q[p] = {
+    $not: {
+      $type: 10
+    }
+  };
   var ret = [
+    { $match: match_q },
     { $group: { _id: name, count: { $sum: 1 } } },
     { $sort: { count: -1 } },
     { $limit: limit }

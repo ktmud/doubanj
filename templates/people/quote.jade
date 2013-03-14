@@ -1,0 +1,24 @@
+extend ./index
+
+include ./stats/book/mixins
+
+block article
+  ul.breadcrumb
+    li
+      a(href=people.url()) #{name}的豆瓣酱
+    li
+      a(href="#{people.url()}read") 读过的书
+    li.active
+      | 阅读体悟
+  h1 #{title}
+  - ns = 'book'
+  - n_comments = most_commented.length
+  ol.comments-list
+    each i in most_commented
+      if i.comment
+        li(id="comment-#{i.id}")
+          mixin comment_item(i)
+  hr
+  .mod
+    a.pull-right.btn.btn-small(href="http://#{ns}.douban.com/people/#{uid}/reviews", target="db-review") 去看#{people.name}的长评 ⇗
+    a.btn.btn-small.btn-success(href="#{people.url()}read") &lt; 返回 #{people.name}读过的书

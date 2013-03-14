@@ -44,13 +44,20 @@
     display inline-block
     margin 10px 10px 40px
 
-.comments-list
+ol.comments-list
   list-style: decimal inside;
+
+.comments-list
   margin: 0;
+  list-style: square inside;
 
   li
-    padding: 30px 20px;
+    padding: 30px 10px;
+    color: #aaa;
     border-top: 1px dotted #ddd;
+
+  p, blockquote
+    color: #111;
 
     &:hover
       background: #fafff9;

@@ -1,0 +1,7 @@
+#keywords.row.mod
+  .span12
+    h3 #{locals.section_title || '关键词'}
+      a.anchor(href="#keywords") #
+    .chart
+      - tree = JSON.stringify(people.book_keywords(istatus.status))
+      #d-keywords.chart-treemap(data-ns="book", data-tree=tree)
