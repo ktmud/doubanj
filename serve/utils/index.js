@@ -4,6 +4,8 @@ var User = require(cwd + '/models/user').User;
 var reg_uid = /\/people\/([^\/]+)/;
 
 function url2uid(url) {
+  url = url || '';
+  url = url.trim();
   var m = url.match(reg_uid);
   if (m) uid = m[1];
   return m && m[1] || url;

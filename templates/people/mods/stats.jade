@@ -32,13 +32,11 @@ section
   include ../stats/book
 
 hr
+if conf.debug || people.last_synced_status !== 'ing' || (new Date() - people.last_synced > 60000)
+  include ../mods/sync
+
 .vmiddle
   p.muted
     ... 更多功能正在紧张开发中，欢迎随时回来看看
-
-if conf.debug || people.last_synced_status !== 'ing' || (new Date() - people.last_synced > 60000)
-  small.muted 如果真的有需要的话：
-  include ../mods/sync
-
 
 include ./stats_js

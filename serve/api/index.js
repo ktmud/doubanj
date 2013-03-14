@@ -1,7 +1,8 @@
-var cwd = central.cwd;
-var User = require(cwd + '/models/user').User;
-
 module.exports = function(app, central) {
+  var utils = central.utils;
+  var cwd = central.cwd;
+  var User = require(cwd + '/models/user').User;
+
   app.get('/api/people/:uid/progress', function(req, res, next) {
     var people = res.data.people;
     if (people) {
@@ -42,5 +43,23 @@ module.exports = function(app, central) {
         r: 404
       });
     }
+  });
+
+  app.get('/api/latest_synced', function(req, res, next) {
+    User.latestSynced(function(err, users) {
+      var people = users.map(function(item) {
+        return {
+          url: item.url(),
+          name: item.name
+        };
+      });
+
+      people = utils.shuffle(people);
+
+      res.json({
+        r: err ? 500 : 0,
+        people: people,
+      });
+    });
   });
 };

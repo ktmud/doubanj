@@ -13,7 +13,16 @@ block main
       &nbsp;
       button.btn.btn-primary(type="submit") 开始
 
+  hr
+  include ./widgets/latest_synced
+
+
 block ending
-  script(src=static('/js/d3.js'), async) // preload the d3 library
+  script
+    Do.urls(!{urlmap('lodash', 'd3')});
+    !{istatic('js/homepage/ticker.js')}
+  // preload the d3 library
+  script(async)
+    Do('d3');
 
 block navbar_form

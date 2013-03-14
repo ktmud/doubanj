@@ -8,7 +8,7 @@ var central = require('../../lib/central');
 
 var cwd = central.cwd;
 var conf = central.conf;
-//var redis = central.redis;
+var redis = central.redis;
 var mongo = central.mongo;
 var utils = central.utils;
 var task = central.task;
@@ -26,6 +26,8 @@ function User(info) {
   central.DOUBAN_APPS.forEach(function(ns) {
     this[ns + '_n'] = this[ns + '_n'] || 0;
   });
+
+  delete this['__cons_id__'];
 
   return this;
 };
@@ -66,8 +68,39 @@ User.getFromMongo = function(uid, cb) {
     });
   });
 };
+
 // User as an available constructor
-//redis.cached.register(User);
+redis.cached.register(User);
+
+User.latestSynced = function(cb) {
+  var cls = this;
+  mongo(function(db) {
+    var collection = db.collection(USER_COLLECTION);
+    collection.find({
+      stats_p: 100 
+    }, {
+      sort: {
+        last_statsed: -1
+      },
+      fields: {
+        id: 1,
+        _id: 0,
+        name: 1,
+        last_synced: 1
+      },
+      limit: 15,
+    }).toArray(function(err, ret) {
+      var users = ret && ret.map(function(item) {
+        return cls(item);
+      });
+      if (err) error(err);
+      return cb(err, users);
+    });
+  });
+};
+// 10 seconds
+User.latestSynced = redis.cached.wrap(User.latestSynced, 'latest-synced', 10000);
+
 
 User.get = function(uid, cb) {
   uid = String(uid).toLowerCase();
@@ -143,6 +176,8 @@ User.prototype.toObject = function() {
     'loc_id': this['loc_id'],
     'loc_name': this['loc_name'],
     'signature': this['signature'],
+
+    'invalid': this['invalid'] || null,
 
     // local props
     '_id': this['_id'],
