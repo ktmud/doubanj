@@ -9,6 +9,6 @@
     span.elapse #{time_elapse(people.created)}。
   if people.desc
     hr
-    .pull-right
-      img.img-rounded(src=people.avatar)
-    p.desc !{people.desc.replace(/\n/g, '<br>')}
+    .clearfix
+      img.pull-right.img-rounded(src=people.avatar, height="48")
+      p.desc !{people.desc.replace(/\n/g, '<br>')}
