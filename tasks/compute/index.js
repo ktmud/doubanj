@@ -21,6 +21,7 @@ var book_task = require('./book');
 var compute, _compute;
 compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, arg, next) {
   var user = arg.user;
+  var raven_extra = { extra: { uid: user.id }, tags: { task: 'compute' } };
 
   if (!user) {
     return arg.error('NO_USER');
@@ -46,21 +47,24 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
       //console.log(err, err.type, err.message);
     }
     err.name = err.name || 'compute fail';
-    raven.error(err, { extra: { uid: user.id }, tags: { task: 'compute' } });
+    raven.error(err, raven_extra);
 
     if (called) return;
     called = true;
 
-    if (err !== 'RUNNING') {
+    if (err === 'RUNNING') {
+      arg.error(err);
+    } else {
       var stats_fail = user.stats_fail || 0;
       // reset user's stats data if error happens
       log('resetting %s\'s compute status', user.uid);
       user.update({
         stats_fail: stats_fail + 1,
         stats_status: err,
+      }, function() {
+        arg.error(err);
       });
     }
-    arg.error(err);
     next();
   };
 
@@ -74,12 +78,13 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
   if (user.last_synced_status !== 'succeed') {
     if (user.syncTimeout()) {
       // reset user data
-      raven.message('Compute found collect timeout.', { tags: { task: 'compute' } });
       user.update({
         invalid: 0,
         last_synced_status: 'TIMEOUT',
+      }, function() {
+        error_cb('TIMEOUT');
       });
-      return error_cb('TIMEOUT');
+      return;
     }
     return error_cb('NOT_READY');
   }

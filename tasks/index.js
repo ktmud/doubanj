@@ -5,6 +5,7 @@ var redis = central.redis;
 
 var debug = require('debug');
 var verbose = debug('dbj:tasks:verbose');
+var log = debug('dbj:tasks:log');
 
 var TaskQueue = require('./queue');
 
@@ -16,7 +17,7 @@ var TaskQueue = require('./queue');
   // let the queue resume undone works.
   queue.on('ready', function(q) {
     verbose('Task queue for ' + item + ' loaded.');
-    verbose('%s unfinished task', q.length);
+    log('%s unfinished task', q.length);
     this.resume();
   });
 

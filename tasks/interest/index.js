@@ -9,11 +9,17 @@ var raven = central.raven;
 var User = require(central.cwd + '/models/user');
 var FetchStream = require('./stream');
 
-function error(err, extra) {
-  raven.error(err, { tags: { task: 'collect' }, extra: extra  });
+function error() {
+  var args = [].slice.apply(arguments);
+  var extra = args[args.length - 1];
+  args[args.length - 1] = { tags: { task: 'collect' }, extra: extra  };
+  raven.error.apply(raven, args);
 }
-function message(err, extra) {
-  raven.message(err, { tags: { task: 'collect' }, extra: extra  });
+function message() {
+  var args = [].slice.apply(arguments);
+  var extra = args[args.length - 1];
+  args[args.length - 1] = { tags: { task: 'collect' }, extra: extra  };
+  raven.message.apply(raven, args);
 }
 
 var collect, _collect;
@@ -31,14 +37,14 @@ collect = User.ensured(function(user, arg) {
 
   var uid = user.uid || user.id;
 
-  var raven_extra = { ns: arg.ns, uid: uid };
-  message('collect interests start', raven_extra);
+  var raven_extra = { ns: arg.ns };
+  message('collect interests for %s start', uid, raven_extra);
 
   var collector = new FetchStream(arg);
 
   // halt if syncing is already running
   if (user.last_synced_status === 'ing' && !arg.force && !arg._from_halt) {
-    message('Collection exit due to runing..');
+    message('collect for %s exit due to runing..', uid, raven_extra);
     arg.error('RUNNING');
     return;
   }
@@ -61,13 +67,13 @@ collect = User.ensured(function(user, arg) {
     // wait for the really ends
     setTimeout(function() {
       if (collector.status == 'succeed') {
-        message('collect interests succeed', raven_extra); 
+        message('collect interests for %s succeed', uid, raven_extra); 
 
         arg.success.call(collector, user);
 
         collector.emit('succeed');
       } else {
-        error('collect interests failed at %s', collector.status, { uid: uid, ns: arg.ns }); 
+        error('collect interests for %s failed at %s', uid, collector.status, raven_extra); 
         arg.error.call(collector, user);
       }
     }, 2000);
