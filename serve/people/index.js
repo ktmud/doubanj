@@ -49,7 +49,12 @@ module.exports = function(app, central) {
   var attach_most_commented = attach('most_commented', function(req, res, cb) {
     var people = res.data.people;
     var istatus = res.data.istatus;
-    res.data.people[istatus.ns + '_most_commented'](istatus.status, 30, cb);
+    res.data.people[istatus.ns + '_most_commented'](istatus.status, 30, function(err, ret) {
+      ret = ret && ret.filter(function(item) {
+        return item.comment;
+      });
+      cb(err, ret);
+    });
   });
   var attach_highest_ratings = attach('highest_ratings', function(req, res, cb) {
     var people = res.data.people;

@@ -54,10 +54,12 @@ mixin interests_list(items)
           div.status #{i.status_cn()}
               mixin stars(i.rating)
           if i.subject
-            .pic
-              img(src=i.subject.images.medium)
+            if i.subject.images
+              .pic
+                img(src=i.subject.images.medium)
             p.title #{i.subject.title}
-            p.meta.authors !{i.subject.author.join(', ')}
+            if i.subject.author
+              p.meta.authors !{i.subject.author.join(', ')}
             if i.subject.publisher
               p.meta.publisher #{i.subject.publisher}
           else
