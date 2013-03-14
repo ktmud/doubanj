@@ -8,6 +8,8 @@ else
   - coll = s.all
 
 if istatus.status == 'all'
+  .pull-right
+    include ../mods/share.html
   h2 #{people.name} 的读书酱
     a.btn.btn-mini.btn-compact(href=people.db_url('book'), target="db-profile")   读书主页 ⇗
   hr

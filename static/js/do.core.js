@@ -44,6 +44,7 @@ resolve = function(f) {
   f = f.toString();
   var mo = mods[f];
   if (mo) return mo.id || resolve(mo.path);
+  if (!notin(f, '://')) return f;
   return f.split(_config.root).pop().split('.js')[0];
 },
 
@@ -57,7 +58,7 @@ realPath = function(m, type) {
 
   if (m in urlmap) return urlmap[m];
 
-  if (type === 'js' && notin(m, '.js')) {
+  if (type === 'js' && notin(m, '.js') && notin(m, '://')) {
     m = _config.root + 'js/' + m + '.js';
   }
 

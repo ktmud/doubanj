@@ -18,4 +18,4 @@ Gruntfile.js
 **static/**/*.js
 templates/**
 var/*
-*.rbd
+*.rdb

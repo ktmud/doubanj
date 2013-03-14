@@ -6,6 +6,8 @@ block article
       a(href=people.url()) #{name}的豆瓣酱
     li.active
       | #{istatus.name}
+  .pull-right
+    include ./mods/share.html
   h1 #{title}
   include ./stats/book
   include ./mods/stats_js.jade
