@@ -45,7 +45,7 @@ Do('lodash', 'd3', 'chart/all', function(_require) {
       },
       height: d_treemap.height(),
       value: item.id === 'd-keywords' ? function(d) {
-        return d.count / 2 + 5;
+        return d.count / 1.3 + 1;
       } : function(d) {
         return d.count + 2;
       },
