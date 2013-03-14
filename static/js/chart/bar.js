@@ -225,13 +225,9 @@ Bar.prototype.drawText = function(delay) {
   var x = self.x;
   var y = self.y;
 
-  var text = self.text;
-  
-  if (!text) {
-    text = self.text = self.layer.selectAll('text').data(function(d) { return d; }).enter().append("text")
-    .attr('x', function(d) { return x(d.x); })
-    .attr('y', 0);
-  }
+  var text = self.text = self.text = self.layer.selectAll('text').data(function(d) { return d; }).enter().append("text")
+  .attr('x', function(d) { return x(d.x); })
+  .attr('y', 0);
 
   var rb = x.rangeBand() / 2;
   text.transition()
@@ -252,10 +248,6 @@ Bar.prototype.grouped = function transitionGrouped(dur) {
   self.style = 'grouped';
 
   dur = dur || 400;
-
-  if (self._filter) {
-    dur = 0;
-  }
 
   var rect = self.rect.transition();
 
