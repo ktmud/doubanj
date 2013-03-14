@@ -48,6 +48,7 @@ module.exports.boot = function() {
       if (req.is_ssl) return mo_url.resolve(central.conf.https_root, url);
       return central.assets.fileUrl(url);
     },
+    res.locals.req = req;
     next();
   });
 

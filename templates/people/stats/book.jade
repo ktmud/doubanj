@@ -10,8 +10,6 @@ else
 if istatus.status == 'all'
   h2 #{people.name} 的读书酱
     a.btn.btn-mini.btn-compact(href=people.db_url('book'), target="db-profile")   读书主页 ⇗
-    .pull-right
-      a.btn.btn-small.btn-success(href=people.url() + 'read') 只看读过
   hr
   include ./book/overview
 
@@ -26,3 +24,7 @@ if locals.most_commented
   include ./book/quote
 if locals.highest_ratings
   include ./book/favs
+
+if istatus.status == 'all'
+  hr
+  a.btn.btn-small.btn-success(href=people.url() + 'read') &gt; 只看读过的书

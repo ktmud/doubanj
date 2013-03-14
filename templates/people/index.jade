@@ -37,3 +37,8 @@ block main
       block sidebar
         if people.created
           include ./mods/intro
+          if conf.debug || people.last_synced_status !== 'ing' || (new Date() - people.last_synced > 60000)
+            hr
+            .pull-right
+              include ./mods/sync
+

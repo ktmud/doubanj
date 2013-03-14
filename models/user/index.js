@@ -100,6 +100,12 @@ User.latestSynced = function(cb) {
 };
 // 10 seconds
 User.latestSynced = redis.cached.wrap(User.latestSynced, 'latest-synced', 10000);
+User.count = redis.cached.wrap(function(cb) {
+  mongo(function(db) {
+    var collection = db.collection(USER_COLLECTION);
+    collection.count({ stats_p: 100 }, cb);
+  });
+}, 'users-count', 60000);
 
 
 User.get = function(uid, cb) {

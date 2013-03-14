@@ -31,10 +31,6 @@ else
 section
   include ../stats/book
 
-hr
-if conf.debug || people.last_synced_status !== 'ing' || (new Date() - people.last_synced > 60000)
-  include ../mods/sync
-
 .vmiddle
   p.muted
     ... 更多功能正在紧张开发中，欢迎随时回来看看

@@ -15,7 +15,7 @@ block main
   h2#privacy 隐私问题
   ul
     li 除非经过你授权，本站采集的数据均为你在豆瓣上公开展示的信息
-    li 任何人都可以查看其他人公开资料的统计数据
+    li.text-warning 任何人都可以查看其他人公开资料的统计数据
     li 如果你不希望自己的资料在豆瓣酱上展示，请
        a(href="mailto:support@doubanj.com") 与我们联系
   h2#tos 权责声明
@@ -33,3 +33,8 @@ block main
     a(href="/donate") 给点捐助
     |。
   p 也欢迎提出各种意见和要求，虽然大部分时候它们并不会被采纳。
+
+  hr
+  p.muted 
+    em
+      截至目前，豆瓣酱已经为 #{n_people} 位豆友生成了统计报表。
