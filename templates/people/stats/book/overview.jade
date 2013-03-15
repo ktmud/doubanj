@@ -13,7 +13,7 @@
         是不是有点太少了呢？
       if s.n_wish > 10 && s.ratio_wish > 60
         想读的书有 #{s.n_wish} 本，占全部收藏的 #{s.ratio_wish}% 。
-        a(href="#{people.db_url()}wish", target="db-interests") 想读的
+        a(href="#{people.db_url('book')}wish", target="db-interests") 想读的
         | 似乎有点多了，不要光想不做哦。
       if s.n_ing
         | 另外还有 #{s.n_ing} 本在读
