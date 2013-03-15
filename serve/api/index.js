@@ -54,7 +54,7 @@ module.exports = function(app, central) {
         };
       });
 
-      people = utils.shuffle(people);
+      people = utils.shuffle(people).slice(0,12);
 
       res.json({
         r: err ? 500 : 0,

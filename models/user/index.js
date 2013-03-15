@@ -88,7 +88,7 @@ User.latestSynced = function(cb) {
         name: 1,
         last_synced: 1
       },
-      limit: 15,
+      limit: 30,
     }).toArray(function(err, ret) {
       var users = ret && ret.map(function(item) {
         return cls(item);
