@@ -133,7 +133,7 @@ module.exports = function(db, user, cb, ondata) {
       if (!(i_status in by_status)) return;
       var sids = by_status[i_status];
 
-      log('Agg %s book for %s...', i_status, uid);
+      log('Agg %s book for %s ...', i_status, uid);
 
       n_phrase++;
 

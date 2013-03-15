@@ -31,11 +31,11 @@ else
 section
   include ../stats/book
   .pull-left
-    if (new Date() - people.last_statsed > 600000)
+    - timediff = 2550000 - (new Date() - people.last_synced)
+    - if (timediff <= 0)
         include ../mods/sync
-    else
-      small.muted
-        十分钟后可重新同步
+    - else
+      small.muted #{chinese_period(timediff, true)}后可重新同步
 
 .vmiddle
   p.muted.notice-more
