@@ -68,7 +68,6 @@ User.getFromMongo = function(uid, cb) {
     });
   });
 };
-
 // User as an available constructor
 redis.cached.register(User);
 
@@ -125,7 +124,23 @@ User.get = function(uid, cb) {
     return cb(null, u);
   });
 };
-//User.get = redis.cached.wrap(User.get, 'user-{0}');
+User.get = redis.cached.wrap(User.get, 'user-{0}');
+User.prototype.clearCache = function(next) {
+  var n = 0;
+  if (this.uid) {
+    n++;
+    redis.clear('user-' + this.uid, tick);
+  }
+  if (this.id) {
+    n++;
+    redis.clear('user-' + this.id, tick);
+  }
+  function tick() {
+    n--;
+    if (n <= 0) return next();
+  }
+  if (n === 0) return next();
+};
 
 // pull from douban api, get account info
 User.prototype.pull = function(cb) {
