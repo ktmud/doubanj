@@ -29,7 +29,7 @@ module.exports = function(db, next) {
     r.ensureIndex({ 'id': 1 }, index_options, function(err, indexname) {
       if (err) return next(err);
 
-      var n = 5;
+      var n = 2;
       function _tick() {
         n--;
         if (n <= 0) tick();
