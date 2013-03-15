@@ -160,9 +160,15 @@ function export_keywords(ns) {
     Object.keys(stats).forEach(function(k) {
       var tmp = k.split('_');
       if (tmp[0] === 'top' && tmp[1] !== 'tags') {
+        var items = stats[k];
+        if (tmp[1] === 'publisher') {
+          items.forEach(function(item) {
+            item.factor = 0.25;
+          });
+        }
         kids.push({
           _id: tmp[1],
-          children: stats[k]
+          children: items
         });
       }
     });

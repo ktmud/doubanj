@@ -12,11 +12,15 @@
       if s.n_done < 10
         是不是有点太少了呢？
       if s.n_wish > 10 && s.ratio_wish > 60
-        想读的书有 #{s.n_wish} 本，占全部收藏的 #{s.ratio_wish}% 。想读的似乎有点多了，不要光想不做哦。
+        想读的书有 #{s.n_wish} 本，占全部收藏的 #{s.ratio_wish}% 。
+        a(href="#{people.db_url()}wish", target="db-interests") 想读的
+        | 似乎有点多了，不要光想不做哦。
       if s.n_ing
         | 另外还有 #{s.n_ing} 本在读
         if s.n_ing > 15
-          ，怎么可能同时读这么呢？一本本看完先吧
+          | ，怎么可能
+          a(href="#{people.db_url('book')do", target="db-interests") 同时读
+          | 这么呢？一本本看完先吧
         | 。
   .span5
     .chart.chart-pie#d-summary(data-pie=people.book_csv('r_status'))
