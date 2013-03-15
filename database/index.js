@@ -1,6 +1,6 @@
 var assert = require('assert');
 var debug = require('debug');
-var log = debug('dbj');
+var log = debug('dbj:database');
 
 
 // unique key index option
@@ -14,11 +14,10 @@ var index_options = {
 
 module.exports = function(db, next) {
   db.collection('book_interest', function(err, r) {
-    assert.equal(null, err);
     log('ensuring database "book_interest"...');
     r.ensureIndex({ 'id': 1 }, index_options, function(err, indexname) {
       if (err) return next(err);
-      r.ensureIndex({ 'book_id': 1, 'user_id': 1, 'uid': 1 }, function(err, indexname) {
+      r.ensureIndex({ 'user_id': 1 }, function(err, indexname) {
         if (err) return next(err);
         tick();
       });
@@ -26,28 +25,36 @@ module.exports = function(db, next) {
   });
 
   db.collection('book', function(err, r) {
-    assert.equal(null, err);
     log('ensuring database "book"...');
     r.ensureIndex({ 'id': 1 }, index_options, function(err, indexname) {
       if (err) return next(err);
-      r.ensureIndex({
-        'author': 1, 'publisher': 1,
-        'pages': 1, 'price': 1,
-        'rated': 1, 'raters': 1,
-        'pubdate': 1,
-      }, function(err, indexname) {
-        if (err) return next(err);
-        tick();
-      });
+
+      var n = 5;
+      function _tick() {
+        n--;
+        if (n <= 0) tick();
+      }
+      r.ensureIndex({ 'pages': 1 }, _tick); 
+      r.ensureIndex({ 'price': 1 }, _tick);
+      r.ensureIndex({ 'raters': 1 }, _tick);
+      r.ensureIndex({ 'rated': 1 }, _tick);
+      r.ensureIndex({ 'pubdate': 1 }, _tick);
     });
   });
 
   db.collection('user', function(err, r) {
-    assert.equal(null, err);
     log('ensuring database "users"...');
-    r.ensureIndex({ 'uid': 1, 'id': 1, 'last_statsed': 1 , 'mtime': 1 }, index_options, function(err, indexname) {
+    r.ensureIndex({ 'id': 1 }, index_options, function(err, indexname) {
       if (err) return next(err);
-      tick();
+
+      var n = 3;
+      function _tick() {
+        n--;
+        if (n <= 0) tick();
+      }
+      r.ensureIndex({ 'uid': 1 }, _tick); 
+      r.ensureIndex({ 'mtime': 1 }, _tick); 
+      r.ensureIndex({ 'last_statsed': 1 }, _tick);
     });
   });
 
