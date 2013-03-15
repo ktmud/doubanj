@@ -89,6 +89,8 @@ exports.remaining = function() {
   // 10 seconds for stats by default
   if (ret && sr === null) sr = 10000;
 
+  if (ret === 0 && sr === null) return null;
+
   return ret + sr;
 };
 exports.statsRemaining = function() {
@@ -100,7 +102,7 @@ exports.statsRemaining = function() {
 
   if (user.isIng()) {
     // At least five seconds
-    return Math.round(Math.sqrt(total) * (100 - (user.stats_p || 0)) * 2) + 5000;
+    return Math.round(Math.sqrt(total) * (100 - (user.stats_p || 0)) * 2.5) + 5000;
   }
 
   return null;

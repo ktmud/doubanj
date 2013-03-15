@@ -45,7 +45,6 @@ Do('lodash', 'd3', 'chart/all', function(_require) {
       },
       height: d_treemap.height(),
       value: function(d) {
-        console.log(d);
         return d.count * (d.factor || 1);
       },
       href: function(d) {
