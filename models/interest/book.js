@@ -1,3 +1,6 @@
+/**
+* Book Interest Class
+*/
 var util = require('util');
 var utils = central.utils;
 

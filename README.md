@@ -19,6 +19,7 @@
 
 新建一份你自己的的 `conf/development.conf.js` ，按需覆盖 `conf/default.conf.js` 里的任意选项。
 
+    cp conf/development.conf.tmpl.js conf/development.conf.js
     grunt
     make
 

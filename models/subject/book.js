@@ -21,4 +21,3 @@ utils.extend(Book, Subject);
 Book.prototype.kind = Book._collection = 'book';
 
 module.exports = Book;
-

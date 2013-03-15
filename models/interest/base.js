@@ -1,3 +1,6 @@
+/**
+* Interest Base Class
+*/
 var debug = require('debug');
 var util = require('util');
 var log = debug('dbj:interest:info');
@@ -51,6 +54,9 @@ Interest.findByUser = function(uid, opts, cb) {
   return this.find(query, opts, cb);
 };
 
+/**
+* Attach book subject
+*/
 Interest.book_attached = Interest.attached('subject_id', 'subject', Subject.book);
 //Interest.movie_attached = Interest.attached('subject_id', Subject.movie);
 

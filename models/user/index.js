@@ -37,6 +37,9 @@ utils.extend(User, mongo.Model);
 
 User.prototype.kind = User.prototype._collection = USER_COLLECTION;
 
+/**
+* Get user from database
+*/
 User.getFromMongo = function(uid, cb) {
   if (uid instanceof User) return cb(null, uid);
   verbose('getting user obj for %s', uid)
@@ -71,6 +74,9 @@ User.getFromMongo = function(uid, cb) {
 // User as an available constructor
 redis.cached.register(User);
 
+/**
+* Get the latest synced users
+*/
 User.latestSynced = function(cb) {
   var cls = this;
   mongo(function(db) {
@@ -97,8 +103,14 @@ User.latestSynced = function(cb) {
     });
   });
 };
-// 10 seconds
-User.latestSynced = redis.cached.wrap(User.latestSynced, 'latest-synced', 10000);
+/**
+* cache the result in redis for 60 seconds
+*/
+User.latestSynced = redis.cached.wrap(User.latestSynced, 'latest-synced', 60000);
+
+/**
+* Count users wish results
+*/
 User.count = function(cb) {
   mongo(function(db) {
     var collection = db.collection(USER_COLLECTION);
@@ -143,7 +155,10 @@ User.prototype.clearCache = function(next) {
   if (n === 0) return next();
 };
 
-// pull from douban api, get account info
+
+/**
+* pull from douban api, get account info
+*/
 User.prototype.pull = function(cb) {
   var self = this;
   var uid = self.uid || self.id;
@@ -174,6 +189,10 @@ User.prototype.pull = function(cb) {
     });
   }, 0);
 };
+
+/**
+* TODO: login in doubanj.com
+*/
 User.getByPass = function(uid, password, cb) {
   if (!uid || !password) return cb(401);
   User.getFromMongo(uid, function(err, user) {
@@ -227,13 +246,16 @@ User.prototype.toObject = function() {
 User.prototype.url = function() {
   return [conf.site_root, 'people', this.uid || this.id].join('/') + '/';
 };
+/**
+* Douban url
+*/
 User.prototype.db_url = function(ns) {
   ns = ns || 'www';
   return 'http://' + ns + '.douban.com/people/' + (this.uid || this.id) + '/';
 };
 
 User.prototype.interests = function(ns, cb) {
-  return Interest.findByUser(ns, this.uid, cb);
+  return Interest[ns].findByUser(this.uid || this.id, cb);
 };
 ['wish', 'ing', 'done'].forEach(function(st) {
   User.prototype[st + 's'] = function(ns, cb) {

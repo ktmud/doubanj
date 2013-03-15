@@ -1,3 +1,6 @@
+/**
+* Stats result decorations for d3.js input
+*/
 var consts = require('../consts');
 
 var INTEREST_STATUS_ORDERED = consts.INTEREST_STATUS_ORDERED;
