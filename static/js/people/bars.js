@@ -7,7 +7,7 @@ $('div.chart-bar').each(function(i, item) {
   var bar = chart.Bar(item, {
     margin: [40, 20, 40, 40],
     legendTransform: function(d, i) {
-      return "translate(" + -(i * 50 + 30) + "," + (h - 30) + ")";
+      return "translate(" + -(i * 50 + 30) + "," + (h - 50) + ")";
     },
     width: w,
     height: h
