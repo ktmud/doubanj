@@ -6,56 +6,60 @@ var log = debug('dbj:database');
 // unique key index option
 var index_options = {
   unique: true,
-  sparse: true,
   background: true,
   dropDups: true,
   w: 1
+};
+var sparse_option = {
+  sparse: 1,
+  background: true,
 };
 
 module.exports = function(db, next) {
   db.collection('book_interest', function(err, r) {
     log('ensuring database "book_interest"...');
-    r.ensureIndex({ 'id': 1 }, index_options, function(err, indexname) {
-      if (err) return next(err);
-      r.ensureIndex({ 'user_id': 1 }, function(err, indexname) {
-        if (err) return next(err);
-        tick();
-      });
-    });
+    var n = 5;
+    function _tick(err, r) {
+      n--;
+      if (err) console.error(err);
+      if (n <= 0) tick();
+    }
+    r.ensureIndex({ 'id': 1 }, index_options, _tick);
+    r.ensureIndex({ 'uid': 1, 'status': 1, 'commented': -1, }, sparse_option, _tick);
+    r.ensureIndex({ 'uid': 1, 'status': 1, 'updated': -1, }, sparse_option, _tick);
+    r.ensureIndex({ 'uid': 1, 'updated': -1, 'status': 1 }, sparse_option, _tick);
+    r.ensureIndex({ 'uid': 1, 'status': 1, 'rating.value': -1, }, sparse_option, _tick);
   });
 
   db.collection('book', function(err, r) {
     log('ensuring database "book"...');
-    r.ensureIndex({ 'id': 1 }, index_options, function(err, indexname) {
-      if (err) return next(err);
+    var n = 6;
+    function _tick(err, r) {
+      n--;
+      if (err) console.error(err);
+      if (n <= 0) tick();
+    }
 
-      var n = 2;
-      function _tick() {
-        n--;
-        if (n <= 0) tick();
-      }
-      //r.ensureIndex({ 'pages': 1 }, _tick); 
-      //r.ensureIndex({ 'price': 1 }, _tick);
-      r.ensureIndex({ 'raters': 1 }, _tick);
-      r.ensureIndex({ 'rated': 1 }, _tick);
-      //r.ensureIndex({ 'pubdate': 1 }, _tick);
-    });
+    r.ensureIndex({ 'id': 1 }, index_options, _tick);
+    r.ensureIndex({ 'raters': -1 }, sparse_option, _tick);
+    r.ensureIndex({ 'rated': -1 }, sparse_option, _tick);
+    r.ensureIndex({ 'pages': -1 }, _tick); 
+    r.ensureIndex({ 'price': -1 }, _tick);
+    r.ensureIndex({ 'pubdate': -1 }, _tick);
   });
 
   db.collection('user', function(err, r) {
     log('ensuring database "users"...');
-    r.ensureIndex({ 'id': 1 }, index_options, function(err, indexname) {
-      if (err) return next(err);
-
-      var n = 3;
-      function _tick() {
-        n--;
-        if (n <= 0) tick();
-      }
-      r.ensureIndex({ 'uid': 1 }, _tick); 
-      r.ensureIndex({ 'mtime': 1 }, _tick); 
-      r.ensureIndex({ 'last_statsed': 1 }, _tick);
-    });
+    var n = 3;
+    function _tick(err, r) {
+      n--;
+      if (err) console.error(err);
+      if (n <= 0) tick();
+    }
+    r.ensureIndex({ 'id': 1 }, index_options, _tick);
+    r.ensureIndex({ 'uid': 1 }, index_options, _tick); 
+    r.ensureIndex({ 'last_statsed': 1 }, sparse_option, _tick);
+    //r.ensureIndex({ 'mtime': 1 }, _tick); 
   });
 
   var n = 3;
