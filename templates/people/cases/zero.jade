@@ -1,4 +1,5 @@
 p 天哪，这位 #{people.name} 居然一本书都没有读过！
 hr
-include ../mods/resync
-p.muted(style="margin-top:30px;font-size:0.8em;") 请在有需要的时候再点上面的按钮
+- if (new Date() - people.last_synecd > 3600000)
+  include ../mods/resync
+p.muted 也有可能是服务器出错了，请不要重复尝试
