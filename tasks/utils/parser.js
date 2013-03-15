@@ -137,10 +137,10 @@ function parse_pubdate(d) {
     mo = moment(d, f);
     if (!mo) return null;
     y = mo.year();
-    if (mo.isValid() && y > 800 && y < next_decade) {
-      if (y > next_year) {
-        console.log('Possible invalid date', _d, d, f, mo.toDate());
-      }
+    if (mo.isValid() && y > 800 && y < next_year) {
+      //if (y > next_year) {
+        //console.log('Possible invalid date', _d, d, f, mo.toDate());
+      //}
       ret = mo.toDate();
       //console.log(d, f, ret);
       break;
