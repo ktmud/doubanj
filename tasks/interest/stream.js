@@ -203,7 +203,7 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
     return;
   }
 
-  var ids = [];
+  var ids = [], sids = [];
   // pick up subjects
   items.forEach(function(item, i) {
     item = utils.norm_interest(item);
@@ -216,6 +216,9 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
     var s = item[ns];
     s = utils.norm_subject(s, ns);
     subjects.push(s);
+
+    sids.push(s.id);
+
     delete item[ns];
   });
 
@@ -236,36 +239,39 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
         // save subjects
         verbose('Saving subjects...');
         var col_s = db.collection(ns);
-
-        //col_s.insert(subjects, { continueOnError: true }, function(err, res) {
-          //log('saving complete.');
-          //cb && cb(null, data);
-        //});
-        function save_subject(i) {
-          var s = subjects[i];
-
-          if (!s) {
-            verbose('all subjects in saving queue.');
+        col_s.remove({ id: { $in: sids } }, function(err, r) {
+          col_s.insert(subjects, { continueOnError: true }, function(err, res) {
+            log('saving complete.');
             cb && cb(null, data);
             self.emit('saved', data);
-            return;
-          }
-
-          //log('updating subject %s', s.id);
-          // we just don't care whether it will succeed.
-          process.nextTick(function() {
-            col_s.update({ 'id': s.id }, s, { upsert: true, w: -1 });
           });
-          //, function(err, r) {
-            //if (err) {
-              //if (cb) return cb(err);
-              //return next();
-            //}
+        });
+
+        //function save_subject(i) {
+          //var s = subjects[i];
+
+          //if (!s) {
+            //verbose('all subjects in saving queue.');
+            //cb && cb(null, data);
+            //self.emit('saved', data);
+            //return;
+          //}
+
+          ////log('updating subject %s', s.id);
+          //// we just don't care whether it will succeed.
+          //process.nextTick(function() {
+            //s && col_s.update({ 'id': s.id }, s, { upsert: true, w: -1 });
           //});
-          // let's save next subject
-          save_subject(i + 1);
-        }
-        save_subject(0);
+          ////, function(err, r) {
+            ////if (err) {
+              ////if (cb) return cb(err);
+              ////return next();
+            ////}
+          ////});
+          //// let's save next subject
+          //save_subject(i + 1);
+        //}
+        //save_subject(0);
       });
     });
   });

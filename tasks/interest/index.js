@@ -29,7 +29,7 @@ collect = User.ensured(function(user, arg) {
   arg.user = user;
 
   // try update user info
-  if (arg.force) {
+  if (arg.fresh) {
     process.nextTick(function() {
       user.pull();
     });

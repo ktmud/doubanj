@@ -69,7 +69,9 @@ exports.progresses = function() {
 * interval for checking progress
 */
 exports.progressInterval = function(remaining, delay) {
-  return remaining < 10000 ? 2000 : delay + 2000;
+  var n = central._interest_queue && central._interest_queue.queue.length || 1;
+  delay = delay * n;
+  return remaining < 10000 ? 4000 : delay + 2000;
 };
 
 exports.isEmpty = function(ns) {
@@ -138,7 +140,7 @@ exports.syncTimeout = function() {
   // 30 minutes by default
   if (remaining === null || this.last_synced === null) return false;
 
-  return new Date() - this.last_synced > remaining + 60000;
+  return new Date() - this.last_synced > remaining + 300000;
 };
 
 /**

@@ -28,7 +28,7 @@ Do.ready(function() {
           return;
         }
 
-        if (remaining < 180000) {
+        if (remaining < 300000) {
           check(d.interval);
         }
       });
