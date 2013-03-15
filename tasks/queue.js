@@ -63,7 +63,7 @@ TaskQueue.prototype._timer = function() {
   }
   self._t = setTimeout(function() {
     self.dump();
-  }, 500);
+  }, 200);
 };
 
 TaskQueue.prototype.push = function() {
@@ -73,29 +73,44 @@ TaskQueue.prototype.push = function() {
   this._timer();
 };
 
-TaskQueue.prototype.shift = function() {
+TaskQueue.prototype.shift = function(fn_name) {
   this._changed = true;
-  var args = [].slice.apply(arguments);
+  var args = arguments;
+  //console.log('========');
+  //console.log(this.queue);
+  //console.log(args);
+  //console.log('======');
   this.queue = this.queue.filter(function(item) {
-    while (item[0]) {
-      if (item.shift() != args.shift()) {
+    if (!Array.isArray(item)) return false;
+
+    item = item.slice();
+    var max_n = Math.max(args.length, item.length);
+    var i = 0;
+    while (i < max_n) {
+      if (item[i] != args[i]) {
         return true;
       }
+      i++;
     }
     return false;
   });
+
+  //console.log(this.queue);
 
   this._timer();
 };
 
 TaskQueue.prototype.resume = function() {
-  var queue = this.queue.slice();
+  var queue = this.queue;
   var mod = this.mod;
   var arg, fn;
+  //console.log(queue);
   while(queue.length) {
     arg = queue.shift();
-    fn = mod[arg.shift()];
-    fn && fn.apply(mod, arg);
+    fn = mod[arg[0]];
+    process.nextTick(function() {
+      fn && fn.apply(mod, arg.slice(1));
+    });
   }
 };
 
@@ -108,8 +123,13 @@ TaskQueue.prototype.safely = function(fn_name, arg) {
   var self = this;
   var queue_arg = extend({}, arg);
 
+  for (var k in queue_arg) {
+    if (queue_arg[k]) {
+      var uid = queue_arg[k].uid || queue_arg[k].id;
+      if (uid) queue_arg[k] = uid;
+    }
+  }
   // clean vars
-  queue_arg.user = queue_arg.user.uid || queue_arg.user.id || queue_arg.user;
   queue_arg.error = queue_arg.success = null;
 
   var cb1 = arg.success;
@@ -137,7 +157,7 @@ TaskQueue.prototype.safely = function(fn_name, arg) {
 */
 TaskQueue.prototype.dump = function() {
   var self = this;
-  if (!this._changed) return;
+  if (!self._changed) return;
   self.store.set(self.key, self.stringify(self.queue), function(err, r) {
     if (err) return self.emit('error', err);
     self._changed = false;

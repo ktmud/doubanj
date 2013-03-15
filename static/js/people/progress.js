@@ -24,7 +24,7 @@ Do.ready(function() {
         if (d.stats_status !== 'ing' && d.stats_status !== null) {
           setTimeout(function() {
             window.location.reload();
-          }, 1200);
+          }, 3000);
           return;
         }
 

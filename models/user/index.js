@@ -161,13 +161,14 @@ User.prototype.pull = function(cb) {
       }
       data['$upsert'] = true;
       data.created = new Date(data.created);
-      // save douban account info
-      self.update(data, function(err, doc) {
-        if (err) {
-          error('save user %s douban info failed: %s', uid, err);
-          self.invalid = 1;
-        }
-        cb && cb(err, self);
+
+      // reget the latest user from db
+      User.getFromMongo(uid, function(err, res) {
+        if (res && res instanceof User) self = res;
+        // save douban account info
+        self.update(data, function(err, doc) {
+          cb && cb(err, self);
+        });
       });
     });
   }, 0);
