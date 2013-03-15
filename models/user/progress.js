@@ -118,7 +118,12 @@ exports.syncRemaining = function() {
   if (!total) return null;
 
   var perpage = task.API_REQ_PERPAGE;
-  return (task.API_REQ_DELAY + 4000) * Math.ceil((total - synced) / perpage);
+
+  var n = central._interest_queue && central._interest_queue.queue.length || 1;
+
+  //console.log(n);
+
+  return (task.API_REQ_DELAY + 4000) * n * Math.ceil((total - synced) / perpage);
 };
 
 exports.isSyncing = function() {

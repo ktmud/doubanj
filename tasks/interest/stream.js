@@ -151,6 +151,10 @@ var ERRORS = {
 FetchStream.prototype.fetch = function(start, cb) {
   var self = this;
 
+  var n = central._interest_queue.queue.length;
+
+  //console.log(n);
+
   setTimeout(function() {
     task.api(function(oauth2, next) {
       log('fetching %s~%s...', start, start + self.perpage);
@@ -181,7 +185,7 @@ FetchStream.prototype.fetch = function(start, cb) {
         self.write(ret, cb);
       });
     });
-  }, API_REQ_DELAY);
+  }, API_REQ_DELAY * n);
 };
 
 // TODO: cache data locally first, wait for some time, then commit to database

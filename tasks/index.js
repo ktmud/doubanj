@@ -12,7 +12,7 @@ var TaskQueue = require('./queue');
 ['interest', 'compute'].forEach(function(item) {
   var mod = module.exports[item] = require('./' + item);
 
-  var queue = mod.queue = new TaskQueue('queue-' + item, mod, redis.client);
+  var queue = mod.queue = central['_' + item + '_queue'] = new TaskQueue('queue-' + item, mod, redis.client);
 
   // let the queue resume undone works.
   queue.on('ready', function(q) {
