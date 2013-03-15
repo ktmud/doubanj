@@ -34,11 +34,11 @@ module.exports = function(db, next) {
         n--;
         if (n <= 0) tick();
       }
-      r.ensureIndex({ 'pages': 1 }, _tick); 
-      r.ensureIndex({ 'price': 1 }, _tick);
+      //r.ensureIndex({ 'pages': 1 }, _tick); 
+      //r.ensureIndex({ 'price': 1 }, _tick);
       r.ensureIndex({ 'raters': 1 }, _tick);
       r.ensureIndex({ 'rated': 1 }, _tick);
-      r.ensureIndex({ 'pubdate': 1 }, _tick);
+      //r.ensureIndex({ 'pubdate': 1 }, _tick);
     });
   });
 
