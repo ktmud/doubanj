@@ -31,11 +31,11 @@ else
 section
   include ../stats/book
   .pull-left
-    if (new Date() - people.last_statsed > 300000)
+    if (new Date() - people.last_statsed > 600000)
         include ../mods/sync
     else
       small.muted
-        五分钟后可重新同步
+        十分钟后可重新同步
 
 .vmiddle
   p.muted.notice-more
