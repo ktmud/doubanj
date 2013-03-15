@@ -8,7 +8,7 @@ module.exports = function(app, central) {
   });
   app.post('/', function(req, res, next) {
     var uid = utils.url2uid(req.body.uid);
-    if (!uid) res.redirect('/');
+    if (!uid) return res.redirect('/');
     res.redirect('/people/' + uid + '/');
   });
 
