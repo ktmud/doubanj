@@ -124,7 +124,7 @@ User.get = function(uid, cb) {
     return cb(null, u);
   });
 };
-User.get = redis.cached.wrap(User.get, 'user-{0}');
+//User.get = redis.cached.wrap(User.get, 'user-{0}');
 User.prototype.clearCache = function(next) {
   var n = 0;
   if (this.uid) {
