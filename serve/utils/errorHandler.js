@@ -11,6 +11,7 @@ module.exports = function(options) {
   return function appError(err, req, res, next) {
     if (err == 403 || (String(err)).indexOf('Forbidden') != -1) {
       res.statusCode = 403;
+      if (res.headerSent) return res.end();
       res.render('403', {
         statusCode: 403,
         data: { r: 1, err: err }
@@ -36,11 +37,6 @@ module.exports = function(options) {
 
     req.session.onesalt = Date.now();
     
-    if (res.headerSent) {
-      res.end();
-      return;
-    }
-
     raven.error(err, {
       'sentry.interfaces.Http': { 
         method: req.method,
@@ -57,6 +53,8 @@ module.exports = function(options) {
       }
     });
 
+    if (res.headerSent) return res.end();
+
     res.statusCode = 500;
     res.render('500', {
       onesalt: req.session.onesalt,
@@ -69,6 +67,7 @@ module.exports = function(options) {
 };
 
 var notFound = module.exports.notFound = function(req, res, next) {
+  if (res.headerSent) return res.end();
   if (req.method == 'HEAD') {
     return next();
   }
