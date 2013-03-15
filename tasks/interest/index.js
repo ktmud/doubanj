@@ -38,13 +38,13 @@ collect = User.ensured(function(user, arg) {
   var uid = user.uid || user.id;
 
   var raven_extra = { ns: arg.ns };
-  message('collect interests for %s start', uid, raven_extra);
+  message('START collect interests for %s', uid, raven_extra);
 
   var collector = new FetchStream(arg);
 
   // halt if syncing is already running
   if (user.last_synced_status === 'ing' && !arg.force && !arg._from_halt) {
-    message('collect for %s exit due to runing..', uid, raven_extra);
+    message('EXIT collect for %s due to runing..', uid, raven_extra);
     arg.error('RUNNING');
     return;
   }
@@ -67,13 +67,13 @@ collect = User.ensured(function(user, arg) {
     // wait for the really ends
     setTimeout(function() {
       if (collector.status == 'succeed') {
-        message('collect interests for %s succeed', uid, raven_extra); 
+        message('SUCCEED collect interests for %s', uid, raven_extra); 
 
         arg.success.call(collector, user);
 
         collector.emit('succeed');
       } else {
-        error('collect interests for %s failed at %s', uid, collector.status, raven_extra); 
+        error('FAILED at %s when collecting interests for %s', collector.status, uid, raven_extra); 
         arg.error.call(collector, user);
       }
     }, 2000);
