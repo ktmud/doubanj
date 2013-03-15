@@ -30,12 +30,15 @@ else
 
 section
   include ../stats/book
-  if conf.debug || people.last_synced_status !== 'ing' || (new Date() - people.last_synced > 120000)
-    .pull-left
-      include ../mods/sync
+  .pull-left
+    if (new Date() - people.last_statsed > 300000)
+        include ../mods/sync
+    else
+      small.muted
+        五分钟后可重新同步
 
 .vmiddle
-  p.muted
+  p.muted.notice-more
     ... 更多功能正在紧张开发中，欢迎随时回来看看
 
 include ./stats_js
