@@ -17,7 +17,7 @@ var TaskQueue = require('./queue');
   // let the queue resume undone works.
   queue.on('ready', function(q) {
     verbose('Task queue for ' + item + ' loaded.');
-    log('%s unfinished task', q.length);
+    log('%s unfinished task for %s', q.length, item);
     this.resume();
   });
 
