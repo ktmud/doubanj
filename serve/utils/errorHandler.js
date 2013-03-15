@@ -41,21 +41,21 @@ module.exports = function(options) {
       return;
     }
 
-    //raven.error(err, {
-      //'sentry.interfaces.Http': { 
-        //method: req.method,
-        //query_string: mo_url.parse(req.url).query,
-        //headers: req.headers,
-        //cookies: req.cookies || '<unavailable: use cookieParser middleware>',
-        //data: req.body || '<unavailable: use bodyParser middleware>',
-        //url: (function build_absolute_url() {
-            //var protocol = req.is_ssl ? 'https' : 'http',
-                //host = req.headers.host || '<no host>';
-            //return protocol+'://'+host+req.url;
-        //}()),
-        //env: process.env
-      //}
-    //});
+    raven.error(err, {
+      'sentry.interfaces.Http': { 
+        method: req.method,
+        query_string: mo_url.parse(req.url).query,
+        headers: req.headers,
+        cookies: req.cookies || '<unavailable: use cookieParser middleware>',
+        data: req.body || '<unavailable: use bodyParser middleware>',
+        url: (function build_absolute_url() {
+            var protocol = req.is_ssl ? 'https' : 'http',
+                host = req.headers.host || '<no host>';
+            return protocol+'://'+host+req.url;
+        }()),
+        env: process.env
+      }
+    });
 
     res.statusCode = 500;
     res.render('500', {
