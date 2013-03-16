@@ -17,7 +17,8 @@
 
 ## 开始开发
 
-新建一份你自己的的 `conf/development.conf.js` ，按需覆盖 `conf/default.conf.js` 里的任意选项。
+依照`development.conf.tmpl.js`修改为你自己的配置文件，并把文件名改为 `conf/development.conf.js` 
+可以按需覆盖 `conf/default.conf.js` 里的任意选项。
 
     cp conf/development.conf.tmpl.js conf/development.conf.js
     grunt
