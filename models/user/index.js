@@ -178,7 +178,7 @@ User.prototype.pull = function(cb) {
       data['$upsert'] = true;
       data.created = new Date(data.created);
 
-      // reget the latest user from db
+      // get the latest user from db (incase some other pull is done)
       User.getFromMongo(uid, function(err, res) {
         if (res && res instanceof User) self = res;
         // save douban account info

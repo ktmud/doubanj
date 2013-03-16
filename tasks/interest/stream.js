@@ -157,7 +157,7 @@ FetchStream.prototype.fetch = function(start, cb) {
 
   setTimeout(function() {
     task.api(function(oauth2, next) {
-      log('fetching %s~%s...', start, start + self.perpage);
+      verbose('fetching %s~%s...', start, start + self.perpage);
 
       var client = oauth2.clientFromToken(self.token);
 
@@ -241,7 +241,7 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
         var col_s = db.collection(ns);
         col_s.remove({ id: { $in: sids } }, function(err, r) {
           col_s.insert(subjects, { continueOnError: true }, function(err, res) {
-            log('saving complete.');
+            verbose('saving complete.');
             cb && cb(null, data);
             self.emit('saved', data);
           });
@@ -295,7 +295,7 @@ FetchStream.prototype.updateUser = function(cb) {
   obj['last_synced'] = obj[ns +'_last_synced'] = new Date();
   obj['last_synced_status'] = obj[ns +'_last_synced_status'] = self.status;
 
-  log('updating %s last syncing status... %s: %s/%s, status: %s',
+  log('%s %s: %s/%s, status: %s',
       self.uid, ns, self._last_fetched, self._last_total, self.status);
 
   // database option
