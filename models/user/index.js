@@ -119,9 +119,12 @@ User.count = function(cb) {
 };
 //User.count = redis.cached.wrap(User.count, 'users-count', 60000);
 
-
+var reg_valid_uid = /^[\w\.\_\-]+$/;
 User.get = function(uid, cb) {
   uid = String(uid).toLowerCase();
+
+  if (!reg_valid_uid.test(uid)) return cb(404);
+
   User.getFromMongo(uid, function(err, u) {
     if (err) return cb(err);
     // got a 404
@@ -162,6 +165,8 @@ var pull_queue = {};
 User.prototype.pull = function(cb) {
   var self = this;
   var uid = self.uid || self.id;
+
+  if (!reg_valid_uid.test(uid)) return cb(404);
 
   if (uid in pull_queue) return cb('ING');
 
