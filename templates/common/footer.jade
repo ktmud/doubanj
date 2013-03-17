@@ -3,6 +3,7 @@
     p.muted.site-links
       a(href="http://github.com/ktmud/doubanj", target="github", title="doubanj.com on github") 源码
       a(href="/about", title="免责声明") 关于
+      a(href="https://stdyun.com/r/MDAwMTU5", target="stdyun", title="本站使用的是 stdyun.com 的VPS") 服务器提供
       if req.url !== '/'
         a(href="/", title="回首页") 首页
       a(href="http://www.douban.com/#{locals.people ? '/people/' + people.uid + '/': 'update/'}", target="douban") 回豆瓣
