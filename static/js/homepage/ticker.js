@@ -1,5 +1,5 @@
 Do('lodash', function() {
-  var tmpl = $('#tmpl-latest-synced').html().trim();
+  var tmpl = $.trim($('#tmpl-latest-synced').html());
   var lodash = require('lodash')._;
 
   $.getJSON('/api/latest_synced', function(res) {
