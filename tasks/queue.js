@@ -34,7 +34,15 @@ TaskQueue.prototype.load = function() {
 TaskQueue.prototype.parse = function(r) {
   if (!r) return this.queue;
   try {
-    return JSON.parse(r);
+    var ret = JSON.parse(r);
+    var seen = {};
+    ret = ret.filter(function(arg) {
+      if (!arg[0] || !arg[1]) return false;
+      if (arg[1].user in seen) return false;
+      seen[arg[1].user] = 1;
+      return true;
+    });
+    return ret;
   } catch (e) {
     //this.emit('error', e);
     return [];
