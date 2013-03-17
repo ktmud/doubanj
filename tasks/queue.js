@@ -112,13 +112,18 @@ TaskQueue.prototype.resume = function() {
   var queue = this.queue;
   var mod = this.mod;
   var arg, fn;
-  //console.log(queue);
-  while(queue.length) {
-    arg = queue.shift();
+
+  function doit(arg) {
     fn = mod[arg[0]];
     process.nextTick(function() {
       fn && fn.apply(mod, arg.slice(1));
     });
+  }
+
+  //console.log(queue);
+  while(queue.length) {
+    arg = queue.shift();
+    doit(arg);
   }
 };
 
