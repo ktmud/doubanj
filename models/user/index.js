@@ -65,8 +65,6 @@ User.getFromMongo = function(uid, cb) {
 
       if (r) return cb(null, User(r));
 
-      log('user %s not found', uid);
-
       return cb(null, null);
     });
   });
@@ -181,7 +179,11 @@ User.prototype.pull = function(cb) {
     delete pull_queue[uid];
   }, 60000);
 
+  log('Try pull user %s ...', uid);
   task.api2(function(oauth2, next) {
+
+    log('Start pull %s from douban...', uid);
+
     oauth2.clientFromToken().request('GET', '/v2/user/' + uid, function(err, data) {
       delete pull_queue[uid];
 
@@ -193,6 +195,7 @@ User.prototype.pull = function(cb) {
         if (err.statusCode == 404) {
           self.invalid = 'NO_USER';
         }
+
         return cb && cb(err);
       }
       if (data.uid) {

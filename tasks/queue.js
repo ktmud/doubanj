@@ -27,7 +27,6 @@ TaskQueue.prototype.load = function() {
       return self.emit('error', err);
     }
     self.queue = self.parse(r);
-    console.log(self.queue);
     self.emit('ready', self.queue);
   });
 };
