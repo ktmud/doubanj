@@ -149,7 +149,7 @@ FetchStream.prototype.fetch = function(start, cb) {
 
   //console.log(n);
   task.api(function(oauth2, next) {
-    verbose('fetching %s~%s...', start, start + self.perpage);
+    log('fetching %s~%s...', start, start + self.perpage);
 
     var client = oauth2.clientFromToken(self.token);
 
@@ -161,9 +161,8 @@ FetchStream.prototype.fetch = function(start, cb) {
       query.from = self._from;
     }
     client.request('GET', self.api_uri, query, function(err, ret, res) {
-      var n = central._interest_queue.queue.length;
       // release pool client
-      setTimeout(next, oauth2.req_delay * n);
+      setTimeout(next, oauth2.req_delay);
 
       var code = err && err.statusCode || res.statusCode;
       if (code !== 200) {
