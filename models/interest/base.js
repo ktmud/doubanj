@@ -50,7 +50,7 @@ Interest.findByUser = function(uid, opts, cb) {
   verbose('getting interests obj for user %s', uid);
 
   var query = opts.query || {};
-  query.uid = uid;
+  query.user_id = uid;
   return this.find(query, opts, cb);
 };
 

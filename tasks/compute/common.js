@@ -159,7 +159,7 @@ function aggParam(conf) {
     var pmost = conf.most;
     var pmost_limit = conf.$most_limit;
     // by default, only output the id (which is subject_id or user_id in douban)
-    var pmost_fields = conf.$most_fields || { 'id': 1, '_id': 0 };
+    var pmost_fields = conf.$most_fields || { '_id': 1 };
 
     function get_fields(p) {
       var f = {};

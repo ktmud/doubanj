@@ -38,13 +38,13 @@ var conf_book = {
   most: ['pages', 'rated', 'raters', {
     price: -1,
     $name: 'most_price',
-    $fields: { id: 1, _id: 0, price: 1, ori_price: 1, title: 1 }
+    $fields: { price: 1, ori_price: 1, title: 1 }
   }, {
     price: 1,
     $name: 'least_price',
-    $fields: { id: 1, _id: 0, price: 1, ori_price: 1, title: 1 }
+    $fields: { price: 1, ori_price: 1, title: 1 }
   }],
-  $most_fields: { id: 1, _id: 0, title: 1 },
+  $most_fields: { title: 1 },
   $most_limit: 20,
   range: {
     'pages': [100, 300, 500, 800],
@@ -66,12 +66,7 @@ module.exports = function(db, user, cb, ondata) {
   var col_i = db.collection(DB_INTEREST);
 
   var uid = user.uid || user.id;
-  var ifilter = {
-    $or: [
-      { 'uid': uid },
-      { 'user_id': user.id }
-    ]
-  };
+  var ifilter = { 'user_id': user._id }
 
   var results = {};
   var last_err = null;
@@ -141,7 +136,7 @@ module.exports = function(db, user, cb, ondata) {
         uid: uid,
         params: agg_param_book,
         collection: DB_BOOK,
-        prefilter: { $match: { id: { $in: sids } }, }
+        prefilter: { $match: { _id: { $in: sids } }, }
       });
 
       agger.once('error', err_cb);

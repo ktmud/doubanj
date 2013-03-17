@@ -11,6 +11,9 @@ function norm_status(s) {
 
 var parsers = require('./parser');
 function norm_subject(s, ns) {
+  s._id = String(s.id);
+  delete s.id;
+
   if (ns) {
     s.type = ns;
   } else if ('book_id' in s) {
@@ -26,7 +29,7 @@ function norm_subject(s, ns) {
         raven.message('invalid %s %s', k, ori, {
           tags: { parsing: k },
           extra: {
-            subject_id: s.id
+            subject_id: s._id
           },
           level: 'warn'
         });
@@ -41,6 +44,9 @@ function norm_subject(s, ns) {
   return s;
 }
 function norm_interest(i) {
+  i._id = String(i.id);
+  delete i.id;
+
   i.status = normalize_status[i.status];
   i.commented = i.comment && i.comment.length || null;
   i['updated'] = new Date(i['updated']);

@@ -50,12 +50,10 @@ User.getFromMongo = function(uid, cb) {
     var collection = db.collection(USER_COLLECTION);
     collection.findOne({
       '$or': [
+        // local id
+        { '_id': uid },
         // douban's uid
         { 'uid': uid },
-        // douban id
-        { 'id': uid },
-        // local id
-        { '_id': uid }
       ]
     }, function(err, r) {
       if (err) {
@@ -86,8 +84,7 @@ User.latestSynced = function(cb) {
         last_statsed: -1
       },
       fields: {
-        id: 1,
-        _id: 0,
+        _id: 1,
         name: 1,
         last_synced: 1
       },
@@ -128,7 +125,7 @@ User.get = function(uid, cb) {
     // got a 404
     if (!u) {
       // try get user info from 
-      var info = parseInt(uid) ? { 'id': uid } : { uid: uid };
+      var info = parseInt(uid) ? { '_id': uid } : { uid: uid };
       u = User(info);
     }
     // haven't got douban account info yet
@@ -145,9 +142,9 @@ User.prototype.clearCache = function(next) {
     n++;
     redis.clear('user-' + this.uid, tick);
   }
-  if (this.id) {
+  if (this._id) {
     n++;
-    redis.clear('user-' + this.id, tick);
+    redis.clear('user-' + this._id, tick);
   }
   function tick() {
     n--;
@@ -162,7 +159,7 @@ var pull_queue = {};
 */
 User.prototype.pull = function(cb) {
   var self = this;
-  var uid = self.uid || self.id;
+  var uid = self.uid || self._id;
 
   if (!reg_valid_uid.test(uid)) return cb(404);
 
@@ -200,12 +197,13 @@ User.prototype.pull = function(cb) {
       if (data.uid) {
         data.uid = String(data.uid).toLowerCase();
       }
-      data['$upsert'] = true;
       data.created = new Date(data.created);
+      data._id = data.id;
+      delete data.id;
 
       // get the latest user from db (incase some other pull is done)
-      //User.getFromMongo(uid, function(err, res) {
-      //if (res && res instanceof User) self = res;
+      //User.getFromMongo(data.id, function(err, res) {
+        //if (res && res instanceof User) self = res;
       // save douban account info
       self.update(data, function(err, doc) {
         cb && cb(err, self);
@@ -234,7 +232,7 @@ User.prototype.toObject = function() {
   var now = new Date();
   return {
     // douban account
-    'id': this['id'],
+    //'id': this['id'],
     'alt': this['alt'],
     'uid': this['uid'],
     'created': this['created'],
@@ -247,7 +245,7 @@ User.prototype.toObject = function() {
     'invalid': this['invalid'] || null,
 
     // local props
-    '_id': this['_id'],
+    '_id': this['_id'] || this['id'],
     'ctime': this['ctime'] || now,
     'mtime': this['mtime'],
     'last_synced': this.last_synced,
@@ -269,18 +267,18 @@ User.prototype.toObject = function() {
 };
 
 User.prototype.url = function() {
-  return [conf.site_root, 'people', this.uid || this.id].join('/') + '/';
+  return [conf.site_root, 'people', this.uid || this._id].join('/') + '/';
 };
 /**
 * Douban url
 */
 User.prototype.db_url = function(ns) {
   ns = ns || 'www';
-  return 'http://' + ns + '.douban.com/people/' + (this.uid || this.id) + '/';
+  return 'http://' + ns + '.douban.com/people/' + (this.uid || this._id) + '/';
 };
 
 User.prototype.interests = function(ns, cb) {
-  return Interest[ns].findByUser(this.uid || this.id, cb);
+  return Interest[ns].findByUser(this.uid || this._id, cb);
 };
 ['wish', 'ing', 'done'].forEach(function(st) {
   User.prototype[st + 's'] = function(ns, cb) {

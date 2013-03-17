@@ -10,7 +10,7 @@ function sorted_list(ns, k, sort) {
     }
 
     var user = this;
-    var uid = user.uid || user.id;
+    var uid = user._id;
     var query = {};
     if (status !== 'all') query = { status: status };
     Interest[ns].findByUser(uid, {
