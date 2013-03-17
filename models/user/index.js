@@ -177,11 +177,10 @@ User.prototype.pull = function(cb) {
   // time out for unfinished socket request
   setTimeout(function() {
     delete pull_queue[uid];
-  }, 60000);
+  }, 300000);
 
   log('Try pull user %s ...', uid);
   task.api2(function(oauth2, next) {
-
     log('Start pull %s from douban...', uid);
 
     oauth2.clientFromToken().request('GET', '/v2/user/' + uid, function(err, data) {
