@@ -276,7 +276,7 @@ FetchStream.prototype.updateUser = function(cb) {
   var ns = self.ns;
   var obj = { invalid: 0 };
 
-  obj[ns + '_n'] = self._last_total + (self._from_total || 0);
+  obj[ns + '_n'] = self._from ? self._last_total + (self._from_total || 0) : self.total;
   obj[ns + '_synced_n'] = self._last_fetched;
   obj['last_synced'] = obj[ns +'_last_synced'] = new Date();
   obj['last_synced_status'] = obj[ns +'_last_synced_status'] = self.status;

@@ -34,14 +34,14 @@ module.exports = {
   },
 
   douban: {
-    limit: 20, // request limit per minute
+    limit: 10, // request limit per minute
     key: '',
     secret: ''
   },
   // more random api keys for public informations
   douban_more: [
     {
-      limit: 20,
+      limit: 10,
       key: '',
       secret: ''
     },

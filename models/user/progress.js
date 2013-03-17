@@ -71,9 +71,12 @@ exports.progresses = function() {
 * interval for checking progress
 */
 exports.progressInterval = function(remaining, delay) {
-  var n = central._interest_queue && central._interest_queue.queue.length || 1;
+  var n = this.queue_length();
   delay = delay * n;
   return remaining < 10000 ? 4000 : delay + 2000;
+};
+exports.queue_length = function() {
+  return central._interest_queue && central._interest_queue.queue.length || 1;
 };
 
 exports.isEmpty = function(ns) {
@@ -123,9 +126,7 @@ exports.syncRemaining = function() {
 
   var perpage = task.API_REQ_PERPAGE;
 
-  var n = central._interest_queue && central._interest_queue.queue.length || 1;
-
-  //console.log(n);
+  var n = this.queue_length();
 
   return (task.API_REQ_DELAY + 4000) * n * Math.ceil((total - synced) / perpage);
 };
@@ -143,6 +144,9 @@ exports.syncTimeout = function() {
   if (remaining === null || this.last_synced === null) return false;
 
   return new Date() - this.last_synced > remaining + 300000;
+};
+exports.syncFailed = function() {
+  return this.last_synced_status !== 'ing' || this.last_synced_status !== 'succeed';
 };
 
 /**
