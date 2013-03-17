@@ -9,6 +9,7 @@ var exports = module.exports;
 exports.reset = function(cb) {
   this.update({
     stats_p: 0,
+    stats_status: null,
     book_n: null,
     book_synced_n: 0,
     last_synced: new Date(),
@@ -22,6 +23,7 @@ exports.reset = function(cb) {
 exports.markSync = function(cb) {
   this.update({
     stats_p: 0,
+    stats_status: null,
     last_synced_status: 'ing'
   }, cb);
 };

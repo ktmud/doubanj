@@ -21,7 +21,7 @@ Do.ready(function() {
         var remaining = d.remaining;
         updateRemains(remaining);
 
-        if (d.stats_status !== 'ing' && d.stats_status !== null) {
+        if (d.stats_status && d.stats_status !== 'ing') {
           setTimeout(function() {
             window.location.reload();
           }, 3000);
