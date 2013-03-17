@@ -21,7 +21,7 @@ var book_task = require('./book');
 var compute, _compute;
 compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, arg, next) {
   var user = arg.user;
-  var raven_extra = { extra: { uid: user.id }, tags: { task: 'compute' } };
+  var raven_extra = { extra: { uid: user.uid || user._id }, tags: { task: 'compute' } };
 
   if (!user) {
     return arg.error('NO_USER');

@@ -18,7 +18,7 @@ block article
   ol.comments-list
     each i in most_commented
       if i.comment
-        li(id="comment-#{i.id}")
+        li(id="comment-#{i._id}")
           mixin comment_item(i)
   hr
   .mod

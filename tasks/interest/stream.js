@@ -20,7 +20,7 @@ function FetchStream(arg) {
   if (arg._from_halt) is_fresh = false;
 
   this._is_fresh = is_fresh;
-  this.uid = user.uid || user.id;
+  this.uid = user.uid || user._id;
   this.total = null;
   this.perpage = arg.perpage || task.API_REQ_PERPAGE;
   this._last_fetched = user[ns + '_synced_n'] || 0;
@@ -34,7 +34,7 @@ function FetchStream(arg) {
 
   this.api_uri = '/v2/' + arg.ns + '/user/' + this.uid + '/collections';
 
-  this.col_query = { user_id: this.user.id };
+  this.col_query = { user_id: this.user._id };
   this.col_name = ns + '_interest';
 
   return this;
@@ -184,7 +184,7 @@ FetchStream.prototype.fetch = function(start, cb) {
 FetchStream.prototype.write = function saveInterest(data, cb) {
   var ns = this.ns
     , self = this
-    , uid = self.user.uid || self.user.id
+    , uid = self.user.uid || self.user._id
     , total = data.total
     , items = data.collections
     , subjects = [];
@@ -195,7 +195,7 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
     return;
   }
 
-  var ids = [], sids = [];
+  var ids = [];
   // pick up subjects
   items.forEach(function(item, i) {
     item = utils.norm_interest(item);
@@ -203,13 +203,13 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
     item['uid'] = uid;
     item['subject_id'] = item[ns + '_id'];
 
-    ids.push(item.id);
+    ids.push(item._id);
 
     var s = item[ns];
     s = utils.norm_subject(s, ns);
     subjects.push(s);
 
-    sids.push(s.id);
+    //sids.push(s._id);
 
     delete item[ns];
   });
@@ -220,7 +220,7 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
 
     // save user interest
     verbose('Clear exsisting interests...');
-    db.collection(ns + '_interest').remove({ id: { $in: ids } }, function(err, r) {
+    db.collection(ns + '_interest').remove({ _id: { $in: ids } }, function(err, r) {
       if (err) console.error(err, uid);
 
       verbose('Saving interests...');
@@ -231,39 +231,33 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
         // save subjects
         verbose('Saving subjects...');
         var col_s = db.collection(ns);
-        col_s.remove({ id: { $in: sids } }, function(err, r) {
-          col_s.insert(subjects, { continueOnError: true }, function(err, res) {
-            verbose('saving complete.');
-            cb && cb(null, data);
-            self.emit('saved', data);
-          });
-        });
-
-        //function save_subject(i) {
-          //var s = subjects[i];
-
-          //if (!s) {
-            //verbose('all subjects in saving queue.');
+        //col_s.remove({ _id: { $in: sids } }, function(err, r) {
+          //col_s.insert(subjects, { continueOnError: true }, function(err, res) {
+            //verbose('saving complete.');
             //cb && cb(null, data);
             //self.emit('saved', data);
-            //return;
-          //}
-
-          ////log('updating subject %s', s.id);
-          //// we just don't care whether it will succeed.
-          //process.nextTick(function() {
-            //s && col_s.update({ 'id': s.id }, s, { upsert: true, w: -1 });
           //});
-          ////, function(err, r) {
-            ////if (err) {
-              ////if (cb) return cb(err);
-              ////return next();
-            ////}
-          ////});
-          //// let's save next subject
-          //save_subject(i + 1);
-        //}
-        //save_subject(0);
+        //});
+
+        function save_subject(i) {
+          var s = subjects[i];
+
+          if (!s) {
+            verbose('all subjects in saving queue.');
+            cb && cb(null, data);
+            self.emit('saved', data);
+            return;
+          }
+          //log('updating subject %s', s.id);
+          // we just don't care whether it will succeed.
+          var _id = s._id;
+          delete s._id;
+          col_s.update({ '_id': _id }, { $set: s }, { upsert: true, w: -1 });
+
+          // let's save next subject
+          save_subject(i + 1);
+        }
+        save_subject(0);
       });
     });
   });
