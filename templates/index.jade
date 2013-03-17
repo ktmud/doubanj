@@ -3,13 +3,12 @@ extend layout/basic
 title = conf.site_name
 
 block main
-  form.vmiddle.form-inline(id="start-form", method="post", action="/")
-    input(type="hidden", name="_csrf", value=_csrf)
+  form.vmiddle.form-inline(id="start-form", action="/")
     div
       label(for="uid")
         输入你的豆瓣ID或个人主页地址：
     p
-      input#uid.span7(name="uid", type="text", size="26", placeholder="http://www.douban.com/people/.../")
+      input#uid.span7(name="q", required, type="text", size="26", placeholder="http://www.douban.com/people/.../")
       &nbsp;
       button.btn.btn-primary(type="submit") 开始
 

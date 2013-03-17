@@ -172,7 +172,7 @@ module.exports = function(db, user, cb, ondata) {
       results['interest'] = this.results;
       tick();
     });
-    log('Agg book interests for %s...', uid);
+    log('Agg book interests for %s ...', uid);
     iagger.run();
   }
 };

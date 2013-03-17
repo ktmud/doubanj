@@ -4,6 +4,15 @@ module.exports = function(app, central) {
   app.all('/*', utils.navbar);
 
   app.get('/', function(req, res, next) {
+    var uid = req.query.q;
+    if (uid) {
+      uid = utils.url2uid(uid);
+      if (uid) {
+        return res.redirect('/people/' + uid + '/');
+      } else {
+        return res.redirect('/');
+      }
+    }
     res.render('index');
   });
   app.post('/', function(req, res, next) {
