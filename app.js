@@ -37,7 +37,6 @@ module.exports.boot = function() {
     secret: central.conf.salt
   }));
   app.use(express.bodyParser());
-  app.use(express.csrf());
 
   app.locals(central.template_helpers);
 
@@ -47,10 +46,12 @@ module.exports.boot = function() {
     res.locals.static = function(url) {
       if (req.is_ssl) return mo_url.resolve(central.conf.https_root, url);
       return central.assets.fileUrl(url);
-    },
+    };
     res.locals.req = req;
     next();
   });
+
+  app.use(express.csrf());
 
   serve(app, central);
   app.listen(central.conf.port);
