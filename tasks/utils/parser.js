@@ -4,26 +4,33 @@ function dbc2sbc(str) {
   return str.replace(/[\uff01-\uff5e]/g,function(a){return String.fromCharCode(a.charCodeAt(0)-65248);}).replace(/\u3000/g," ");
 }
 
+var reg_chinese_yen = /^[\s￥]*[\d\,，\.]元?$/;
 var currency_trans = [
   [/^\s*(USD?\$?|\$)[\.\s]*/i, 6.23],
   [/^\s*(HKD?\$?|港币)[\.\s]*/i, 0.8],
-  [/^\s*CNY\s*/i, 1],
+  [/^\s*(CNY|￥)\s*/i, 1],
   [/^\s*(GBP?\£?|\£)[\.\s]*/i, 9.44],
   [/^\s*(NTD?\$?)[\.\s]*/i, 0.21],
+  [/円\s*$/i, 0.07],
+  [/^\s*JPY\s*/i, 0.07],
   [/^\s*(CDN|CAD)[\.\s]*\$?\s*/i, 6.1]
 ];
 function parse_price(price) {
+  price = price || '';
+  price = price.trim();
+
   if (!price) return null;
 
   price = dbc2sbc(price).replace(/[,，]/g, '');
 
   var n = parseFloat(price, 10);
-  if (!isNaN(n)) return n;
+  if (!isNaN(n) && reg_chinese_yen.test(price)) return n;
 
   for (var i = 0, l = currency_trans.length; i < l; i++) {
     var item = currency_trans[i];
     if (item[0].test(price)) {
       var replaced = price.replace(item[0], '');
+      //console.log(replaced);
       //console.log('%s replaced to %s', price, replaced);
       return parseFloat(replaced, 10) * item[1];
     }
