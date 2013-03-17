@@ -45,16 +45,6 @@ module.exports = {
       key: '',
       secret: ''
     },
-    {
-      limit: 20,
-      key: '',
-      secret: ''
-    },
-    {
-      limit: 20,
-      key: '',
-      secret: ''
-    },
   ],
 
   // google analytics id

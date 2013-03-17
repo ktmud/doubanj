@@ -10,6 +10,9 @@ build:
 watch:
 	@export DEBUG="dbj:*" && grunt watch
 
+init:
+	@cp -iv ./conf/development.conf.tmpl.js ./conf/development.conf.js
+
 init_bootstrap:
 	git submodule init
 	git submodule update

@@ -71,7 +71,7 @@ TaskQueue.prototype._timer = function() {
   }
   self._t = setTimeout(function() {
     self.dump();
-  }, 200);
+  }, 1000);
 };
 
 TaskQueue.prototype.push = function() {

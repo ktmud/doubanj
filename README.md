@@ -17,15 +17,13 @@
 
 ## 开始开发
 
-新建一份你自己的的 `conf/development.conf.js` ，按需覆盖 `conf/default.conf.js` 里的任意选项。
-
-    cp conf/development.conf.tmpl.js conf/development.conf.js
-    grunt
+    make init
+    make grunt
     make
 
 make 的默认命令是使用 `forever` 执行 `app.js` 。
 
-使用 `make watch` 执行 `grunt watch` ，监视静态文件改动。
+如果需要修改静态文件，请执行 `make watch` ，利用 `grunt` 监视静态文件改动。
 
 ## 一点说明
 
