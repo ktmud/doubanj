@@ -1,9 +1,12 @@
 extend ../500
 
 block message
-  if err === 'ING'
+  if err && err.message === 'pulling'
     h1 OH, wait....
     p 正在尝试获取用户信息，耐心一点啦
+    if err.n
+      p.muted
+        small 你前面还有#{err.n}位用户
   else if (err && err.statusCode !== 404 && err !== 404)
     h1 OH, NO!
     p 获取用户出错了

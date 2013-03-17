@@ -168,9 +168,13 @@ User.prototype.pull = function(cb) {
 
   if (!reg_valid_uid.test(uid)) return cb(404);
 
-  if (uid in pull_queue) return cb('ING');
+  if (uid in pull_queue) {
+    var err = new Error('pulling');
+    err.n = pull_queue[uid];
+    return cb(err);
+  }
 
-  pull_queue[uid] = 1;
+  pull_queue[uid] = Object.keys(pull_queue).length;
 
   // time out for unfinished socket request
   setTimeout(function() {
