@@ -38,6 +38,24 @@ module.exports = {
     key: '',
     secret: ''
   },
+  // more random api keys for public informations
+  douban_more: [
+    {
+      limit: 20,
+      key: '',
+      secret: ''
+    },
+    {
+      limit: 20,
+      key: '',
+      secret: ''
+    },
+    {
+      limit: 20,
+      key: '',
+      secret: ''
+    },
+  ],
 
   // google analytics id
   ga_id: ''

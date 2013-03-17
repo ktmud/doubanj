@@ -155,15 +155,29 @@ User.prototype.clearCache = function(next) {
   if (n === 0) return next();
 };
 
-
+var pull_queue = {};
 /**
 * pull from douban api, get account info
 */
 User.prototype.pull = function(cb) {
   var self = this;
   var uid = self.uid || self.id;
-  task.api(function(oauth2) {
+
+  if (uid in pull_queue) return cb('ING');
+
+  pull_queue[uid] = 1;
+
+  // time out for unfinished socket request
+  setTimeout(function() {
+    delete pull_queue[uid];
+  }, 60000);
+
+  task.api2(function(oauth2, next) {
     oauth2.clientFromToken().request('GET', '/v2/user/' + uid, function(err, data) {
+      delete pull_queue[uid];
+
+      setTimeout(next, oauth2.req_delay || 0);
+
       if (err) {
         error('get douban info for %s failed: %s', uid, JSON.stringify(err));
         // no such user in douban
@@ -179,15 +193,15 @@ User.prototype.pull = function(cb) {
       data.created = new Date(data.created);
 
       // get the latest user from db (incase some other pull is done)
-      User.getFromMongo(uid, function(err, res) {
-        if (res && res instanceof User) self = res;
-        // save douban account info
-        self.update(data, function(err, doc) {
-          cb && cb(err, self);
-        });
+      //User.getFromMongo(uid, function(err, res) {
+      //if (res && res instanceof User) self = res;
+      // save douban account info
+      self.update(data, function(err, doc) {
+        cb && cb(err, self);
       });
+      //});
     });
-  }, 0);
+  });
 };
 
 /**

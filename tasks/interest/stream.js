@@ -5,11 +5,7 @@ var log = debug('dbj:tasks:interest:log');
 var task = central.task;
 var mongo = central.mongo;
 
-
-var douban_key = central.conf.douban.key;
-
 var utils = require('../utils');
-var API_REQ_DELAY = task.API_REQ_DELAY;
 
 // request stream
 function FetchStream(arg) {
@@ -151,41 +147,38 @@ var ERRORS = {
 FetchStream.prototype.fetch = function(start, cb) {
   var self = this;
 
-  var n = central._interest_queue.queue.length;
-
   //console.log(n);
+  task.api(function(oauth2, next) {
+    verbose('fetching %s~%s...', start, start + self.perpage);
 
-  setTimeout(function() {
-    task.api(function(oauth2, next) {
-      verbose('fetching %s~%s...', start, start + self.perpage);
+    var client = oauth2.clientFromToken(self.token);
 
-      var client = oauth2.clientFromToken(self.token);
+    var from = '';
 
-      var from = '';
+    var query = { count: self.perpage, start: start };
 
-      var query = { count: self.perpage, start: start };
+    if (self._from) {
+      query.from = self._from;
+    }
+    client.request('GET', self.api_uri, query, function(err, ret, res) {
+      var n = central._interest_queue.queue.length;
+      // release pool client
+      setTimeout(next, oauth2.req_delay * n);
 
-      if (self._from) {
-        query.from = self._from;
+      var code = err && err.statusCode || res.statusCode;
+      if (code !== 200) {
+        var err_code = ERRORS[String(code)];
+        self.user.invalid = err_code || 1;
+        return self.emit('error', err_code || new Error('douban api responded with ' + code)); 
       }
-      client.request('GET', self.api_uri, query, function(err, ret, res) {
-        next();
+      if (err) {
+        return self.emit('error', err);
+      }
 
-        var code = err && err.statusCode || res.statusCode;
-        if (code !== 200) {
-          var err_code = ERRORS[String(code)];
-          self.user.invalid = err_code || 1;
-          return self.emit('error', err_code || new Error('douban api responded with ' + code)); 
-        }
-        if (err) {
-          return self.emit('error', err);
-        }
-
-        self.emit('fetched', ret);
-        self.write(ret, cb);
-      });
+      self.emit('fetched', ret);
+      self.write(ret, cb);
     });
-  }, API_REQ_DELAY * n);
+  });
 };
 
 // TODO: cache data locally first, wait for some time, then commit to database
