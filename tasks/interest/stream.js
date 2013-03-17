@@ -129,7 +129,7 @@ FetchStream.prototype._fetch_cb = function() {
     // the total fetched number
     if (self.fetched >= total) {
       self.fetched = total;
-      log('fetching reached end.');
+      log('fetching for %s reached end.', self.uid);
       self.status = 'succeed';
       self.end();
     } else {

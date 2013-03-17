@@ -6,6 +6,7 @@ var common = require('./common');
 var debug = require('debug');
 var log = debug('dbj:task:compute:book:info');
 var error = debug('dbj:task:compute:book:error');
+var verbose = debug('dbj:task:compute:book:verbose');
 
 var AggStream = common.AggStream;
 
@@ -128,7 +129,7 @@ module.exports = function(db, user, cb, ondata) {
       if (!(i_status in by_status)) return;
       var sids = by_status[i_status];
 
-      log('Agg %s book for %s ...', i_status, uid);
+      verbose('Agg %s book for %s ...', i_status, uid);
 
       n_phrase++;
 

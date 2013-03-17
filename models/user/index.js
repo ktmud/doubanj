@@ -171,17 +171,22 @@ User.prototype.pull = function(cb) {
 
   pull_queue[uid] = Object.keys(pull_queue).length;
 
-  // time out for unfinished socket request
-  setTimeout(function() {
+  function done() {
+    log('Pulled user %s', uid);
     delete pull_queue[uid];
-  }, 300000);
+    try {
+      clearTimeout(t);
+    } catch (e) {}
+  }
 
-  log('Try pull user %s ...', uid);
+  // time out for unfinished socket request
+  var t = setTimeout(done, 300000);
+
+  log('Queue pull user %s ...', uid);
   task.api2(function(oauth2, next) {
-    log('Start pull %s from douban...', uid);
 
     oauth2.clientFromToken().request('GET', '/v2/user/' + uid, function(err, data) {
-      delete pull_queue[uid];
+      done();
 
       setTimeout(next, oauth2.req_delay || 0);
 
