@@ -3,20 +3,23 @@ var Interest = require('../interest');
 //var redis = central.redis;
 
 function sorted_list(ns, k, sort) {
-  var list = Interest[ns][ns + '_attached'](function(status, limit, cb) {
-    if (typeof limit == 'function') {
-      cb = limit;
-      limit = 20;
+  var list = Interest[ns][ns + '_attached'](function(opts, cb) {
+    if (typeof opts == 'function') {
+      cb = opts;
+      opts = {};
     }
 
     var user = this;
     var uid = user._id;
-    var query = {};
-    if (status !== 'all') query = { status: status };
+    var query = opts.query || {};
+    if (opts.status && opts.status !== 'all') {
+      query.status = opts.status;
+    }
     Interest[ns].findByUser(uid, {
       query: query,
       sort: sort,
-      limit: limit
+      limit: opts.limit || 30,
+      skip: opts.start || 0,
     }, cb);
   });
 

@@ -51,6 +51,7 @@ Interest.findByUser = function(uid, opts, cb) {
 
   var query = opts.query || {};
   query.user_id = uid;
+  delete opts.query;
   return this.find(query, opts, cb);
 };
 

@@ -10,16 +10,22 @@ block article
       a(href="#{people.url()}read") 读过的书
     li.active
       | 阅读体悟
-  .pull-right
-    include ./mods/share.html
+  if !req.query.start
+    .pull-right
+      include ./mods/share.html
   h1 #{title}
   - ns = 'book'
-  - n_comments = most_commented.length
-  ol.comments-list
-    each i in most_commented
-      if i.comment
-        li(id="comment-#{i._id}")
-          mixin comment_item(i)
+  .mod
+    if commented_total
+      ol.comments-list
+        each i in most_commented
+          if i.comment
+            li(id="comment-#{i._id}")
+              mixin comment_item(i)
+      .pager-center
+        mixin paginator(req.query.start, commented_total, perpage, 6)
+    else
+      p 还没有撰写过任何阅读体悟哦
   hr
   .mod
     a.pull-right.btn.btn-small(href="http://#{ns}.douban.com/people/#{uid}/reviews", target="db-review") 去看#{people.name}的长评 ⇗

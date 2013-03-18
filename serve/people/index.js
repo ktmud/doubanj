@@ -1,6 +1,6 @@
 var cwd = central.cwd;
 var User = require(cwd + '/models/user').User;
-var Interest = require(cwd + '/models/interest').Interest;
+var Interest = require(cwd + '/models/interest');
 
 var utils = require('../utils');
 
@@ -44,12 +44,20 @@ module.exports = function(app, central) {
 
   var attach_latest = attach('latest_interests', function(req, res, cb) {
     var istatus = res.data.istatus;
-    res.data.people[istatus.ns + '_latest'](istatus.status, 7, cb);
+    res.data.people[istatus.ns + '_latest']({
+      status: istatus.status,
+      limit: 7,
+    }, cb);
   });
   var attach_most_commented = attach('most_commented', function(req, res, cb) {
     var people = res.data.people;
     var istatus = res.data.istatus;
-    res.data.people[istatus.ns + '_most_commented'](istatus.status, 30, function(err, ret) {
+
+    res.data.people[istatus.ns + '_most_commented']({
+      //status: istatus.status,
+      limit: res.data.perpage || 20,
+      start: req.query.start
+    }, function(err, ret) {
       ret = ret && ret.filter(function(item) {
         return item.comment;
       });
@@ -59,7 +67,9 @@ module.exports = function(app, central) {
   var attach_highest_ratings = attach('highest_ratings', function(req, res, cb) {
     var people = res.data.people;
     var istatus = res.data.istatus;
-    res.data.people[istatus.ns + '_highest_ratings'](istatus.status, 18, cb);
+    res.data.people[istatus.ns + '_highest_ratings']({
+      status: istatus.status, limit: 18
+    }, cb);
   });
   var do_render = function(tmpl) {
     return function(req, res, next) {
@@ -119,14 +129,35 @@ module.exports = function(app, central) {
   app.get('/people/:uid/quote', function(req, res, next) {
     var people = res.data.people;
 
-    res.data.title = people.name + '的阅读体悟';
-
     var istatus = res.data.istatus = availables['read'];
 
     if (people.notReady() || people.isEmpty(istatus.ns)) {
       return res.redirect('/people/' + req.params.uid + '/');
     }
-    next();
+
+    var perpage = res.data.perpage = Math.max(20, parseInt(req.query.perpage, 10)) || 20;
+    var start = req.query.start = Math.max(0, parseInt(req.query.start, 10)) || 0;
+
+    res.data.title = people.name + '的阅读体悟';
+
+    Interest.book.count({
+      user_id: people._id,
+      commented: {
+        $gt: 0
+      },
+    }, function(err, r) {
+      var total = res.data.commented_total = r;
+      var n = 1;
+      if (start > 0) {
+        n = res.data.page_now = Math.floor(start / perpage + 1);
+        res.data.title += ' - 第' + n + '页';
+      }
+      if (start > total) {
+        res.redirect('/people/' + req.params.uid + '/quote?start=' + (Math.ceil(total / perpage) - 1) * perpage);
+      }
+
+      next();
+    });
   }, attach_most_commented, do_render('people/quote'));
 
   app.get('/people/:uid/:istatus', function(req, res, next) {

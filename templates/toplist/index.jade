@@ -5,16 +5,19 @@ block main
   hr
   section.chart
     .row
-      h2.span12 读书最多的人
+      h2.span12 最勤奋的读书人
+      .span4
+        h3 去年
+        mixin people_wall(hardest_reader_last_year)
       .span4
         h3 过去12个月
         mixin people_wall(hardest_reader_last_12_month)
       .span4
         h3 一直以来
         mixin people_wall(hardest_reader_all_time)
-      .span4
-        h3 去年
-        mixin people_wall(hardest_reader_last_year)
+      .span12
+        p.muted
+          | ＊「最勤奋」是指认真撰写阅读感想且阅读量够大
 
 mixin people_wall(people)
   ol.rbox-list.people-rboxes.toplist
@@ -22,8 +25,8 @@ mixin people_wall(people)
       li
         - gray = i < 5 ? null : 'background: #dfdfdf;'
         .top-n(style=gray) #{i + 1}
-        a(href="#{p.url()}", title="${p.name}")
+        a(href="#{p.url()}quote", title="${p.name}")
           .pic
             img(src="#{p.avatar}", width=48, height=48, alt="#{p.name}")
-          p #{p.name}
-          p #{p._count}本
+          p.title #{p.name}
+          p #{p._count}条体悟
