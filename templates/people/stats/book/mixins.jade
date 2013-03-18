@@ -1,6 +1,6 @@
 mixin comment_item(i)
   small.muted.datetime.pull-right #{strftime('%Y-%m-%d', i.updated)}
-  p 评《
+  p #{i.status === 'done' ? '评' : i.status_cn()}《
     mixin subject_link(i)
     |》
     mixin stars(i.rating)
