@@ -21,10 +21,10 @@ block main
 
 mixin people_wall(people)
   ol.rbox-list.people-rboxes.toplist
-    for p, i in people.slice(0,9)
+    for p, i in people
       li
-        - gray = i < 5 ? null : 'background: #dfdfdf;'
-        .top-n(style=gray) #{i + 1}
+        - top_color = i < 5 ? 'background: #93d6ef;' : ''
+        .top-n(style=top_color) #{i + 1}
         a(href="#{p.url()}quote", title="${p.name}")
           .pic
             img(src="#{p.avatar}", width=48, height=48, alt="#{p.name}")
