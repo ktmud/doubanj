@@ -33,14 +33,14 @@ mixin stars(star)
 mixin interest_item(i, trimto)
   if !i
     - return
-  trimto = trimto || 100
+  trimto = trimto || 14
   span.label.label-status #{i.status_cn()}
   &nbsp;
   if i.subject
     a(href="http://#{i.subject_ns()}.douban.com/subject/#{i.subject_id}/",
       target="_blank",
       title="#{i.subject.title}#{i.subject.author ? ' - ' + i.subject.author.join(', ') : ''}")
-      | #{trunc(i.subject.title, 8)}
+      | #{trunc(i.subject.title, trimto)}
   else
     a(href="http://#{i.subject_ns()}.douban.com/subject/#{i.subject_id}/", target="_blank")
       | #{i.subject_id}

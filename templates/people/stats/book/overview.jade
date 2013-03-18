@@ -11,13 +11,13 @@
       | 。
       if s.n_done < 10
         是不是有点太少了呢？
-      if s.n_wish > 10 && s.ratio_wish > 60
+      if s.n_wish > 20 && s.ratio_wish > 60
         想读的书有 #{s.n_wish} 本，占全部收藏的 #{s.ratio_wish}% 。
         a(href="#{people.db_url('book')}wish", target="db-interests") 想读的
         | 似乎有点多了，不要光想不做哦。
       if s.n_ing
         | 另外还有 #{s.n_ing} 本在读
-        if s.n_ing > 15
+        if s.n_ing > 30
           | ，怎么可能
           a(href="#{people.db_url('book')}do", target="db-interests") 同时读
           | 这么呢？一本本看完先吧
@@ -31,9 +31,8 @@
       ul.muted
         each item in latest_interests
           li 
-            mixin interest_item(item)
+            mixin interest_item(item, 8)
     else if people.last_synced_status === 'ing'
       p.muted 正在重新同步...
     else
       p 暂时没有
-
