@@ -9,7 +9,7 @@ function hardest_reader(period, cb) {
   mongo(function(db) {
     db.collection(out_coll).find({}, {
       sort: { 'value': -1 },
-      limit: 10
+      limit: 30
     }).toArray(function(err, res) {
       cb(err, res);
     });
