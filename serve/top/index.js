@@ -24,7 +24,7 @@ module.exports = function(app, central) {
   app.get('/top/', function(req, res, next) {
     res.data = res.data || {};
     res.data.errors = {};
-    res.data.title = '排行榜';
+    res.data.title = '排行榜 - ' + central.conf.site_name;
     next();
   },
   attach('book.hardest_reader', 'all_time'),

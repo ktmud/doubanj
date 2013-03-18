@@ -47,12 +47,12 @@ module.exports = function(app, central) {
 
   app.get('/api/latest_synced', function(req, res, next) {
     User.latestSynced(function(err, users) {
-      var people = users.map(function(item) {
+      var people = users && users.map(function(item) {
         return {
           url: item.url(),
           name: item.name
         };
-      });
+      }) || [];
 
       people = utils.shuffle(people).slice(0,12);
 

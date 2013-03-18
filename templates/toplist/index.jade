@@ -18,13 +18,12 @@ block main
 
 mixin people_wall(people)
   ol.rbox-list.people-rboxes.toplist
-    - people = people.filter(function(p) { return p })
-    for p, i in people
+    for p, i in people.slice(0,9)
       li
-        - if (i < 7)
-          .top-n #{i + 1}
+        - gray = i < 5 ? null : 'background: #dfdfdf;'
+        .top-n(style=gray) #{i + 1}
         a(href="#{p.url()}", title="${p.name}")
           .pic
             img(src="#{p.avatar}", width=48, height=48, alt="#{p.name}")
           p #{p.name}
-          p #{p.book_stats.done.total}本
+          p #{p._count}本
