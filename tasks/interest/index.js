@@ -82,6 +82,20 @@ collect = User.ensured(function(user, arg) {
   collector.once('succeed', function() {
     // run compute task right after success
     require('../compute')[arg.ns]({ user: user, force: true });
+
+    var toplist = require('../toplist');
+
+    try {
+      clearTimeout(toplist._timer);
+    } catch (e) {}
+
+    // 2 minutes of free
+    toplist._timer = setTimeout(function() {
+      toplist.hardest_reader('last_year');
+      toplist.hardest_reader('last_12_month');
+      toplist.hardest_reader('all_time');
+    }, 120000);
+
   });
 
   collector.run();

@@ -111,7 +111,6 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
     jobs_percent[ns] = 0;
 
     mongo.queue(function(db, next) {
-
       // 3 minutes timeout
       timeouts[ns] = setTimeout(function() {
         error_cb('TIMEOUT');

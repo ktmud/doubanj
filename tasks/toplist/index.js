@@ -1,6 +1,11 @@
 var central = require('../../lib/central');
 var mongo = central.mongo;
 
+var debug = require('debug');
+var log = debug('dbj:toplist:log');
+var verbose = debug('dbj:toplist:verbose');
+var error = debug('dbj:toplist:error');
+
 var ONE_MONTH = 60 * 60 * 24 * 1000 * 30.5;
 
 function generate_hardest_reader(period, cb) {
@@ -37,14 +42,19 @@ function generate_hardest_reader(period, cb) {
 
   var out_coll = 'book_done_count_' + period;
 
-  mongo(function(db) {
+  mongo.queue(function(db, next) {
     db.collection('book_interest').mapReduce(map, reduce, {
       query: query,
       sort: { user_id: 1 },
       //out: { inline: 1 },
       out: { replace: out_coll },
     }, function(err, coll) {
-      if (err) return cb(err, []);
+      next();
+      if (err) {
+        error('Toplist failed: ', err)
+        return cb(err);
+      }
+      log('Toplist for %s generated', out_coll);
       coll.ensureIndex({ value: -1 }, { background: true }, cb);
     });
   });
