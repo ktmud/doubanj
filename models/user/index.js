@@ -35,7 +35,7 @@ function User(info) {
 util.inherits(User, mongo.Model);
 utils.extend(User, mongo.Model);
 
-User.prototype.kind = User.prototype._collection = USER_COLLECTION;
+User.prototype.kind = User.prototype._collection = User._collection = User.kind = USER_COLLECTION;
 
 /**
 * Get user from database

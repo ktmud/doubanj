@@ -47,7 +47,7 @@ mixin interest_item(i, trimto)
 
 
 mixin interests_list(items)
-  ol.interests-list
+  ol.rbox-list.interest-rboxed
     each i in items
       li 
         a(href="http://#{i.subject_ns()}.douban.com/subject/#{i.subject_id}/", target="db-#{i.subject_type}") 

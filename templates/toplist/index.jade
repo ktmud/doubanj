@@ -1,0 +1,30 @@
+extend ../layout/basic
+
+block main
+  h1 豆瓣酱排行榜
+  hr
+  section.chart
+    .row
+      h2.span12 读书最多的人
+      .span4
+        h3 过去12个月
+        mixin people_wall(hardest_reader_last_12_month)
+      .span4
+        h3 一直以来
+        mixin people_wall(hardest_reader_all_time)
+      .span4
+        h3 去年
+        mixin people_wall(hardest_reader_last_year)
+
+mixin people_wall(people)
+  ol.rbox-list.people-rboxes.toplist
+    - people = people.filter(function(p) { return p })
+    for p, i in people
+      li
+        - if (i < 7)
+          .top-n #{i + 1}
+        a(href="#{p.url()}", title="${p.name}")
+          .pic
+            img(src="#{p.avatar}", width=48, height=48, alt="#{p.name}")
+          p #{p.name}
+          p #{p.book_stats.done.total}本

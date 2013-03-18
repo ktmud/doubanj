@@ -51,17 +51,23 @@ module.exports = {
   url2uid: url2uid,
   getUser: getUser,
   navbar: function navbar(req, res, next) {
-    var links = [{
-      href: central.conf.site_root,
-      active: req.url === '/',
-      text: '首页'
-    }];
+    var links = [];
     if (req.user) {
       links.push({
         href: '/user/' + req.user.uid,
         text: '我的'
       });
     }
+    links.push({
+      href: '/top/',
+      active: req.url === '/top/',
+      text: '榜单'
+    });
+    links.unshift({
+      href: central.conf.site_root,
+      active: req.url === '/',
+      text: '首页'
+    });
     res.locals.navbar_links = links;
     next();
   }
