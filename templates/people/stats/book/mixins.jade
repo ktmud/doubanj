@@ -1,3 +1,5 @@
+include ../../mixins/enable_links.jade
+
 mixin comment_item(i)
   small.muted.datetime.pull-right #{strftime('%Y-%m-%d', i.updated)}
   p #{i.status === 'done' ? '评' : i.status_cn()}《
@@ -7,55 +9,8 @@ mixin comment_item(i)
   blockquote
     - c = i.comment.split('\n\n')
     each p in c
-      p #{p.replace('\n', '&nbsp;&nbsp;')}
+      p
+        mixin enable_links(p.replace('\n', '&nbsp;&nbsp;'), 60)
 
 mixin subject_link(i)
   a(href="http://#{i.subject_ns()}.douban.com/subject/#{i.subject_id}/", target="db-#{i.subject_type}") #{i.subject && i.subject.title || i.subject_id}
-
-mixin paginator(start, total, perpage, wing)
-  perpage = perpage || 20
-  wing = wing || 3
-  - link = function(s) { return '?start=' + s; }
-  - prev = start - perpage
-  - next = start + perpage
-  - p_current = Math.ceil((start + perpage) / perpage)
-  - p_min = p_current - wing
-  - p_max = p_current + wing
-  - p_last = Math.ceil(total / perpage)
-  - pages = []
-  - i = p_current, n = start
-  - while (i > 0 && i >= p_min)
-    - cls = (i == p_current) ? 'active' : null;
-    - pages.unshift({ cls: cls, text: i, href: link(n) })
-    - if (i === p_min && i > 1)
-      - pages.unshift({ cls: 'disabled', span: true, text: '...', })
-    - i--
-    - n = Math.max(n - perpage, 0)
-
-  - i = p_current, n = start
-  - while (i < p_last && i < p_max)
-    - i++
-    - n += perpage
-    - pages.push({ cls: null, span: false, text: i, href: link(n) })
-    - if (i === p_max && i < p_last)
-      - pages.push({ cls: 'disabled', span: true, text: '...', })
-
-  ul.pagination
-    - if (prev >= 0)
-      li
-        a(href="#{link(prev)}", title="上一页") &laquo;
-    - else
-      li.diasbled
-        span &laquo;
-    each p in pages
-        li(class=p.cls)
-          if p.span
-            span #{p.text}
-          else
-            a(href=p.href, title="第#{p.text}页") #{p.text}
-    - if (next < total)
-      li
-        a(href="#{link(next)}", title="下一页") &raquo;
-    - else
-      li.diasbled
-        span &raquo;

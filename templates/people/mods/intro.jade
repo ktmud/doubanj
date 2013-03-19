@@ -1,3 +1,5 @@
+include ../mixins/enable_links.jade
+
 .people-intro
   h2 谁是 #{name} ?
   p.basic
@@ -11,4 +13,5 @@
     hr
     .clearfix
       img.pull-right.img-rounded(src=people.avatar, height="48")
-      p.desc !{people.desc.replace(/\n/g, '<br>')}
+      p.desc
+        mixin enable_links(people.desc)

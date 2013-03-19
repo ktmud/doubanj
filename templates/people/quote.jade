@@ -1,5 +1,6 @@
 extend ./index
 
+include ./mixins/paginator
 include ./stats/book/mixins
 
 block article
@@ -23,7 +24,7 @@ block article
             li(id="comment-#{i._id}")
               mixin comment_item(i)
       .pager-center
-        mixin paginator(req.query.start, commented_total, perpage, 6)
+        mixin paginator(req.query.start, commented_total, perpage, 4)
     else
       p 还没有撰写过任何阅读体悟哦
   hr
