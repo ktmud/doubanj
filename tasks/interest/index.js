@@ -92,7 +92,6 @@ collect = User.ensured(function(user, arg) {
     // 2 minutes of free
     toplist._timer = setTimeout(function() {
       toplist.hardest_reader('last_30_days');
-      toplist.hardest_reader('last_year');
       toplist.hardest_reader('last_12_month');
       toplist.hardest_reader('all_time');
     }, 120000);

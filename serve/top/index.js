@@ -29,7 +29,6 @@ module.exports = function(app, central) {
   },
   attach('book.hardest_reader', 'last_30_days'),
   attach('book.hardest_reader', 'last_12_month'),
-  attach('book.hardest_reader', 'last_year'),
   attach('book.hardest_reader', 'all_time'),
   function(req, res, next) {
     res.render('toplist/index', res.data);
