@@ -40,7 +40,7 @@ module.exports = {
           if (item) {
             item._count = ids[i].value;
             try {
-              // there are useless type of book in its tag
+              // there are useless type of books in he/she's collection
               if (has_banned_tag(item.book_stats.all.top_tags.slice(0,10))) {
                 return false;
               }
