@@ -109,7 +109,7 @@ User.latestSynced = redis.cached.wrap(User.latestSynced, 'latest-synced', 60000)
 User.count = function(cb) {
   mongo(function(db) {
     var collection = db.collection(USER_COLLECTION);
-    collection.count({ last_statsed: { $not: { $type: 10 } } }, cb);
+    collection.count({ last_statsed: { $lt: new Date() } }, cb);
   });
 };
 //User.count = redis.cached.wrap(User.count, 'users-count', 60000);
