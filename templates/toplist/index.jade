@@ -7,14 +7,20 @@ block main
     .row
       h2.span12 最勤奋的读书人
       .span4
-        h3 去年
-        mixin people_wall(hardest_reader_last_year)
+        h3 上个月
+        mixin people_wall(hardest_reader_last_30_days)
       .span4
         h3 过去12个月
         mixin people_wall(hardest_reader_last_12_month)
       .span4
+        h3 去年
+        mixin people_wall(hardest_reader_last_year)
+    hr
+    .row
+      .span12
         h3 一直以来
         mixin people_wall(hardest_reader_all_time)
+    .row
       .span12
         p.muted
           | ＊「最勤奋」是指认真撰写阅读感想且阅读量够大<br>
@@ -23,12 +29,22 @@ block main
 
 mixin people_wall(people)
   ol.rbox-list.people-rboxes.toplist
-    for p, i in people
+    people = people.concat(people, people, people, people, people)
+    for p, i in people.slice(0,18)
       li
         - top_color = i < 5 ? 'background: #93d6ef;' : ''
         .top-n(style=top_color) #{i + 1}
-        a(href="#{p.url()}quote", title="${p.name}")
+        a(href="#{p.url()}quote", title="#{p.name} (#{p.signature})")
           .pic
             img(src="#{p.avatar}", width=48, height=48, alt="#{p.name}")
           p.title #{p.name}
           p #{p._count}条体悟
+          mixin tags_list(p.book_stats.all.top_tags)
+
+mixin tags_list(tags)
+  list = []
+  for t in tags.slice(0,10)
+    if t._id != '中国'
+      - list.push(t._id)
+  p.tags(title="#{list.join('、')}")
+    | !{trunc(list.join('/'), 11.5)}

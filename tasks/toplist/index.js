@@ -14,12 +14,18 @@ function generate_hardest_reader(period, cb) {
   var map = function() { emit(this.user_id, 1); };
   var reduce = function(k, vals) { return Array.sum(vals); };
 
+  // at least three words will be consider useful
   var query = { commented: { $gt: 2 } };
 
   period = period || 'all_time';
 
   var now = new Date();
   switch(period) {
+    case 'last_30_days':
+      query.updated = {
+        $gte: new Date(now - ONE_MONTH)
+      };
+      break;
     case 'this_year':
       query.updated = {
         $gte: new Date('' + now.getFullYear())
