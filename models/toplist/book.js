@@ -18,6 +18,17 @@ function hardest_reader(period, cb) {
 
 var people_fields = { _id: 1, uid: 1, name: 1, avatar: 1, 'book_stats.all.top_tags': 1, signature: 1 };
 
+var banned_tags = ['耽美', '漫画', 'BL', '写真'];
+function has_banned_tag(tags) {
+  for (var i in tags) {
+    var item = tags[i];
+    if (banned_tags.indexOf(item._id) !== -1) {
+      return true;
+    }
+  }
+  return false;
+}
+
 module.exports = {
   hardest_reader: function(period, cb) {
     hardest_reader(period, function(err, ids) {
@@ -29,8 +40,8 @@ module.exports = {
           if (item) {
             item._count = ids[i].value;
             try {
-              // 过滤漫画用户
-              if (item.book_stats.all.top_tags[0]._id === '漫画') {
+              // there are useless type of book in its tag
+              if (has_banned_tag(item.book_stats.all.top_tags.slice(0,10))) {
                 return false;
               }
             } catch (e) {
