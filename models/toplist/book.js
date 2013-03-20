@@ -7,12 +7,9 @@ var redis = central.redis;
 function hardest_reader(period, cb) {
   var out_coll = 'book_done_count_' + period;
   mongo(function(db) {
-    db.collection(out_coll).find({}, {
-      sort: { 'value': -1 },
-      limit: 30
-    }).toArray(function(err, res) {
-      cb(err, res);
-    });
+    db.collection(out_coll).find()
+    .sort({ 'value': -1 })
+    .limit(40).toArray(cb);
   });
 }
 
@@ -41,7 +38,7 @@ module.exports = {
             item._count = ids[i].value;
             try {
               // there are useless type of books in he/she's collection
-              if (has_banned_tag(item.book_stats.all.top_tags.slice(0,10))) {
+              if (has_banned_tag(item.book_stats.all.top_tags.slice(0,5))) {
                 return false;
               }
             } catch (e) {
