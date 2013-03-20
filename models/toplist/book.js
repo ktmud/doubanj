@@ -9,21 +9,36 @@ function hardest_reader(period, cb) {
   mongo(function(db) {
     db.collection(out_coll).find()
     .sort({ 'value': -1 })
-    .limit(70).toArray(cb);
+    .limit(80).toArray(cb);
   });
 }
 
 var people_fields = { _id: 1, uid: 1, name: 1, avatar: 1, 'book_stats.all.top_tags': 1, signature: 1 };
 
-var banned_tags = ['耽美', 'BL', '写真', '推理', '轻小说', '网络小说', '绘本', '少年漫画'];
-function has_banned_tag(tags) {
+var banned_tags = [
+  '耽美', 'BL', '青春文学', '耽美小说',
+  'BL漫画', '腐',
+  '日本文学', '日本',
+  '推理', '推理小说', '日系推理', '日本推理',
+  '写真', '写真集', '摄影', 'PHOTOBOOK', '寫真',
+  '绘本', '童话', '童书', '儿童文学', '图画书',
+  '轻小说', '网络小说', '青春', '言情',
+  '少年向', '少年漫画', '经典', 
+  '穿越', '武侠', '奇幻',
+  '晋江', '现代都市',
+  '漫画', '日本漫画', '漫畫',
+  '小说', '爱情', '悬疑'
+];
+function is_serious_reading(tags) {
+  var counter = 0;
   for (var i in tags) {
     var item = tags[i];
     if (banned_tags.indexOf(item._id) !== -1) {
-      return true;
+      counter++;
+      if (counter > 5) return false;
     }
   }
-  return false;
+  return true;
 }
 
 module.exports = {
@@ -38,13 +53,10 @@ module.exports = {
             item._count = ids[i].value;
             try {
               // there are useless type of books in he/she's collection
-              if (has_banned_tag(item.book_stats.all.top_tags.slice(0,10))) {
-                return false;
+              if (is_serious_reading(item.book_stats.all.top_tags.slice(0,12))) {
+                return true;
               }
-            } catch (e) {
-              return false;
-            }
-            return true;
+            } catch (e) {}
           }
           return false;
         });
