@@ -29,7 +29,7 @@ mixin people_wall(people)
       li
         - top_color = i < 5 ? 'background: #93d6ef;' : ''
         .top-n(style=top_color) #{i + 1}
-        a(href="#{p.url()}quote", title="#{p.name} (#{p.signature})")
+        a(href="#{p.url()}quote", title="#{p.name}#{p.signature ? ' (' + p.signature + ')' : ''}")
           .pic
             img(src="#{p.avatar}", width=48, height=48, alt="#{p.name}")
           p.title #{p.name}
@@ -38,7 +38,7 @@ mixin people_wall(people)
 
 mixin tags_list(tags)
   list = []
-  for t in tags.slice(0,10)
+  for t in tags.slice(0,20)
     if t._id != '中国'
       - list.push(t._id)
   p.tags(title="#{list.join('、')}")

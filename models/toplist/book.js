@@ -15,7 +15,7 @@ function hardest_reader(period, cb) {
 
 var people_fields = { _id: 1, uid: 1, name: 1, avatar: 1, 'book_stats.all.top_tags': 1, signature: 1 };
 
-var banned_tags = ['耽美', '漫画', 'BL', '写真'];
+var banned_tags = ['耽美', '漫画', 'BL', '写真', '推理', '轻小说', '网络小说'];
 function has_banned_tag(tags) {
   for (var i in tags) {
     var item = tags[i];
