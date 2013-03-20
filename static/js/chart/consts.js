@@ -1,7 +1,15 @@
-var D3_COLORS = ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"];
+//var DEFAULT_COLORS = ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"];
+//var DEFAULT_COLORS = ["", "", "", "", ""];
+//var DEFAULT_COLORS = ["#d9ceb2", "#948c75", "#d5ded9", "#7a6a53", "#99b2b7"];
+var DEFAULT_COLORS = ["#009ecf", "#ff7050", "#90e920", "#63dee0", "#ffa03f", "#8fbe00", "#78c0a8","#ed303c"];
+//var DEFAULT_COLORS = ["#00a8c6", "#40c0cb", "#f9f2e7", "#aee239", "#8fbe00"];
+//var DEFAULT_COLORS = ["#c02942", "#542437", "#ecd078", "#d95b43", "#53777a"];
+//var DEFAULT_COLORS = ["#a8dba8", "#79bd9a",];
+//var DEFAULT_COLORS = ["#d1f2a5", "#effab4", "#ffc48c", "#ff9f80", "#f56991"];
 
-function d3_colors(cate, list) {
-  return list ? d3.scale.ordinal().range(list) : d3.scale['category' + cate]();
+function d3_colors(list) {
+  //return d3.scale.category10();
+  return d3.scale.ordinal().range(list);
 }
 
 function timeFormat(formats) {

@@ -12,6 +12,7 @@ function Treemap(container, options) {
 }
 
 Treemap.defaultOptions = {
+  colors: DEFAULT_COLORS,
   width: 600,
   height: 400,
   name_prop: '_id',
@@ -38,7 +39,7 @@ Treemap.prototype.draw = function(data) {
     , width = options.width
     , height = options.height;
 
-  var color = colors ? d3.scale.ordinal(colors) : d3.scale.category20c();
+  var color = colors ? d3_colors(colors) : d3.scale.category20c();
   var text = options.text || function(d) { return d.children ? null : d[name_prop]; };
 
   var treemap = self.treemap = d3.layout.treemap()
@@ -51,7 +52,12 @@ Treemap.prototype.draw = function(data) {
   .enter().append('div')
   .attr('class', function(d) { return d.children ? 'node parent' : 'node'; })
     .call(options.position)
-    .style('background', function(d) { return d.children ? color(d[name_prop]) : null ; })
+    .style('background', function(d) {
+      if (d.children) return color(d[name_prop]);
+      var kid_len = d.parent.children.length;
+      var factor = Math.pow(d.value / d.parent.value * kid_len, 0.34);
+      return d3.hsl(color(d.parent[name_prop])).brighter(1.57).darker(factor);
+    })
     .append('a')
     .text(text);
 

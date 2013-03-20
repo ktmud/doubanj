@@ -164,10 +164,16 @@ function export_keywords(ns) {
       var tmp = k.split('_');
       if (tmp[0] === 'top' && tmp[1] !== 'tags') {
         var items = stats[k];
-        if (tmp[1] === 'publisher') {
+        if (tmp[1] === 'translator') {
           items.forEach(function(item) {
-            item.factor = 0.25;
+            item.factor = 0.7;
+          })
+          items = items.slice(0, 14);
+        } else if (tmp[1] === 'publisher') {
+          items.forEach(function(item) {
+            item.factor = 0.2;
           });
+          items = items.slice(0, 10);
         }
         kids.push({
           _id: tmp[1],
@@ -175,6 +181,10 @@ function export_keywords(ns) {
         });
       }
     });
+    //var orders = ['author', 'tags', 'translator', 'publishers'];
+    //kids = kids.sort(function(a, b) {
+      //return orders.indexOf(a._id) - orders.indexOf(b._id);
+    //});
     return ret;
   }
 }
@@ -201,9 +211,13 @@ function export_tags(ns) {
       });
     }
     if (stats.interest.top_tags) {
+      var items = stats.interest.top_tags;
+      items.forEach(function(item) {
+        item.factor = 4;
+      });
       kids.push({
         _id: 'personal_tags',
-        children: stats.interest.top_tags
+        children: items
       });
     }
     return ret;

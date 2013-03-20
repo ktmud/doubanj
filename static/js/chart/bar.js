@@ -19,8 +19,7 @@ function Bar(container, options) {
 }
 
 Bar.defaultOptions = {
-  colorCate: '10',
-  //colors: D3_COLORS,
+  colors: DEFAULT_COLORS,
   periodic: null,
   width: 300,
   height: 160,
@@ -98,7 +97,7 @@ Bar.prototype._prepare = function(data) {
 
   if (multi_keys.length > 1) this._is_multi = true;
 
-  var color = self.color = d3_colors(options.colorCate, options.colors);
+  var color = self.color = d3_colors(options.colors);
 
   var n = self.n = self._n(), // number of layers
       m = self.m = self._m(); // number of samples per layer
