@@ -9,13 +9,13 @@ function hardest_reader(period, cb) {
   mongo(function(db) {
     db.collection(out_coll).find()
     .sort({ 'value': -1 })
-    .limit(60).toArray(cb);
+    .limit(70).toArray(cb);
   });
 }
 
 var people_fields = { _id: 1, uid: 1, name: 1, avatar: 1, 'book_stats.all.top_tags': 1, signature: 1 };
 
-var banned_tags = ['耽美', '漫画', 'BL', '写真', '推理', '轻小说', '网络小说', '绘本'];
+var banned_tags = ['耽美', 'BL', '写真', '推理', '轻小说', '网络小说', '绘本'];
 function has_banned_tag(tags) {
   for (var i in tags) {
     var item = tags[i];
