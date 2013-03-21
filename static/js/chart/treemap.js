@@ -55,7 +55,7 @@ Treemap.prototype.draw = function(data) {
     .style('background', function(d) {
       if (d.children) return color(d[name_prop]);
       var kid_len = d.parent.children.length;
-      var factor = Math.pow(d.value / d.parent.value * kid_len, 0.34);
+      var factor = Math.pow(d.value / d.parent.value * kid_len, 0.29);
       return d3.hsl(color(d.parent[name_prop])).brighter(1.57).darker(factor);
     })
     .append('a')
