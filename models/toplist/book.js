@@ -41,27 +41,32 @@ function is_serious_reading(tags) {
   return true;
 }
 
-module.exports = {
-  hardest_reader: function(period, cb) {
-    hardest_reader(period, function(err, ids) {
-      User.gets(ids, {
-        preserve_order: true,
-        fields: people_fields
-      }, function(err, users) {
-        users = users.filter(function(item, i) {
-          if (item) {
-            item._count = ids[i].value;
-            try {
-              // there are useless type of books in he/she's collection
-              if (is_serious_reading(item.book_stats.all.top_tags.slice(0,12))) {
-                return true;
-              }
-            } catch (e) {}
-          }
-          return false;
-        });
-        cb(err, users);
+function get_hardest_reader(period, cb) {
+  hardest_reader(period, function(err, ids) {
+    User.gets(ids, {
+      preserve_order: true,
+      fields: people_fields
+    }, function(err, users) {
+      users = users.filter(function(item, i) {
+        if (item) {
+          item._count = ids[i].value;
+          try {
+            // there are useless type of books in he/she's collection
+            if (is_serious_reading(item.book_stats.all.top_tags.slice(0,12))) {
+              return true;
+            }
+          } catch (e) {}
+        }
+        return false;
       });
+      cb(err, users);
     });
-  }
+  });
+}
+
+var ONE_HOUR = 24 * 60 * 60000;
+get_hardest_reader = central.redis.cached.wrap(get_hardest_reader, 'hardest-reader-{0}', ONE_HOUR);
+
+module.exports = {
+  hardest_reader: get_hardest_reader
 };
