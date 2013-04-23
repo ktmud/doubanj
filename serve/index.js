@@ -21,7 +21,7 @@ module.exports = function(app, central) {
     res.redirect('/people/' + uid + '/');
   });
 
-  ['queue', 'people', 'api', 'misc', 'top'].forEach(function(item) {
+  ['people', 'api', 'misc', 'top', 'auth', 'queue'].forEach(function(item) {
     require('./' + item)(app, central);
   });
 

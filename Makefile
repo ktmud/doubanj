@@ -13,6 +13,9 @@ watch:
 init:
 	@cp -iv ./conf/development.conf.tmpl.js ./conf/development.conf.js
 
+update:
+	@export DEBUG="dbj:* -*:verbose" && ./tools/update.js
+
 init_bootstrap:
 	git submodule init
 	git submodule update

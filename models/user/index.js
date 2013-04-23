@@ -184,7 +184,6 @@ User.prototype.pull = function(cb) {
 
   log('Queue pull user %s ...', uid);
   task.api2(function(oauth2, next) {
-
     oauth2.clientFromToken().request('GET', '/v2/user/' + uid, function(err, data) {
       done();
 
@@ -221,7 +220,7 @@ User.prototype.pull = function(cb) {
 /**
 * TODO: login in doubanj.com
 */
-User.getByPass = function(uid, password, cb) {
+User.getByPasswd = function(uid, password, cb) {
   if (!uid || !password) return cb(401);
   User.getFromMongo(uid, function(err, user) {
     if (err || !user) return cb(err, user);

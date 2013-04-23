@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "debug": "~0.7.2",
-    "raven": "~0.4.7",
+    "raven": "~0.5.0",
     "strftime": "~0.5.0",
     "moment": "~2.0.0",
     "redis": "~0.8.2",
@@ -23,6 +23,7 @@
     "express-istatic": "~0.0.9-2",
     "jade": "~0.28.1",
     "passport": "~0.1.15",
+    "passport-oauth": "~0.1.0",
     "generic-pool": "~2.0.3",
     "mongodb": "~1.2.6",
     "request": "~2.12",

@@ -2,13 +2,13 @@ if !locals.navbar_links
   - return
 .navbar
   .container
-    a.navbar-toggler(data-toggle="collapse", data-target=".navbar-responsive-collapse")
+    button.navbar-toggle(data-toggle="collapse", data-target=".nav-collapse")
       span.icon-bar
       span.icon-bar
       span.icon-bar
     a.navbar-brand(href=conf.site_root) #{conf.site_name}
 
-    .nav-collapse.collapse.navbar-responsive-collapse
+    .nav-collapse.collapse
       .nav
         each link in navbar_links
           li(class=link.active ? 'active' : null)

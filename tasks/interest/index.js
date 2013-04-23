@@ -89,12 +89,12 @@ collect = User.ensured(function(user, arg) {
       clearTimeout(toplist._timer);
     } catch (e) {}
 
-    // 2 minutes of free
+    // 5 minutes of free
     toplist._timer = setTimeout(function() {
       toplist.hardest_reader('last_30_days');
       toplist.hardest_reader('last_12_month');
       toplist.hardest_reader('all_time');
-    }, 120000);
+    }, 300000);
 
   });
 

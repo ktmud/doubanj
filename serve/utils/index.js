@@ -52,12 +52,6 @@ module.exports = {
   getUser: getUser,
   navbar: function navbar(req, res, next) {
     var links = [];
-    if (req.user) {
-      links.push({
-        href: '/user/' + req.user.uid,
-        text: '我的'
-      });
-    }
     links.push({
       href: '/top/',
       active: req.url === '/top/',
@@ -68,6 +62,10 @@ module.exports = {
       active: req.url === '/',
       text: '首页'
     });
+    //links.push({
+      //href: '/mine',
+      //text: '我的'
+    //});
     res.locals.navbar_links = links;
     next();
   }
