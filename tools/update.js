@@ -9,8 +9,9 @@ var User = require('../models/user');
 var tasks = require('../tasks');
 
 var oneday = 60 * 60 * 24 * 1000;
+var oneweek = oneday * 7;
 
-function updateAll() {
+function updateAll(query) {
   var now = new Date();
 
   if (tasks.interest.queue.queue.length) {
@@ -18,14 +19,14 @@ function updateAll() {
     return;
   }
 
-  User.stream(null, { limit: null }, function(stream) {
+  User.stream(query, { limit: null }, function(stream) {
     stream.on('data', function(doc) {
       var u = new User(doc);
 
       // 一周之内更新过的用户就不再更新
-      if (u.last_synced_status === 'ing' || now - u.last_synced < oneday * 7) {
-          log('Skipping %s...', u.name);
-          return;
+      if (u.invalid || u.last_synced_status === 'ing' || now - u.last_synced < oneweek) {
+        log('Skipping %s...', u.name);
+        return;
       }
 
       stream.pause();
@@ -58,4 +59,4 @@ function updateAll() {
   });
 }
 
-setTimeout(updateAll, 2000);
+setTimeout(updateAll, 2000, null);

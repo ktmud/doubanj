@@ -11,13 +11,13 @@ var FetchStream = require('./stream');
 
 function error() {
   var args = [].slice.apply(arguments);
-  var extra = args[args.length - 1];
+  var extra = args[args.length - 1] || {};
   args[args.length - 1] = { tags: { task: 'collect' }, extra: extra  };
   raven.error.apply(raven, args);
 }
 function message() {
   var args = [].slice.apply(arguments);
-  var extra = args[args.length - 1];
+  var extra = args[args.length - 1] || {};
   args[args.length - 1] = { tags: { task: 'collect' }, extra: extra  };
   raven.message.apply(raven, args);
 }
@@ -37,7 +37,7 @@ collect = User.ensured(function(user, arg) {
 
   var uid = user.uid || user.id;
 
-  var raven_extra = { ns: arg.ns };
+  var raven_extra = { ns: arg.ns, uid: uid };
   message('START collect interests for %s', uid, raven_extra);
 
   var collector = new FetchStream(arg);
@@ -73,7 +73,8 @@ collect = User.ensured(function(user, arg) {
 
         collector.emit('succeed');
       } else {
-        error('FAILED at %s when collecting interests for %s', collector.status, uid, raven_extra); 
+        raven_extra.status = collector.status;
+        error('Collect failed.', raven_extra); 
         arg.error.call(collector, user);
       }
     }, 2000);
