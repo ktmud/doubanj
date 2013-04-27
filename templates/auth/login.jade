@@ -1,0 +1,19 @@
+extend ../layout/basic
+
+block title
+  title
+    登录 -  #{conf.site_name}
+
+block head_more
+    link(rel='stylesheet', href=static('/css/mine.css'))
+
+block main
+  .row.logins
+    .span6.douban-login
+      h2 通过豆瓣验证登录
+      p
+        a(href="/auth/douban", title="使用豆瓣账号登录")
+          img(alt="使用豆瓣账号登录", src="#{static('/pics/login_with_douban_32.png')}")
+    .span.splitter
+    .span6
+      include ./mods/login_form.jade

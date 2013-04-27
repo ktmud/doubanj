@@ -195,25 +195,27 @@ User.prototype.pull = function(cb) {
         if (err.statusCode == 404) {
           self.invalid = 'NO_USER';
         }
-
         return cb && cb(err);
       }
-      if (data.uid) {
-        data.uid = String(data.uid).toLowerCase();
-      }
-      data.created = new Date(data.created);
-      data._id = data.id;
-      delete data.id;
 
-      // get the latest user from db (incase some other pull is done)
-      //User.getFromMongo(data.id, function(err, res) {
-        //if (res && res instanceof User) self = res;
-      // save douban account info
-      self.update(data, function(err, doc) {
-        cb && cb(err, self);
-      });
-      //});
+      self.merge(data, cb);
     });
+  });
+};
+User.prototype.merge = function(data, cb) {
+  verbose('Merge douban account data for [%s]..', data.name);
+
+  if (data.uid) {
+    data.uid = String(data.uid).toLowerCase();
+  }
+  data.created = new Date(data.created);
+  data._id = data.id;
+  delete data.id;
+
+  var self = this;
+  // save douban account info
+  self.update(data, function(err, r) {
+    cb && cb(err, self);
   });
 };
 
@@ -223,12 +225,13 @@ User.prototype.pull = function(cb) {
 User.getByPasswd = function(uid, password, cb) {
   if (!uid || !password) return cb(401);
   User.getFromMongo(uid, function(err, user) {
-    if (err || !user) return cb(err, user);
-    if (user.verifyPassword(password)) return cb(null, user);
+    if (err) return cb(err);
+    if (!user) return cb(404);
+    if (user.validPassword(password)) return cb(null, user);
     return cb(403);
   });
 };
-User.prototype.verifyPassword = function() {
+User.prototype.validPassword = function() {
 };
 
 
@@ -298,6 +301,8 @@ User.prototype.interests = function(ns, cb) {
 });
 User.prototype.wishes = User.prototype.wishs;
 
+
+
 /**
 * output stats as csv
 */
@@ -312,6 +317,20 @@ utils.extend(User.prototype, require('./progress'));
 * predefined interests collection
 */
 utils.extend(User.prototype, require('./interest'));
+
+/**
+ * get friends
+ */
+utils.extend(User.prototype, require('./friends'));
+
+User.prototype.listFollowings = User.extended(User.prototype.listFollowings, { filter_null: true });
+
+
+/**
+ * redis data set/get mixin
+ */
+utils.extend(User.prototype, require('../mixins/data'));
+
 
 module.exports = User;
 module.exports.User = User;

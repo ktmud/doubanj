@@ -1,0 +1,9 @@
+<ul class="users-avatar">
+  <% _.forEach(people, function(item) { %>
+  <li>
+    <a href="<%= item.url %>" title="<%= item.name %>">
+      <img src="<%= item.avatar %>" alt="<%= item.name %> 的头像" />
+    </a>
+  </li>
+  <% }); %>
+</ul>

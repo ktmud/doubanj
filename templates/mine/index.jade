@@ -1,0 +1,28 @@
+extend ../layout/basic
+
+include ../people/stats/book/mixins.jade
+
+block title
+  title
+    我的豆瓣酱
+
+block head_more
+    link(rel='stylesheet', href=static('/css/mine.css'))
+
+block main 
+  .row
+    .span3
+      .mod.aside
+        h2 我的的读书酱
+        mixin overview(user)
+        p
+          a(href=user.url()) &raquo; 详细
+    .span9
+      .mod
+        h2 我与友邻
+        #friends.vmiddle
+          正在获取友邻列表...
+        script#tmpl-friends(type="text/tmpl")
+          include ./mods/tmpl_friends_list.html
+    script
+      !{istatic('/js/mine.js')}

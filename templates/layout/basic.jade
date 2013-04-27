@@ -7,6 +7,7 @@ html
       title #{typeof title === 'undefined' ? conf.site_name : title}
     link(rel='stylesheet', href=static('/css/bootstrap.css'))
     link(rel='stylesheet', href=static('/css/base.css'))
+    block head_more
     script(src=static('/js/do.js'), data-cfg-corelib='main', data-cfg-root=static('/'))
     script
       Do.urls(!{urlmap('main')});

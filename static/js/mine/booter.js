@@ -1,0 +1,2 @@
+Do('lodash', function() {
+});

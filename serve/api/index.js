@@ -44,6 +44,22 @@ module.exports = function(app, central) {
       });
     }
   });
+  app.get('/api/people/:uid/followings', function(req, res, next) {
+    var people = res.data.people;
+    if (!people) {
+      res.statusCode = 404;
+      res.json({ r: 404 });
+      return;
+    }
+
+    people.listFollowings(req.query, function(err, result) {
+      if (err) {
+        res.statusCode = err.code || 200;
+        return res.json({ r: err.code || 500, msg: err.message });
+      }
+      res.json(result);
+    });
+  });
 
   app.get('/api/latest_synced', function(req, res, next) {
     User.latestSynced(function(err, users) {

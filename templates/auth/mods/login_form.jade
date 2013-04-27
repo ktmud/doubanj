@@ -1,0 +1,16 @@
+h2 已有豆瓣酱账号，直接登录
+form.form-horizontal(method="post", action="#{conf.ssl_root}/login")
+  input(type="hidden", name="_csrf", value="#{_csrf}")
+  .control-group
+    label.control-label(for="username") 用户名/邮箱
+    .controls
+      input#username(name="username", placeholder="yourname@example.com", autofocus, value=fields.username, type="text")
+  .control-group
+    label.control-label(for="password") 密码
+    .controls
+      input#password(name="password", placeholder="你的密码", type="password")
+  .control-group
+    .controls
+      button.btn.btn-primary(type="submit")
+        登录
+

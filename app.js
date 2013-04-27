@@ -13,14 +13,18 @@
 var mo_url = require('url');
 var express = require('express');
 var central = require('./lib/central');
+var passport = require('./lib/passport');
 var serve = require('./serve');
 var jade = require('jade');
+var Redis = require('redis');
+var RedisStore = require('connect-redis')(express);
 
 var TWO_WEEKS = 60 * 60 * 24 * 14;
 
 // initial bootstraping, only serve the API
 module.exports.boot = function() {
   var app = express();
+  var conf = central.conf;
   app.enable('trust proxy')
 
   app.engine('jade', jade.renderFile);
@@ -33,10 +37,15 @@ module.exports.boot = function() {
 
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  app.use(express.cookieSession({
-    secret: central.conf.salt
-  }));
   app.use(express.bodyParser());
+  app.use(express.session({
+    secret: conf.salt,
+    store: new RedisStore({
+      client: Redis.createClient(conf.redis)
+    })
+  }));
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   app.locals(central.template_helpers);
 

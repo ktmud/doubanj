@@ -14,3 +14,28 @@ mixin comment_item(i)
 
 mixin subject_link(i)
   a(href="http://#{i.subject_ns()}.douban.com/subject/#{i.subject_id}/", target="db-#{i.subject_type}") #{i.subject && i.subject.title || i.subject_id}
+
+
+mixin overview(people)
+  - s = user.book_stats
+  - coll = s.all
+  p 从 #{people.created.getFullYear()} 年至今，你一共收藏了 
+    strong.num #{coll.total} 
+    | 本图书，其中读过 
+    strong.num #{s.n_done} 
+    | 本，占全部收藏的 
+    em.percent #{s.ratio_done}%
+    | 。
+    if s.n_done < 10
+      是不是有点太少了呢？
+    if s.n_wish > 20 && s.ratio_wish > 60
+      想读的书有 #{s.n_wish} 本，占全部收藏的 #{s.ratio_wish}% 。
+      a(href="#{people.db_url('book')}wish", target="db-interests") 想读的
+      | 似乎有点多了，不要光想不做哦。
+    if s.n_ing
+      | 在读的书一共有 #{s.n_ing} 本
+      if s.n_ing > 30
+        | ，怎么可能
+        a(href="#{people.db_url('book')}do", target="db-interests") 同时读
+        | 这么呢？一本本读完先吧
+      | 。

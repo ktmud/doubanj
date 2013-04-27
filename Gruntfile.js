@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 module.exports = function(grunt) {
   'use strict';
 
@@ -8,7 +10,15 @@ module.exports = function(grunt) {
   try {
     hash_cache = grunt.file.readJSON('static/source_hash.json');
     dist_hash_cache = grunt.file.readJSON('static/hash.json');
-  } catch (e) {}
+    for (var k in dist_hash_cache) {
+      if (!grunt.file.exists('static/dist/' + k)) {
+        grunt.log.writeln('!! Missing ' + k.cyan);
+        delete dist_hash_cache[k];
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
 
 
   function hash_check(f) {
@@ -123,7 +133,7 @@ module.exports = function(grunt) {
           {
             expand: true,
             cwd: 'static/css/',
-            src: ['base.styl'],
+            src: ['base.styl', 'mine.styl'],
             dest: 'static/dist/css/',
             ext: '.css'
           }
@@ -182,6 +192,9 @@ module.exports = function(grunt) {
     clean: {
       tmp: {
         src: ['tmp/static/js', 'tmp/static/css']
+      },
+      hash: {
+        src: ['static/source_hash.json', 'static/hash.json']
       },
       js: {
         src: ['static/dist/js/']
