@@ -17,7 +17,7 @@ function attach(context_name, fn) {
 module.exports = function(app, central) {
   var tasks = require(central.cwd + '/tasks');
 
-  app.get(/^(\/api)?\/people\/[^\/]+$/, function(req, res, next) {
+  app.get(/^\/people\/[^\/]+$/, function(req, res, next) {
     return res.redirect(301, req._parsedUrl.pathname + '/');
   });
   app.get(/^(\/api)?\/people\/([^\/]+)\/?.*$/, utils.getUser({
@@ -34,7 +34,7 @@ module.exports = function(app, central) {
       return res.render('people/failed', res.data);
     }
     if (uid === people.id && people.uid && people.uid !== people.id) {
-      return res.redirect(301, '/people/' + people.uid + '/');
+      return res.redirect(301, req._parsedUrl.pathname.replace(uid, people.uid));
     }
 
     res.data.name = people.name || people.uid

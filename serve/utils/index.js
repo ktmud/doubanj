@@ -62,11 +62,13 @@ module.exports = {
       active: req.url === '/',
       text: '首页'
     });
-    //links.push({
-      //href: '/mine',
-      //text: '我的'
-    //});
+    links.push({
+      href: '/mine',
+      active: req.url === '/mine',
+      text: '我的'
+    });
     res.locals.navbar_links = links;
+    res.locals.user = req.user;
     next();
   }
 };

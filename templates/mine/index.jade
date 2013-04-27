@@ -1,0 +1,33 @@
+extend ../layout/basic
+
+include ../people/stats/book/mixins.jade
+
+block title
+  title
+    我的豆瓣酱
+
+block head_more
+    link(rel='stylesheet', href=static('/css/mine.css'))
+
+block main 
+  .row
+    .span3
+      .mod.aside
+        h2 我的的读书酱
+        if user.stats
+          mixin overview(user)
+          p
+            a(href=user.url()) &raquo; 详细
+        else
+          .vmiddle
+            a.btn.btn-primary(href=user.url()) 点此生成报告
+    .span9
+      .mod
+        h2 我关注的友邻
+        #followings.friends
+          .alert.vmiddle
+            正在获取友邻列表...
+        include ./mods/tmpl_friends_list.html
+    script
+      window._uid_ = '#{user.uid || user.id}';
+      !{istatic('js/mine/booter.js')}

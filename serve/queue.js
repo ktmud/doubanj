@@ -23,7 +23,7 @@ module.exports = function(app, central) {
       user: user, 
       // to start a sync discard of running states
       force: 'force' in req.body,
-      fresh: fresh,
+      fresh: !user.desc || fresh,
     });
 
     var fn = fresh ? 'reset' : 'markSync';

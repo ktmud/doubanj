@@ -44,7 +44,6 @@ module.exports = function(app, central) {
       });
     }
   });
-
   app.get('/api/latest_synced', function(req, res, next) {
     User.latestSynced(function(err, users) {
       var people = users && users.map(function(item) {
@@ -62,4 +61,5 @@ module.exports = function(app, central) {
       });
     });
   });
+
 };

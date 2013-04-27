@@ -1,0 +1,31 @@
+<script id="tmpl-friends" type="text/tmpl">
+  <% if (!items || !items.length) { %>
+    <div class="alert vmiddle">:-( 好像一个友邻都没有哦</div>
+  <% } else { %>
+  <ul class="users-avatar clearfix">
+    <% _.forEach(items, function(item) { %>
+    <li>
+      <a class="pic" href="<%= item.url %>" title="<%= item.name %>">
+        <img width="48" height="48" src="<%= item.avatar %>" alt="<%= item.name %> 的头像" />
+      </a>
+      <a href="<%= item.url %>">
+        <%= item.name %>
+      </a>
+    </li>
+    <% }); %>
+  </ul>
+  <a href="javascript:void(0);" class="btn btn-block btn-more">加载更多友邻</a>
+  <% } %>
+</script>
+<script id="tmpl-friends-items" type="text/tmpl">
+  <% _.forEach(items, function(item) { %>
+  <li>
+    <a class="pic" href="<%= item.url %>" title="<%= item.name %>">
+      <img width="48" height="48" src="<%= item.avatar %>" alt="<%= item.name %> 的头像" />
+    </a>
+    <a href="<%= item.url %>">
+      <%= item.name %>
+    </a>
+  </li>
+  <% }); %>
+</script>

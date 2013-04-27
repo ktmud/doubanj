@@ -1,4 +1,5 @@
 var debug = require('debug');
+var async = require('async');
 var util = require('util');
 var verbose = debug('dbj:user:verbose');
 var log = debug('dbj:user:info');
@@ -37,12 +38,20 @@ utils.extend(User, mongo.Model);
 
 User.prototype.kind = User.prototype._collection = User._collection = User.kind = USER_COLLECTION;
 
+User._gets = User.gets;
+
+User.gets = function(ids, options, cb) {
+  if (typeof options === 'function') {
+    cb = options;
+  }
+  async.map(ids, User.get, cb);
+};
+
 /**
 * Get user from database
 */
 User.getFromMongo = function(uid, cb) {
   if (uid instanceof User) return cb(null, uid);
-  verbose('getting user obj for %s', uid)
 
   uid = String(uid).toLowerCase();
 
@@ -116,9 +125,19 @@ User.count = function(cb) {
 
 var reg_valid_uid = /^[\w\.\_\-]+$/;
 User.get = function(uid, cb) {
+  if (uid instanceof User) return cb(null, uid);
+
+  if (uid && typeof uid === 'object' && '_id' in uid) {
+    uid = uid._id;
+  }
+
+  if (!uid) return cb(null, null);
+
   uid = String(uid).toLowerCase();
 
-  if (!reg_valid_uid.test(uid)) return cb(404);
+  verbose('getting user %s...', uid);
+
+  if (!reg_valid_uid.test(uid)) return cb(null, null);
 
   User.getFromMongo(uid, function(err, u) {
     if (err) return cb(err);
@@ -137,20 +156,23 @@ User.get = function(uid, cb) {
 };
 //User.get = redis.cached.wrap(User.get, 'user-{0}');
 User.prototype.clearCache = function(next) {
-  var n = 0;
-  if (this.uid) {
-    n++;
+  var n = 1;
+  if (this.uid && this.uid !== this._id) {
+    n += 1;
     redis.clear('user-' + this.uid, tick);
   }
-  if (this._id) {
-    n++;
-    redis.clear('user-' + this._id, tick);
-  }
+
+  redis.clear('user-' + this._id, tick);
+
+  var called = false;
   function tick() {
-    n--;
-    if (n <= 0) return next();
+    n -= 1;
+    if (called) return;
+    if (n <= 0) {
+      called = true;
+      return next();
+    }
   }
-  if (n === 0) return next();
 };
 
 var pull_queue = {};
@@ -195,25 +217,27 @@ User.prototype.pull = function(cb) {
         if (err.statusCode == 404) {
           self.invalid = 'NO_USER';
         }
-
         return cb && cb(err);
       }
-      if (data.uid) {
-        data.uid = String(data.uid).toLowerCase();
-      }
-      data.created = new Date(data.created);
-      data._id = data.id;
-      delete data.id;
 
-      // get the latest user from db (incase some other pull is done)
-      //User.getFromMongo(data.id, function(err, res) {
-        //if (res && res instanceof User) self = res;
-      // save douban account info
-      self.update(data, function(err, doc) {
-        cb && cb(err, self);
-      });
-      //});
+      self.merge(data, cb);
     });
+  });
+};
+User.prototype.merge = function(data, cb) {
+  verbose('Merge douban account data for [%s]..', data.name);
+
+  if (data.uid) {
+    data.uid = String(data.uid).toLowerCase();
+  }
+  data.created = new Date(data.created);
+  data._id = data.id;
+  delete data.id;
+
+  var self = this;
+  // save douban account info
+  self.update(data, function(err, r) {
+    cb && cb(err, self);
   });
 };
 
@@ -223,12 +247,13 @@ User.prototype.pull = function(cb) {
 User.getByPasswd = function(uid, password, cb) {
   if (!uid || !password) return cb(401);
   User.getFromMongo(uid, function(err, user) {
-    if (err || !user) return cb(err, user);
-    if (user.verifyPassword(password)) return cb(null, user);
+    if (err) return cb(err);
+    if (!user) return cb(404);
+    if (user.validPassword(password)) return cb(null, user);
     return cb(403);
   });
 };
-User.prototype.verifyPassword = function() {
+User.prototype.validPassword = function() {
 };
 
 
@@ -238,7 +263,7 @@ User.prototype.toObject = function() {
     // douban account
     //'id': this['id'],
     'alt': this['alt'],
-    'uid': this['uid'],
+    'uid': this['uid'] || this.id,
     'created': this['created'],
     'avatar': this['avatar'],
     'desc': this['desc'],
@@ -249,7 +274,7 @@ User.prototype.toObject = function() {
     'invalid': this['invalid'] || null,
 
     // local props
-    '_id': this['_id'] || this['id'],
+    '_id': this['_id'],
     'ctime': this['ctime'] || now,
     'mtime': this['mtime'],
     'last_synced': this.last_synced,
@@ -298,6 +323,8 @@ User.prototype.interests = function(ns, cb) {
 });
 User.prototype.wishes = User.prototype.wishs;
 
+
+
 /**
 * output stats as csv
 */
@@ -312,6 +339,20 @@ utils.extend(User.prototype, require('./progress'));
 * predefined interests collection
 */
 utils.extend(User.prototype, require('./interest'));
+
+/**
+ * get friends
+ */
+utils.extend(User.prototype, require('./friends'));
+
+User.prototype.listFollowings = User.extended(User.prototype.listFollowings, { filter_null: true });
+
+
+/**
+ * redis data set/get mixin
+ */
+utils.extend(User.prototype, require('../mixins/data'));
+
 
 module.exports = User;
 module.exports.User = User;
