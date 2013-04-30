@@ -55,7 +55,10 @@ exports.listFollowings = function(query, cb) {
       }
       log('Pulling followings for [%s] from: %s (current: %s)', self.uid, _start, start);
       self.pullFollowings(_start, function(err, _ids) {
-        if (err) return cb(err);
+        if (err) {
+          error('Pulling followings failed: %s', err);
+          return cb(err);
+        }
 
         ids = lodash.union(ids, _ids);
 
@@ -64,8 +67,8 @@ exports.listFollowings = function(query, cb) {
           verbose('Save pulled followings: (%s, %s)', err, r);
           end(ids);
         });
-        // expire friendships in 30 days.
-        self.expire('followings', 30 * ONE_DAY);
+        // expire friendships in 2 days.
+        self.expire('followings', 2 * ONE_DAY);
       });
     });
   });
