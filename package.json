@@ -1,16 +1,13 @@
 {
   "name": "doubanj",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "homepage": "http:/www.doubanj.com",
   "description": "Data visualization for douban.com",
   "private": true,
   "contributors": [
-    "ktmud <jyyjcc@gmail.com> (http://ktmud.com)"
+    "ktmud <kissmud@gmail.com> (http://ktmud.com)"
   ],
-  "author": {
-    "name": "Douban F2E",
-    "url": "https://github.com/douban-F2E"
-  },
+  "author": "ktmud <kissmud@gmail.com> (http://ktmud.com)",
   "dependencies": {
     "debug": "~0.7.2",
     "raven": "~0.5.0",
