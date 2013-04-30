@@ -255,9 +255,8 @@ module.exports = function(app, central) {
       if (people.id === other.id) {
         return res.redirect(people.url());
       }
-      if (req.user) {
-        [people, other].forEach(defineName);
-      }
+
+      [people, other].forEach(defineName);
 
       res.data.other = other;
       next();
