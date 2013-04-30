@@ -38,6 +38,9 @@ var compute = task.compute_pool.pooled(function calculateClick(computings, arg, 
       is_valid = false;
       break;
     }
+    users = users.sort(function(a, b) {
+      return a.id - b.id;
+    });
   } else {
     is_valid = false;
   }

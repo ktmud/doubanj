@@ -43,15 +43,32 @@ User._gets = User.gets;
 User.gets = function(ids, options, cb) {
   if (typeof options === 'function') {
     cb = options;
+    options = {};
   }
-  async.map(ids, User.get, cb);
+  var filter_null = options.filter_null;
+  if (filter_null) {
+    delete options.filter_null;
+  }
+  async.map(ids, function(id, callback) {
+    User.get(id, options, callback);
+  }, function(err, ret) {
+    if (ret && filter_null) {
+      ret = ret.filter(function(item) { return item; });
+    }
+    cb(err, ret);
+  });
 };
 
 /**
 * Get user from database
 */
-User.getFromMongo = function(uid, cb) {
+User.getFromMongo = function(uid, options, cb) {
   if (uid instanceof User) return cb(null, uid);
+
+  if (typeof options === 'function') {
+    cb = options;
+    options = {};
+  }
 
   uid = String(uid).toLowerCase();
 
@@ -64,7 +81,7 @@ User.getFromMongo = function(uid, cb) {
         // douban's uid
         { 'uid': uid },
       ]
-    }, function(err, r) {
+    }, options, function(err, r) {
       if (err) {
         error('get user from mongo failed: %s', err);
         return cb(err);
@@ -124,8 +141,13 @@ User.count = function(cb) {
 //User.count = redis.cached.wrap(User.count, 'users-count', 60000);
 
 var reg_valid_uid = /^[\w\.\_\-]+$/;
-User.get = function(uid, cb) {
+User.get = function(uid, options, cb) {
   if (uid instanceof User) return cb(null, uid);
+
+  if (typeof options === 'function') {
+    cb = options;
+    options = {};
+  }
 
   if (uid && typeof uid === 'object' && '_id' in uid) {
     uid = uid._id;
@@ -139,7 +161,7 @@ User.get = function(uid, cb) {
 
   if (!reg_valid_uid.test(uid)) return cb(null, null);
 
-  User.getFromMongo(uid, function(err, u) {
+  User.getFromMongo(uid, options, function(err, u) {
     if (err) return cb(err);
     // got a 404
     if (!u) {
@@ -352,7 +374,7 @@ utils.extend(User.prototype, require('./click'));
  */
 utils.extend(User.prototype, require('./friends'));
 
-User.prototype.listFollowings = User.extended(User.prototype.listFollowings, { filter_null: true });
+User.prototype.listFollowings = User.extended(User.prototype.listFollowings, { fields: { uid: 1, avatar: 1, name: 1 } });
 
 
 /**
