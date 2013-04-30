@@ -1,0 +1,14 @@
+extend ./index
+
+block left
+  .vmiddle
+      .alert.alert-error
+        p 要查看契合指数，需要两人的统计数据都已准备好
+      hr
+      small.muted
+        a(href="#{people.url()}") 去#{people._name}的页面
+        | &nbsp;&nbsp; | &nbsp;&nbsp;
+        a(href="#{other.url()}") 去#{other._name}的页面
+
+block sidebar
+

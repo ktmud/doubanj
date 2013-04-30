@@ -47,11 +47,15 @@ Interest._default_sort = { 'updated': -1 };
 //Interest.get = redis.cached.wrap(mongo.Model.get);
 
 Interest.findByUser = function(uid, opts, cb) {
-  verbose('getting interests obj for user %s', uid);
+  verbose('getting interests for [%s]: ', uid, opts);
 
-  var query = opts.query || {};
-  query.user_id = uid;
-  delete opts.query;
+  var query = { user_id: uid };
+
+  if (opts.query) {
+    utils.extend(query, opts.query);
+    delete opts.query;
+  }
+
   return this.find(query, opts, cb);
 };
 
@@ -85,5 +89,12 @@ Interest.prototype.status_cn = function(unknown) {
   unknown = '' || unknown;
   return INTEREST_STATUS_LABELS[this.subject_type][this.status] || unknown;
 };
+
+Object.defineProperty(Interest.prototype, 'rated', {
+  get: function() {
+    return this.rating && this.rating.value;
+  },
+  enumerable: false
+});
 
 module.exports = Interest;

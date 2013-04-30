@@ -4,6 +4,7 @@ var utils = require('./utils');
 
 module.exports = function(app, central) {
   app.get('/login', function(req, res, next) {
+    req.session.redir = req.query.redir;
     res.render('auth/login', { fields: req.query });
   });
 
@@ -18,7 +19,13 @@ module.exports = function(app, central) {
   app.get('/auth/douban/callback',
     passport.authenticate('douban', { failureRedirect: '/login' }),
     function(req, res, next) {
-      res.redirect(req.query.redir || '/mine');
+      res.redirect(req.session.redir || '/mine');
     });
 
+  app.get('/logout', function(req, res, next) {
+    delete req.session.passport;
+    delete req.session.user_id;
+    var refer = req.get('Referer');
+    return res.redirect(refer || '/login');
+  });
 };

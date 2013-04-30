@@ -1,5 +1,3 @@
-var msgpack = require('msgpack');
-
 var central = require('../../lib/central');
 
 var redis = central.redis;

@@ -1,11 +1,12 @@
 mixin tagcloud(tags, ns)
-  ns = ns || locals.ns
+  ns = ns || locals.ns || 'book'
   .tagcloud
     each tag in tags
       if tag && tag._id
-        span.tag-item
-          a(href="http://" + ns + '.douban.com/tag/' + encodeURIComponent(tag._id), target="_blank") #{tag._id}
-          span.muted (#{tag.count})
+        a.tag-item(href="http://" + ns + '.douban.com/tag/' + encodeURIComponent(tag._id), target="_blank")
+          strong #{tag._id}
+          | &nbsp;
+          span.muted (#{tag.count}#{tag.count_b ? ':' + tag.count_b : ''})
 
 - ns_cats = { 'book': '1001' }
 mixin searchcloud(tags, ns)
@@ -19,15 +20,21 @@ mixin searchcloud(tags, ns)
             target="_blank") #{tag._id}
           span.muted (#{tag.count})
 
-mixin stars(star)
-  if !star || !star.value
+- make_stars = function(star) { if (!star || !star.value) return ''; var n = star.max || 5, s = ''; star = star.value; while (n > 0) { star--; n--; s += star >= 0 ? '&#10029;' : '&#10025' } return s; }
+
+mixin stars(star, only_text)
+  if star && star.value
+    - star = star.value
+  if !star
     - return
   - var n = star.max || 5, s = '';
-  - star = star.value
   while n > 0
     - star--
     - n --
     - s += star >= 0 ? '&#10029;' : '&#10025'
+  if only_text
+    !{s}
+    - return
   span.stars !{s}
 
 mixin interest_item(i, trimto)

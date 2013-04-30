@@ -33,16 +33,21 @@ function getUser(opts) {
         if (typeof redir === 'function') redir = redir(req);
         return res.redirect(redir);
       }
-      return next();
+      return next(404);
     }
 
-    User.get(uid, function getUserCallback(err, people) {
-
+    function end(err, people) {
       c.err = err;
       c.people = people;
       if (people) c.title = people.name + '的豆瓣酱';
       next();
-    });
+    }
+
+    if (req.user && req.user.uid === uid) {
+      return end(null, req.user);
+    }
+
+    User.get(uid, end);
   };
 }
 

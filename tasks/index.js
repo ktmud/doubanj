@@ -9,10 +9,10 @@ var log = debug('dbj:tasks:log');
 
 var Resumable = require('resumable');
 
-['interest', 'compute'].forEach(function(item) {
-  var mod = module.exports[item] = require('./' + item);
+var User = require('../models/user');
 
-  var User = require('../models/user');
+['interest', 'compute', 'click'].forEach(function(item) {
+  var mod = module.exports[item] = require('./' + item);
 
   var queue = new Resumable({
     key: 'doubanj-queue-' + item,

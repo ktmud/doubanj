@@ -63,6 +63,7 @@ module.exports.boot = function() {
   app.use(express.csrf());
 
   serve(app, central);
+
   app.listen(central.conf.port);
   central.log('Now listening on ' + central.conf.port);
   central.log('Site root: ' + central.conf.site_root);

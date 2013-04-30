@@ -1,0 +1,9 @@
+form(method="post", action="/queue")
+  input(type="hidden", name="_csrf", value=_csrf)
+  input(type="hidden", name="uid", value=uid)
+  div.vmiddle
+    p
+      button.btn.btn-primary 开始为 #{name} 制造美味豆瓣酱
+    if req.user && req.user !== people
+      hr
+      small.muted 为TA制造豆瓣酱，查看你们的兴趣投好指数

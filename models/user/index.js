@@ -156,6 +156,8 @@ User.get = function(uid, cb) {
 };
 //User.get = redis.cached.wrap(User.get, 'user-{0}');
 User.prototype.clearCache = function(next) {
+  return next();
+
   var n = 1;
   if (this.uid && this.uid !== this._id) {
     n += 1;
@@ -339,6 +341,11 @@ utils.extend(User.prototype, require('./progress'));
 * predefined interests collection
 */
 utils.extend(User.prototype, require('./interest'));
+
+/**
+ * Clicks with other people
+ */
+utils.extend(User.prototype, require('./click'));
 
 /**
  * get friends

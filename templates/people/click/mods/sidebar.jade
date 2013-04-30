@@ -1,0 +1,15 @@
+include ../../mixins/interest.jade
+
+.well#aside-click
+  table.click-indexes
+    tr
+      td
+        h3 契合指数
+        .click-number #{clicks.index}
+      td.click-grade #{click_grade}
+  p.reliability 可信度: 
+    strong #{clicks.reliability}% 
+    a(href="/about/click", title="查看什么叫「可信度」") [?]
+if (locals.mutual_keywords && mutual_keywords.length)
+  h2 共同阅读关键字
+  mixin tagcloud(mutual_keywords)

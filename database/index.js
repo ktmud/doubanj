@@ -18,13 +18,14 @@ var sparse_option = {
 module.exports = function(db, next) {
   db.collection('book_interest', function(err, r) {
     log('ensuring database "book_interest"...');
-    var n = 4;
+    var n = 5;
     function _tick(err, r) {
       n--;
       if (err) console.error(err);
       if (n <= 0) tick();
     }
     //r.ensureIndex({ 'id': 1 }, index_options, _tick);
+    r.ensureIndex({ 'user_id': 1, 'subject_id': 1, }, sparse_option, _tick);
     r.ensureIndex({ 'user_id': 1, 'status': 1, 'commented': -1, }, sparse_option, _tick);
     r.ensureIndex({ 'user_id': 1, 'status': 1, 'updated': -1, }, sparse_option, _tick);
     r.ensureIndex({ 'user_id': 1, 'updated': -1, 'status': 1 }, sparse_option, _tick);

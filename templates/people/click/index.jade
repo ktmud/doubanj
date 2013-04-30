@@ -1,0 +1,22 @@
+extend ../../layout/basic
+
+block head_more
+  link(rel='stylesheet', href=static('/css/mine.css'))
+
+block title
+  title #{people._name} 与 #{other._name} 的契合指数
+
+block main 
+  .row
+    .span9.click-results
+      h1
+        a(href="#{people.url()}") #{people._name}
+        | &nbsp;+&nbsp;
+        a(href="#{other.url()}") #{other._name}
+        | &nbsp;
+        a.btn.btn-mini.btn-compact(href="#{other.url()}click/#{people.uid}") 交换视角
+      block left
+        include ./mods/done.jade
+    .span3
+      block sidebar
+        include ./mods/sidebar.jade

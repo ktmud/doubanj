@@ -129,19 +129,22 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
         clearTimeout(timeouts[ns]);
 
         stats[ns] = new Date();
-        all_results[ns + '_stats'] = results; 
-        all_results[ns + '_stats_error'] = err && err.name || err; 
 
-        var stats_p = all_results.stats_p;
+        user.data(ns + '_stats', results, function() {
+          all_results[ns + '_stats'] = results; 
+          all_results[ns + '_stats_error'] = err && err.name || err; 
 
-        jobs_percent[ns] = done_percent;
+          var stats_p = all_results.stats_p;
 
-        for (var j in jobs_percent) {
-          stats_p += (jobs_percent[j] || 0); 
-        }
+          jobs_percent[ns] = done_percent;
 
-        // all works done, safe to save.
-        if (stats_p >= 100) {
+          for (var j in jobs_percent) {
+            stats_p += (jobs_percent[j] || 0); 
+          }
+
+          // all works done, safe to save.
+          if (stats_p < 100) return;
+
           stats_p = 100;
           all_results.last_statsed = stats[ns];
           all_results.stats = stats;
@@ -159,7 +162,7 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
               next();
             });
           }, 1000);
-        }
+        });
       }, function(percent) {
         if (called) return;
 

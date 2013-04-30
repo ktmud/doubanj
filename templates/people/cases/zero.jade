@@ -1,5 +1,12 @@
 p 天哪，这位 #{people.name} 居然一本书都没有读过！
 hr
-- if (new Date() - people.last_synecd > 3600000)
+- if (new Date() - people.last_synced > 120000)
   include ../mods/resync
-p.muted 也有可能是服务器出错了，请不要重复尝试
+- else
+  // cannot requeue in two minutes
+  p.muted
+    if req.user === people
+      你需要
+      a(href="http://book.douban.com/") 去收藏几本书
+      | 吗？
+    两分钟后才可以重试

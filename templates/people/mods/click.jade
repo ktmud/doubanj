@@ -1,0 +1,16 @@
+#aside-click.well
+  if req.user._click
+    h4 你和#{people.name}的契合指数
+    .click-number
+      strong #{req.user._click.index}
+    a.btn.btn-small.btn-primary(href="#{req.user.url()}click/#{people.uid}") 查看详细
+  else
+    h4 你和#{people.name}
+    .click-results
+      .click-progress.progress.progress-striped.active
+        .progress-bar(style="width:5%")
+      small.muted 正在生成你们的契合指数
+    include ./tmpl_click.html
+    script
+      !{istatic('js/mine/click.js')}
+      Do.loadClick('#{people.uid}', '#aside-click');

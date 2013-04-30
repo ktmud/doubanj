@@ -1,0 +1,72 @@
+include ../../mixins/interest
+
+mixin mixed_ratings(subject_id)
+  each u in [people, other]
+    item = u._interest_by_subject_id[subject_id]
+    - if (item && item.rating)
+      .rating A: 
+        mixin stars(item.rating)
+    - else
+      .rating B: 未评价
+
+mixin rating_text(user, subject_id)
+  - item = user._interest_by_subject_id[subject_id]
+  if !item
+    - return
+  if item.rating
+    | #{user._name}的评价: 
+    mixin stars(item.rating)
+  else
+    | #{user._name}未评价 
+
+mixin mixed_rating_text(subject_id)
+  - item1 = people._interest_by_subject_id[subject_id]
+  - item2 = other._interest_by_subject_id[subject_id]
+  - item = item1 && item1.rating && item1 || item2
+  if !item
+    - return
+  div.mixed-ratings
+    - if (item1 && item2 && item1.rated && item2.rated)
+      - if (item1.rated === item2.rated)
+        p #{people._name}和#{other._name}都给了#{item.rated}星
+    - else
+      if item1 && item1.rated
+        p #{people._name}给了#{item1.rated}星
+      if item2 && item2.rated
+        p #{other._name}给了#{item2.rated}星
+
+mixin rate_stars(i)
+  if i
+    mixin stars(i)
+  else
+    small.muted (暂未评价)
+
+mixin mixed_rating_stars(subject_id)
+  - item1 = people._interest_by_subject_id[subject_id]
+  - item2 = other._interest_by_subject_id[subject_id]
+  div.mixed-ratings.mixed-stars
+    mixin rate_stars(item1.rated)
+    .splitter v.s.
+    mixin rate_stars(item2.rated)
+
+mixin book_list(ids, head, tail)
+  if (!ids || !ids.length)
+    p.no-result 暂时没有诶 ...
+    - return
+  ol.rbox-list.interest-rboxes
+    each i in ids
+      if !(i in all_books)
+        - continue
+      - subject = all_books[i]
+      li
+        !{head && head(i)}
+        a(href="http://book.douban.com/subject/#{subject.id}/", target="db-#{subject.type}") 
+          if subject.images
+            .pic
+              img(src=subject.images.medium)
+          p.title #{subject.title}
+          if subject.author
+            p.meta.authors !{subject.author.join(', ')}
+          if subject.publisher
+            p.meta.publisher #{subject.publisher}
+        !{tail && tail(i)}

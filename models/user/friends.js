@@ -1,6 +1,8 @@
 var debug = require('debug');
 var async = require('async');
 var util = require('util');
+var lodash = require('lodash');
+
 var verbose = debug('dbj:user:friends:verbose');
 var log = debug('dbj:user:friends:info');
 var error = debug('dbj:user:friends:error');
@@ -55,11 +57,11 @@ exports.listFollowings = function(query, cb) {
       self.pullFollowings(_start, function(err, _ids) {
         if (err) return cb(err);
 
-        ids = central.utils.uniqConcat(ids, _ids);
+        ids = lodash.union(ids, _ids);
 
         // save it
         self.data('followings', ids, function(err, r) {
-          verbose('Saved pull followings result: %s, %s', err, r);
+          verbose('Save pulled followings: (%s, %s)', err, r);
           end(ids);
         });
         // expire friendships in 30 days.
@@ -114,7 +116,7 @@ exports.pullFollowings = function(start, cb) {
           }, callback);
         }, function(err) {
           self.data('following_sites', sites, function(err, r) {
-            verbose('Saved pull followings sites: %s, %s', err, r);
+            verbose('Save pulled followings sites: (%s, %s)', err, r);
             cb(err, ids);
           });
           self.expire('following_sites', 30 * ONE_DAY);

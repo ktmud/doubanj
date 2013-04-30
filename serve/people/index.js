@@ -1,6 +1,10 @@
+var lodash = require('lodash');
+var async = require('async');
+
 var cwd = central.cwd;
 var User = require(cwd + '/models/user').User;
 var Interest = require(cwd + '/models/interest');
+var Subject = require(cwd + '/models/subject');
 
 var utils = require('../utils');
 
@@ -39,7 +43,12 @@ module.exports = function(app, central) {
 
     res.data.name = people.name || people.uid
 
-    next();
+    if (people.book_stats) return next();
+    people.data('book_stats', function(err, ret) {
+      if (err) return next(err);
+      people.book_stats = ret;
+      next();
+    });
   });
 
   var attach_latest = attach('latest_interests', function(req, res, cb) {
@@ -124,7 +133,21 @@ module.exports = function(app, central) {
     if (!people.stats) return res.render('people', res.data);
 
     next();
-  }, attach_latest, attach_highest_ratings, do_render('people'));
+  }, attach_latest, attach_highest_ratings, function(req, res, next) {
+    var people = res.data.people;
+    var user = req.user;
+    if (user && user !== people) {
+      res.data.user = user;
+      user.getClick(people, function(err, ret) {
+        if (ret && ret.ratios) {
+          user._click = ret;
+        }
+        next();
+      });
+      return;
+    }
+    next();
+  }, do_render('people'));
 
   app.get('/people/:uid/quote', function(req, res, next) {
     var people = res.data.people;
@@ -198,4 +221,110 @@ module.exports = function(app, central) {
       res.render('people/interests', c);
     });
   });
+
+  function getInterest(user, book_ids, callback) {
+    Interest.book.findByUser(user.id, {
+      book_id: {
+        $in: book_ids
+      },
+      limit: 0
+    }, callback);
+  }
+
+  function makeDict(interests, prop) {
+    var ret = {};
+    interests.forEach(function(item, i) {
+      ret[item[prop]] = item;
+    });
+    return ret;
+  }
+
+  app.get('/people/:uid/click/:other', function(req, res, next) {
+    var people = res.data.people;
+    var other_uid = req.param('other');
+
+    if (other_uid === people.uid) return res.redirect(people.url());
+
+    function defineName(user) {
+      return user._name = (user === req.user ? '你' : user.name);
+    }
+
+    function done(err, other) {
+      if (err || !other) return next(err || 404);
+
+      if (people.id === other.id) {
+        return res.redirect(people.url());
+      }
+      if (req.user) {
+        [people, other].forEach(defineName);
+      }
+
+      res.data.other = other;
+      next();
+    }
+
+    if (req.user && req.user.uid === other_uid) {
+      return done(null, req.user);
+    }
+
+    User.get(other_uid, done);
+  }, function(req, res, next) {
+    var people = res.data.people;
+    var other = res.data.other;
+
+    people.getClick(other, function(err, clicks) {
+      if (err) return next(err);
+
+      if (!clicks) {
+        res.render('people/click/not_ready', res.data);
+        return;
+      }
+
+      res.data.clicks = clicks;
+
+      var all_book_ids = [];
+      for (var k in clicks) {
+        if (Array.isArray(clicks[k])) {
+          all_book_ids = lodash.union(all_book_ids, clicks[k].slice(0,8));
+        }
+      }
+      res.data.click_grade = people.clickGrade(clicks.index);
+      res.data.all_book_ids = all_book_ids;
+      next();
+    });
+  }, function(req, res, next) {
+    var c = res.data;
+    var book_ids = c.all_book_ids;
+
+    c.mutual_keywords = getMutualKeywords(c.people.book_stats, c.other.book_stats);
+
+    async.map([c.people, c.other],
+      function(user, callback) {
+        getInterest(user, book_ids, callback);
+      },
+      function(err, ret) {
+        c.people._interest_by_subject_id = makeDict(ret[0], 'subject_id');
+        c.other._interest_by_subject_id = makeDict(ret[1], 'subject_id');
+        next();
+      });
+  }, function(req, res, next) {
+
+    Subject.book.gets(res.data.all_book_ids, function(err, items) {
+      if (err) return next(err);
+      res.data.all_books = makeDict(items, 'id');
+      res.render('people/click', res.data);
+    });
+  });
+
+  function getMutualKeywords(a, b) {
+    b = lodash(b.interest.top_tags).pluck('_id')
+        .object(lodash.pluck(b.interest.top_tags, 'count'))
+        .value();
+    return a.interest.top_tags.filter(function(item) {
+      if (item._id in b) {
+        item.count_b = b[item._id];
+        return true;
+      }
+    });
+  }
 };
