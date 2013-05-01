@@ -138,16 +138,16 @@ app.get('/api/people/:uid/click/:other', function(req, res, next) {
   }
 
   var r = res.data.clicks;
-  if (r === null || typeof r !== 'object' || r.retry_count > 7) {
+  if (r === null || typeof r !== 'object' || r.retry_count > 15) {
     r = { p: r && r.p || 10 };
     a.setClick(b, r, function() {
       tasks.click.book({ users: [a, b] });
     });
   }
-  if (r.p !== 100) {
+  if (r.p !== 100 || !r.ratios) {
     r.retry_count = r.retry_count || 0; 
     r.retry_count += 1;
-    r.p += 5;
+    r.p = Math.min(r.p + 7, 70) || 10;
     a.setClick(b, r);
   }
 
@@ -162,6 +162,7 @@ app.get('/api/people/:uid/click/:other', function(req, res, next) {
     };
   } else {
     result = {
+      retry_count: r.retry_count,
       error: r.error
     };
   }

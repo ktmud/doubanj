@@ -11,7 +11,7 @@ function getIds(query) {
     var opts = {
       // only get subject_ids
       fields: { subject_id: 1, _id: -1 },
-      limit: null,
+      limit: 20000,
     };
 
     if (query) {
