@@ -16,7 +16,8 @@ include ./mixins.jade
     mixin avatar_list(top_click_users, 'book_score')
     .pull-right
       - topper = top_click_users[0]
-      - share_text = '#豆瓣酱# 目前为止，和我读书品味最接近的友邻是 @' + topper.id + ' 和 ' + top_click_users.slice(1).map(function(item) { return '@' + item.id; }).join(' ')
+      - share_text = '#豆瓣酱# 目前为止，和我读书品味最接近的友邻是 @' + topper.id
+      - if (top_click_users.length > 1) share_text += ' 和 ' + top_click_users.slice(1).map(function(item) { return '@' + item.id; }).join(' ')
       - target_url = user.url() + 'click/' + topper.uid
       - share_url = "http://shuo.douban.com/!service/share?image=&href=" + encodeURIComponent(target_url)
       - share_url += "&name=" + encodeURIComponent(user.name + ' + ' + topper.name + ' 的契合指数 - 豆瓣酱')
