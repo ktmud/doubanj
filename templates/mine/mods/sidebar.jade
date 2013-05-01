@@ -10,15 +10,22 @@ include ./mixins.jade
     .vmiddle
       a.btn.btn-primary(href=user.url()) 点此生成报告
 
-if top_click_users
-  .mod
-    h2 与我最契合的友邻
-    if !top_click_users.length
-      .muted
-        p 访问友邻们的页面，会自动生成你们的
-          a(href="/about/click", target="_blank") 契合指数
-        p 得分最高的友邻会出现在这里
-    else
-      mixin avatar_list(top_click_users, 'book_score')
-      small.muted
-        注：只统计了你访问过报表的友邻
+.mod
+  h2 与我最契合的友邻
+  if top_click_users.length
+    mixin avatar_list(top_click_users, 'book_score')
+    .pull-right
+      - topper = top_click_users[0]
+      - share_text = '#豆瓣酱# 目前为止，和我读书品味最接近的友邻是 @' + topper.id + ' 和 ' + top_click_users.slice(1).map(function(item) { return '@' + item.id; }).join(' ')
+      - target_url = user.url() + 'click/' + topper.uid
+      - share_url = "http://shuo.douban.com/!service/share?image=&href=" + encodeURIComponent(target_url)
+      - share_url += "&name=" + encodeURIComponent(user.name + ' + ' + topper.name + ' 的契合指数 - 豆瓣酱')
+      - share_url += "&text=" + encodeURIComponent(share_text)
+      a.btn.btn-mini.btn-compact(target="_blank", href="#{share_url}") 告诉他们
+    small.muted
+      *只统计了你访问过报表的友邻
+  else
+    .muted
+      p 访问友邻们的页面，会自动生成你们的
+        a(href="/about/click", target="_blank") 契合指数
+      p 得分最高的友邻会出现在这里
