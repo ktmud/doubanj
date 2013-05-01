@@ -1,0 +1,35 @@
+include ../../stats/book/mixins.jade
+
+mixin comment_item(i)
+  small.pull-right.muted #{strftime('%Y-%m-%d', i.updated)} #{i.status_cn()} 
+    mixin stars(i.rating)
+  if i.subject
+    .subject-image
+      mixin subject_image(i.subject)
+  mixin quote_comment(i.comment)
+
+mixin user_th(user)
+  th #{user._name}
+    a.btn.btn-mini.btn-compact.pull-right(href="#{user.url()}quote") 全部评语 &raquo;
+
+h2 对同一本书的不同评语
+table.table.table-bordered.comments-list
+  tr.heading
+    th &nbsp;
+    mixin user_th(people)
+    mixin user_th(other)
+  each sid in clicks.commented
+    - subject = all_books[sid]
+    if !subject
+      - continue
+    - a = people._interest_by_subject_id[sid]
+    - b = other._interest_by_subject_id[sid]
+    tr
+      th.subject
+        mixin subject_image(subject)
+        a(href="http://book.douban.com/subject/#{sid}/") #{subject.title}
+      td
+        mixin comment_item(a, true)
+      td
+        mixin comment_item(b, true)
+hr

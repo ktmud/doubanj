@@ -19,6 +19,8 @@ block main
       block left
         .pull-right
           include ../mods/share.html
+        if clicks.commented.length
+          include ./mods/comments.jade
         include ./mods/done.jade
     .span3
       block sidebar

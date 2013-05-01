@@ -82,7 +82,8 @@ app.get('/people/:uid/click/:other', function(req, res, next) {
     var all_book_ids = [];
     for (var k in clicks) {
       if (Array.isArray(clicks[k]) && parseInt(clicks[k][0])) {
-        all_book_ids = lodash.union(all_book_ids, clicks[k].slice(0, 6));
+        var n = k === 'commented' ? 10 : 6;
+        all_book_ids = lodash.union(all_book_ids, clicks[k].slice(0, n));
       }
     }
     res.data.click_grade = people.clickGrade(clicks.score);

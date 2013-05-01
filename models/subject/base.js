@@ -34,5 +34,8 @@ Subject.prototype.toObject = function() {
   });
   return ret;
 };
+Subject.prototype.db_url = function() {
+  return 'http://' + this.kind + '.douban.com/subject/' + this.id + '/';
+};
 
 module.exports = Subject;

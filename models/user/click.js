@@ -4,7 +4,7 @@ var redis = central.redis;
 var CLICK_EXPIRES = 60 * 120;
 
 if (central.conf.debug) {
-  CLICK_EXPIRES = 20;
+  CLICK_EXPIRES = 120;
 }
 
 var grades = {

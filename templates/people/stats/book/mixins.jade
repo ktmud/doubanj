@@ -6,8 +6,14 @@ mixin comment_item(i)
     mixin subject_link(i)
     |》
     mixin stars(i.rating)
+  if i.subject
+    .subject-image
+      mixin subject_image(i.subject)
+  mixin quote_comment(i.comment)
+
+mixin quote_comment(comment)
   blockquote
-    - c = i.comment.split('\n\n')
+    - c = comment.split('\n\n')
     each p in c
       p
         mixin enable_links(p.replace('\n', '&nbsp;&nbsp;'), 60)
@@ -15,6 +21,9 @@ mixin comment_item(i)
 mixin subject_link(i)
   a(href="http://#{i.subject_ns()}.douban.com/subject/#{i.subject_id}/", target="db-#{i.subject_type}") #{i.subject && i.subject.title || i.subject_id}
 
+mixin subject_image(subject)
+  a(href="#{subject.db_url()}", target="db-#{subject.type}")
+    img(src='#{subject.images.medium}')
 
 mixin overview(people)
   - s = people.book_stats
