@@ -184,9 +184,20 @@ a.anchor
     display: none;
   .row
     margin: 0
+    .mod, .chart
+      padding: 0;
+@media (min-width: 440px) and (max-width: 768px)
+  #tops .span3
+    float: left;
+    width: 50%;
 
 @media (max-width: 480px)
   .navbar-form input
     width: 100%;
   .navbar-form
     float: none;
+
+@media (max-width: 768px)
+  .rbox-list
+    margin: 0 -8px;
+
