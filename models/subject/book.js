@@ -11,7 +11,10 @@ function Book(info) {
   info.type = info.subject_type = 'book';
   utils.extend(self, info);
 
-  this.prop_keys = Object.keys(info);
+  Object.defineProperty(this, 'prop_keys', {
+    value: Object.keys(info),
+    enumerable: false
+  });
 
   return this;
 }

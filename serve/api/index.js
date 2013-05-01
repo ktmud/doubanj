@@ -1,8 +1,32 @@
+var error = require('debug')('dbj:api');
+
 module.exports = function(app, central) {
   var utils = central.utils;
   var cwd = central.cwd;
   var User = require(cwd + '/models/user').User;
 
+  app.use('/api/', function(err, req, res, next) {
+    if (err == 404) {
+      res.statusCode = 404;
+      return res.json({ r: 404 });
+    }
+
+    if (err) {
+      error(err);
+      if (err.stack) {
+        console.error(err.stack);
+      }
+
+      central.raven.express(err, req, res);
+
+      res.statusCode = err.statusCode || 500;
+      return res.json({
+        err: err.code || 500,
+        msg: err.msg
+      });
+    }
+    next();
+  });
   app.get('/api/people/:uid/progress', function(req, res, next) {
     var people = res.data.people;
     if (people) {

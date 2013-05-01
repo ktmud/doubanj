@@ -1,4 +1,3 @@
-var mo_url = require('url');
 var debug = require('debug');
 var error = debug('dbj:error');
 
@@ -37,21 +36,7 @@ module.exports = function(options) {
 
     req.session.onesalt = Date.now();
     
-    //raven.error(err, {
-      //'sentry.interfaces.Http': { 
-        //method: req.method,
-        //query_string: mo_url.parse(req.url).query,
-        //headers: req.headers,
-        //cookies: req.cookies || '<unavailable: use cookieParser middleware>',
-        //data: req.body || '<unavailable: use bodyParser middleware>',
-        //url: (function build_absolute_url() {
-            //var protocol = req.is_ssl ? 'https' : 'http',
-                //host = req.headers.host || '<no host>';
-            //return protocol+'://'+host+req.url;
-        //}()),
-        //env: process.env
-      //}
-    //});
+    raven.express(err, req, res);
 
     if (res.headerSent) return res.end();
 

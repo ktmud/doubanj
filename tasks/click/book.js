@@ -126,6 +126,15 @@ function main(users, callback) {
       ret.index = calcIndex(ret.ratios, res);
 
       ret.reliability = reliability(res);
+
+      var top_tags = [];
+      users.forEach(function(u) {
+        top_tags.push(u.book_stats.interest.top_tags);
+      });
+      ret.mutual_tags = getMutual(top_tags);
+
+      console.log(ret.mutual_tags);
+
       ret.p = 100;
     }
 
@@ -197,6 +206,20 @@ function main(users, callback) {
     var max = Math.max.apply(Math, lens);
     var min = Math.min.apply(Math, lens);
     return Number((100 - (max - min) / max * 100).toFixed(2));
+  }
+
+  function getMutual(list) {
+    return lodash.reduce(list, function(a, b) {
+      b = lodash(b).pluck('_id')
+          .object(lodash.pluck(b, 'count'))
+          .value();
+      return a.filter(function(item) {
+          if (item._id in b) {
+            item.count_b = b[item._id];
+            return true;
+          }
+        });
+    });
   }
 }
 

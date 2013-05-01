@@ -13,4 +13,4 @@
     include ./tmpl_click.html
     script
       !{istatic('js/mine/click.js')}
-      Do.loadClick('#{people.uid}', '#aside-click');
+      Do.loadClick('#{req.user.uid}', '#{people.uid}', '#aside-click');
