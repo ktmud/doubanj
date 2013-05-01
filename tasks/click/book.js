@@ -4,6 +4,8 @@ var Interest = require('../../models/interest');
 var async = require('async');
 var lodash = require('lodash');
 
+var KEY_CLICK_BOOK_SCORE = require('../../models/consts').KEY_CLICK_BOOK_SCORE;
+
 function getIds(query) {
   return function getDoneIds(u, cb) {
     var opts = {
@@ -67,19 +69,22 @@ function main(users, callback) {
   var p_perstep = 90 / tasks.length;
   var _t_save_progress = setTimeout(function(){}, 0);
 
-  function do_updateProgress() {
-    users[0].setClick(users[1], { p: progress }, function() {
+  function save(users, result, callback) {
+    users[0].setClick(users[1], result, callback);
+  }
+
+  function saveClicks(users, result) {
+    save(users, result, function() {
       // 如果还有最终结果，得再存一次
-      if (finalResult) users[0].setClick(users[1], finalResult);
+      if (finalResult) save(users, finalResult);
     });
   }
 
   function updateProgress(result, next) {
-
     progress += p_perstep;
 
     clearTimeout(_t_save_progress);
-    _t_save_progress = setTimeout(do_updateProgress, 2000);
+    _t_save_progress = setTimeout(saveClicks, 2000, { p: progress });
 
     next(null, result);
   }
@@ -111,20 +116,20 @@ function main(users, callback) {
 
       if (users.length === 2) {
         // 想读的你读过的书
-        ret.wish_done = lodash.intersection(res[0][1], res[1][0]);
-        // 读过的你想读的书（users[1] 代表对方，users[0] 代表自己）
         ret.done_wish = lodash.intersection(res[0][0], res[1][1]);
+        // 读过的你想读的书（users[1] 代表对方，users[0] 代表自己）
+        ret.wish_done = lodash.intersection(res[0][1], res[1][0]);
         // 你给高分，他却不喜欢的
-        ret.hate_love = lodash.intersection(res[2][0], res[3][1]);
+        ret.love_hate = lodash.intersection(res[2][0], res[3][1]);
         // 你不喜欢，他却给高分的
-        ret.love_hate = lodash.intersection(res[2][1], res[3][0]);
+        ret.hate_love = lodash.intersection(res[2][1], res[3][0]);
       }
 
       // 占比
       ret.ratios = getRatios(ret, res);
       // 契合指数
-      ret.index = calcIndex(ret.ratios, res);
-
+      ret.score = calcScore(ret.ratios, res);
+      // 可信度
       ret.reliability = reliability(res);
 
       var top_tags = [];
@@ -133,17 +138,42 @@ function main(users, callback) {
       });
       ret.mutual_tags = getMutual(top_tags);
 
-      console.log(ret.mutual_tags);
+      // 每多一个共同感兴趣的图书标签，指数+30
+      ret.score += (ret.mutual_tags.length * 30);
+
+      saveScore(users, ret.score);
 
       ret.p = 100;
     }
 
     finalResult = ret;
 
-    users[0].setClick(users[1], ret, function(e) {
+    save(users, ret, function(e) {
       callback(e || err, ret);
     });
   });
+
+  function saveScore(users, score) {
+    var user_ids = lodash(users).pluck('id').object([]).value();
+
+    for (var k in user_ids) {
+      user_ids[k] = score;
+    }
+
+    async.map(users, function(item, callback) {
+      item.data(KEY_CLICK_BOOK_SCORE, callback);
+    }, function(err, all_scores) {
+      all_scores = all_scores.map(function(item, i) {
+        if (!item || typeof item !== 'object') item = {};
+        item = lodash.extend(item, user_ids);
+        delete item[users[i].id];
+        return item;
+      });
+      users.forEach(function(user, i) {
+        user.data(KEY_CLICK_BOOK_SCORE, all_scores[i]);
+      });
+    });
+  }
 
   function getRatios(ret, ids_list) {
     var ratios = {};
@@ -176,19 +206,19 @@ function main(users, callback) {
     return Math.min(a || 0, b || 0);
   }
 
-  function calcIndex(r, all_ids) {
+  function calcScore(r, all_ids) {
     var i = 0;
     var factors = {
       done: 2.5,
       wish: 1,
-      love: 3,
-      hate: 1.5,
+      love: 4,
+      hate: 5,
       commented: 2,
 
       done_wish: 1,
       wish_done: 1,
-      hate_love: -1,
-      love_hate: -1
+      hate_love: -5,
+      love_hate: -5
     };
 
     for (var k in r) {

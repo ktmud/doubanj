@@ -1,0 +1,10 @@
+mixin avatar_list(users, extra_prop)
+  .users-avatar.clearfix
+    each u in users
+      li(data-user_id=u.id)
+        a(href="#{u.url()}")
+          img(width="48", height="48", src="#{u.avatar}")
+          br
+          | #{u.name}
+        if extra_prop
+          p(class="prop-#{extra_prop}") #{u[extra_prop]}

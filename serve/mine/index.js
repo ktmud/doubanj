@@ -1,21 +1,44 @@
+module.exports = function(app, central) {
+
+var utils = require('../utils');
+var auth_utils = require('../auth/utils');
+
+var KEY_CLICK_BOOK_SCORE = require('../../models/consts').KEY_CLICK_BOOK_SCORE;
+
+var lodash = require('lodash');
 var cwd = central.cwd;
 var User = require(cwd + '/models/user').User;
 var Interest = require(cwd + '/models/interest');
 var tasks = require(cwd + '/tasks');
 
-var utils = require('../utils');
-var auth_utils = require('../auth/utils');
-
-module.exports = function(app, central) {
-
 app.get('/mine', auth_utils.require_login, function(req, res, next) {
-  var people = req.user;
-  if (!people.stats) {
-    res.redirect(people.url());
+  var user = req.user;
+  if (!user.stats) {
+    res.redirect(user.url());
   }
-  res.render('mine', {
-    people: req.user
+
+  var c = res.data = { user: user };
+
+  user.data(KEY_CLICK_BOOK_SCORE, function(err, ret) {
+    ret = ret || {};
+    c.click_book_scores = ret;
+    var user_ids = Object.keys(ret).sort(function(a, b) { return ret[b] - ret[a] });
+    c.top_click_users = user_ids.slice(0, 4);
+    next();
   });
+}, function(req, res, next) {
+  var c = res.data;
+  var book_scores = c.click_book_scores;
+
+  User.gets(c.top_click_users, function(err, users) {
+    c.top_click_users = users.filter(function(a) { return a; });
+    c.top_click_users.forEach(function(u, i) {
+      u.book_score = book_scores[u.id];
+    });
+    next();
+  });
+}, function(req, res, next) {
+  res.render('mine', res.data);
 });
 
 var rj = auth_utils.require_login_json; 
@@ -28,9 +51,11 @@ app.get('/api/mine/followings', rj, function(req, res, next) {
     return;
   }
 
+  var query = req.query || {};
+
   people.listFollowings({
-    limit: 24,
-    start: req.query && req.query.start
+    limit: query.limit || 24,
+    start: query.start
   }, function(err, result) {
     if (err) {
       res.statusCode = err.code || 200;

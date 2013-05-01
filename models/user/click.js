@@ -3,6 +3,10 @@ var redis = central.redis;
 // 过期时间，单位 秒
 var CLICK_EXPIRES = 60 * 60 * 6;
 
+if (central.conf.debug) {
+  CLICK_EXPIRES = 20;
+}
+
 var grades = {
   0: '话不投机',
   100: '形同陌路',
@@ -10,8 +14,8 @@ var grades = {
   500: '志同道合',
   800: '情投意合',
   1000: '情同手足',
-  2000: '一条裤子',
-  3000: '生死与共',
+  1500: '心有灵犀',
+  2000: '生死与共',
 };
 
 
@@ -63,6 +67,7 @@ exports.getClick = function(other, cb) {
           swap(ret.ratios[k], 0, 1);
         }
       }
+      ret.score = ret.score || ret.index || '0';
     }
     return cb(err, ret);
   });

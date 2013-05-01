@@ -2,7 +2,7 @@
   if req.user._click
     h4 你和#{people.name}的契合指数
     .click-number
-      strong #{req.user._click.index}
+      strong #{String(req.user._click.index || 0)}
     a.btn.btn-small.btn-primary(href="#{req.user.url()}click/#{people.uid}") 查看详细
   else
     h4 你和#{people.name}

@@ -6,6 +6,7 @@ Do.loadClick = function(me, uid, container, success, failed) {
 
   success = success || function(r) {
     Do('lodash', function() {
+      r.score = r.score || 0;
       var lodash = require('lodash')._;
       var tmpl_click_index = lodash.template($('#tmpl-click-index').html());
       $(container).html(tmpl_click_index(r));

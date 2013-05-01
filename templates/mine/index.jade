@@ -15,15 +15,7 @@ block main
   .row
     .span3
       .aside
-        .mod
-          h2 我的读书酱
-          if user.stats
-            mixin overview(user)
-            p
-              a(href=user.url()) &raquo; 详细
-          else
-            .vmiddle
-              a.btn.btn-primary(href=user.url()) 点此生成报告
+        include ./mods/sidebar
     .span9
       .mod
         h2 我关注的友邻

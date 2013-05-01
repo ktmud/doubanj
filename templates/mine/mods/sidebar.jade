@@ -1,0 +1,24 @@
+include ./mixins.jade
+
+.mod
+  h2 我的读书酱
+  if user.stats
+    mixin overview(user)
+    p
+      a(href=user.url()) &raquo; 详细
+  else
+    .vmiddle
+      a.btn.btn-primary(href=user.url()) 点此生成报告
+
+if top_click_users
+  .mod
+    h2 与我最契合的友邻
+    if !top_click_users.length
+      .muted
+        p 访问友邻们的页面，会自动生成你们的
+          a(href="/about/click", target="_blank") 契合指数
+        p 得分最高的友邻会出现在这里
+    else
+      mixin avatar_list(top_click_users, 'book_score')
+      small.muted
+        注：只统计了你访问过报表的友邻

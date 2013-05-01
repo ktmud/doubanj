@@ -15,8 +15,10 @@ Do('lodash', function() {
 
   var followings = $('#followings');
 
-  function pull() {
-    $.getJSON(API_FOLLOWINGS, function(res, err) {
+  var start = 48, limit = 24;
+
+  function first_pull() {
+    $.getJSON(API_FOLLOWINGS, { limit: start }, function(res, err) {
       if (res.r) {
         if (res.msg === 'pulling') {
           res.msg === '同步正在进行..';
@@ -31,9 +33,8 @@ Do('lodash', function() {
       followings.html(tmpl_friends(res));
     });
   }
-  pull();
+  first_pull();
 
-  var start = limit = 24;
   followings.delegate('.btn-more', 'click', function(e) {
 
     e.preventDefault();
@@ -43,7 +44,7 @@ Do('lodash', function() {
 
     node.addClass('disabled').html('加载中...');
 
-    $.getJSON(API_FOLLOWINGS, { start: start }, function(res, a) {
+    $.getJSON(API_FOLLOWINGS, { start: start, limit: limit }, function(res, a) {
       start += limit;
       if (res.r) {
         node.remove();

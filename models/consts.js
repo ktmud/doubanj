@@ -1,4 +1,6 @@
 module.exports = {
+  KEY_CLICK_BOOK_SCORE: 'click_book_scores',
+
   DOUBAN_APPS: ['book', 'movie', 'music'],
   USER_COLLECTION: 'user',
   INTEREST_STATUS_ORDERED: {

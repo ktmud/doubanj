@@ -4,14 +4,11 @@
   <% } else { %>
   <ul class="users-avatar clearfix">
     <% _.forEach(items, function(item) { %>
-    <li>
-      <a class="pic" href="<%= item.url %>" title="<%= item.name %>">
-        <img width="48" height="48" src="<%= item.avatar %>" alt="<%= item.name %> 的头像" />
-      </a>
-      <a href="<%= item.url %>">
-        <%= item.name %>
-      </a>
-    </li>
+      <li data-user_id="<%= item._id %>">
+        <a href="<%= item.url %>" title="<%= item.name %>">
+          <img width="48" height="48" src="<%= item.avatar %>" alt="<%= item.name %> 的头像" /><br><%= item.name %>
+        </a>
+      </li>
     <% }); %>
   </ul>
   <a href="javascript:void(0);" class="btn btn-block btn-more">加载更多友邻</a>
@@ -19,12 +16,9 @@
 </script>
 <script id="tmpl-friends-items" type="text/tmpl">
   <% _.forEach(items, function(item) { %>
-  <li>
-    <a class="pic" href="<%= item.url %>" title="<%= item.name %>">
-      <img width="48" height="48" src="<%= item.avatar %>" alt="<%= item.name %> 的头像" />
-    </a>
-    <a href="<%= item.url %>">
-      <%= item.name %>
+  <li data-user_id="<%= item._id %>">
+    <a href="<%= item.url %>" title="<%= item.name %>">
+      <img width="48" height="48" src="<%= item.avatar %>" alt="<%= item.name %> 的头像" /><br><%= item.name %>
     </a>
   </li>
   <% }); %>

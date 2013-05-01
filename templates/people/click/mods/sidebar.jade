@@ -5,7 +5,7 @@ include ../../mixins/interest.jade
     tr
       td
         h3 契合指数
-        .click-number #{clicks.index}
+        .click-number #{String(clicks.score || 0)}
       td.click-grade #{click_grade}
   p.reliability 可信度: 
     strong #{clicks.reliability}% 
@@ -13,3 +13,5 @@ include ../../mixins/interest.jade
 if (locals.mutual_keywords && mutual_keywords.length)
   h2 共同阅读关键字
   mixin tagcloud(mutual_keywords)
+p
+  a(href="/mine") &gt; 我也想要这样的报表
