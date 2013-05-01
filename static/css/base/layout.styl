@@ -177,3 +177,16 @@ a.anchor
 
 .pager-center
   text-align: center;
+
+@media (max-width: 768px)
+  .navbar:before, .navbar:after
+    content: ""
+    display: none;
+  .row
+    margin: 0
+
+@media (max-width: 480px)
+  .navbar-form input
+    width: 100%;
+  .navbar-form
+    float: none;

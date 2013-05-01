@@ -26,3 +26,8 @@ block main
     script
       window._uid_ = '#{user.uid || user.id}';
       !{istatic('js/mine/booter.js')}
+
+block navbar_form
+  form.navbar-form.pull-right(id="navbar-form", action="/")
+    div
+      input(name="q", type="text", placeholder="输入友邻个人主页地址...", title="输入豆瓣ID以查看其统计", size="36")
