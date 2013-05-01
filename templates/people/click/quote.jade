@@ -1,0 +1,24 @@
+extend ./index
+
+block title
+  title #{people._name} 与 #{other._name} 对一本书的不同评语
+
+block left
+  if !commented.length
+    .well 这两个人暂时没有对同一本书发表过看法
+  else
+    include ./mods/quote.jade
+
+block breadcrumb
+  ul.breadcrumb
+    li
+      a(href=people.url()) #{name}的豆瓣酱
+    li
+      a(href=people.click_url(other)) 与#{other._name}
+    li.active
+      | 阅读体悟
+
+block h1
+  .pull-right
+    include ../mods/share.html
+  h1 #{people._name} v.s. #{other._name}

@@ -9,18 +9,32 @@ block title
 block main 
   .row
     .span9.click-results
-      h1
-        a(href="#{people.url()}") #{people._name}
-        | &nbsp;+&nbsp;
-        a(href="#{other.url()}") #{other._name}
-        block switch
-          | &nbsp;
-          a.btn.btn-mini.btn-compact(href="#{other.url()}click/#{people.uid}") 交换视角
-      block left
+      block breadcrumb
+        ul.breadcrumb
+          li
+            a(href=people.url()) #{name}的豆瓣酱
+          li.active
+            | 与#{other._name}
+      block h1 
         .pull-right
           include ../mods/share.html
+        h1
+          a(href="#{people.url()}") #{people._name}
+          | &nbsp;+&nbsp;
+          a(href="#{other.url()}") #{other._name}
+          block switch
+            | &nbsp;
+            a.btn.btn-mini.btn-compact(href="#{other.url()}click/#{people.uid}") 交换视角
+      block left
         if clicks.commented.length
-          include ./mods/comments.jade
+          commented = central.utils.shuffle(clicks.commented.slice(0, 10)).slice(0,3)
+          h2 对同一本书的不同评语 
+            - if (clicks.commented.length > commented.length)
+              small (
+                a(href="#{people.click_url(other)}/quote") 全部#{clicks.commented.length}
+                )
+          include ./mods/quote.jade
+          hr
         include ./mods/done.jade
     .span3
       block sidebar

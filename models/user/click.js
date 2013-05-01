@@ -78,6 +78,10 @@ exports.setClick = function(other, val, cb) {
   redis.client.set(key, JSON.stringify(val), cb);
   redis.client.expire(key, CLICK_EXPIRES);
 };
+exports.click_url = function(other, tail) {
+  var other_uid = typeof other !== 'object' ? other : (other.uid || other.id);
+  return this.url() + 'click/' + other_uid + (tail || '');
+};
 
 exports._clickKey = function(other) {
   return 'click_' + [this.id, other.id].sort().join('_');
