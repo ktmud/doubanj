@@ -23,7 +23,7 @@ include ./mixins.jade
       - share_url += "&text=" + encodeURIComponent(share_text)
       a.btn.btn-mini.btn-compact(target="_blank", href="#{share_url}") 告诉他们
     small.muted
-      *只统计了你访问过报表的友邻
+      *只包括已经有报表的友邻
   else
     .muted
       p 访问友邻们的页面，会自动生成你们的
