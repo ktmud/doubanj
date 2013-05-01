@@ -138,8 +138,8 @@ function main(users, callback) {
       });
       ret.mutual_tags = getMutual(top_tags);
 
-      // 每多一个共同感兴趣的图书标签，指数+25
-      ret.score += (ret.mutual_tags.length * 25);
+      // 每多一个共同感兴趣的图书标签，指数+30
+      ret.score += (ret.mutual_tags.length * 30);
 
       saveScore(users, ret.score);
 
@@ -218,8 +218,8 @@ function main(users, callback) {
 
       done_wish: 1.5,
       wish_done: 1.5,
-      hate_love: -1, // 偏好上的差异理应最大程度影响评分
-      love_hate: -1
+      hate_love: -0.8, // 偏好上的差异理应最大程度影响评分
+      love_hate: -0.8
     };
 
     for (var k in r) {
