@@ -1,7 +1,7 @@
 var redis = central.redis;
 
 // 过期时间，单位 秒
-var CLICK_EXPIRES = 60 * 60 * 6;
+var CLICK_EXPIRES = 60 * 120;
 
 if (central.conf.debug) {
   CLICK_EXPIRES = 20;
@@ -11,10 +11,10 @@ var grades = {
   0: '话不投机',
   100: '形同陌路',
   300: '貌合神离',
-  500: '志同道合',
+  600: '志同道合',
   800: '情投意合',
-  1000: '情同手足',
-  1500: '心有灵犀',
+  1200: '情同手足',
+  1600: '心有灵犀',
   2000: '生死与共',
 };
 

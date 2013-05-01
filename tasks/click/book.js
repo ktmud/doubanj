@@ -138,8 +138,8 @@ function main(users, callback) {
       });
       ret.mutual_tags = getMutual(top_tags);
 
-      // 每多一个共同感兴趣的图书标签，指数+30
-      ret.score += (ret.mutual_tags.length * 30);
+      // 每多一个共同感兴趣的图书标签，指数+25
+      ret.score += (ret.mutual_tags.length * 25);
 
       saveScore(users, ret.score);
 
@@ -210,14 +210,15 @@ function main(users, callback) {
     var i = 0;
     var factors = {
       done: 2.5,
-      wish: 1,
-      love: 4,
-      hate: 5,
+      wish: 1.2,
+      love: 3.5,
+      // TODO: 不喜欢的书一般都很少，这个比例的权重理应与绝对值相关
+      hate: 0.5,
       commented: 2,
 
-      done_wish: 1,
-      wish_done: 1,
-      hate_love: -5,
+      done_wish: 1.5,
+      wish_done: 1.5,
+      hate_love: -5, // 偏好上的差异理应最大程度影响评分
       love_hate: -5
     };
 
