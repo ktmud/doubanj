@@ -218,8 +218,8 @@ function main(users, callback) {
 
       done_wish: 1.5,
       wish_done: 1.5,
-      hate_love: -5, // 偏好上的差异理应最大程度影响评分
-      love_hate: -5
+      hate_love: -1, // 偏好上的差异理应最大程度影响评分
+      love_hate: -1
     };
 
     for (var k in r) {
