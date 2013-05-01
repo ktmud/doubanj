@@ -44,7 +44,6 @@ function is_serious_reading(tags) {
 function get_hardest_reader(period, cb) {
   hardest_reader(period, function(err, ids) {
     User.gets(ids, {
-      preserve_order: true,
       fields: people_fields
     }, function(err, users) {
       users = users.filter(function(item, i) {
@@ -52,10 +51,10 @@ function get_hardest_reader(period, cb) {
           try {
             // there are useless type of books in he/she's collection
             if (is_serious_reading(item.book_stats.all.top_tags.slice(0,12))) {
+              item._count = ids[i].value;
               return true;
             }
           } catch (e) {}
-          item._count = ids[i].value;
         }
         return false;
       });
