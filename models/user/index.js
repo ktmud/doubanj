@@ -159,7 +159,9 @@ User.get = function(uid, options, cb) {
 
   verbose('getting user %s...', uid);
 
-  if (!reg_valid_uid.test(uid)) return cb(null, null);
+  if (!reg_valid_uid.test(uid)) {
+    return cb(null, null);
+  }
 
   User.getFromMongo(uid, options, function(err, u) {
     if (err) return cb(err);

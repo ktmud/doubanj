@@ -1,7 +1,7 @@
 extend ../500
 
 block message
-  if err && err.message === 'pulling'
+  if (err && err.message === 'pulling')
     h1 OH, wait....
     p 正在尝试获取用户信息，耐心一点啦
     if err.n

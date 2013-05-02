@@ -21,7 +21,7 @@
     "hiredis": "~0.1.15",
     "async": "~0.2.7",
     "express-istatic": "~0.1.0",
-    "jade": "~0.30.0",
+    "jade": "~0.29.0",
     "passport": "~0.1.15",
     "passport-local": "~0.1.6",
     "passport-douban": "~0.0.1",
