@@ -126,17 +126,17 @@ function main(users, callback) {
         ret.hate_love = lodash.intersection(res[2][1], res[3][0]);
       }
 
-      // 如果收藏数量实在太大的，过期时间设置得长一点
-      if (Math.max(res[1][0].length, res[1][1].length) > 10000) {
-        ret.expires_in = 7 * ONE_DAY;
-      }
-
       // 占比
       ret.ratios = getRatios(ret, res);
       // 契合指数
       ret.score = calcScore(ret.ratios, res);
       // 可信度
       ret.reliability = reliability(res);
+
+      // 如果收藏数量实在太大的，过期时间设置得长一点
+      if (Math.max(res[1][0].length, res[1][1].length) > 10000) {
+        ret.expires_in = 7 * ONE_DAY;
+      }
 
       var top_tags = [];
       users.forEach(function(u) {
@@ -197,6 +197,7 @@ function main(users, callback) {
     };
     for (var k in ret) {
       var ids = ret[k];
+      if (!all_ids[k]) continue;
       ratios[k] = all_ids[k].map(function(item, i) {
         return ids.length / item.length;
       });
