@@ -18,7 +18,7 @@ var task = central.task;
 var consts = require('../consts');
 
 var ONE_DAY = 60 * 60 * 24 * 100;
-var FRIENDSHIP_EXPIRES = 2 * ONE_DAY;
+var FRIENDSHIP_EXPIRES = 10 * ONE_DAY;
 
 
 /**
@@ -68,7 +68,6 @@ exports.listFollowings = function(query, cb) {
           verbose('Save pulled followings: (%s, %s)', err, r);
           end(ids);
         });
-        // expire friendships in 2 days.
         self.expire('followings', FRIENDSHIP_EXPIRES);
       });
     });
@@ -128,4 +127,12 @@ exports.pullFollowings = function(start, cb) {
 
       });
   });
+};
+
+/**
+ * clear local cache of followings
+ */
+exports.clearFollowings = function(cb) {
+  var self = this;
+  self._del_data(['followings', 'following_sites'], cb);
 };

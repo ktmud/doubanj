@@ -13,5 +13,15 @@ include ../../mixins/interest.jade
 if (locals.mutual_keywords && mutual_keywords.length)
   h2 共同阅读关键字
   mixin tagcloud(mutual_keywords)
-p
-  a(href="/mine") &gt; 我也想要这样的报表
+hr
+if !req.user
+  p.muted &gt; 
+    a(href="/mine") 我也想要这样的报表
+else if req.user != people
+    p.muted &gt; 
+      a(href="#{req.user.click_url(people)}") 看看我与#{people.name}
+    p.muted &gt; 
+      a(href="#{req.user.click_url(other)}") 看看我与#{other.name}
+else
+  p.muted &gt; 
+    a(href="/mine") 返回我的友邻

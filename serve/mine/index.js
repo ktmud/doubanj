@@ -44,18 +44,22 @@ app.get('/mine', auth_utils.require_login, function(req, res, next) {
 var rj = auth_utils.require_login_json; 
 
 app.get('/api/mine/followings', rj, function(req, res, next) {
-  var people = req.user;
-  if (!people) {
-    res.statusCode = 404;
-    res.json({ r: 404 });
+  if (!req.user) {
+    res.statusCode = 401;
+    res.json({ r: 401 });
     return;
   }
+  req.query = req.query || {};
 
-  var query = req.query || {};
-
-  people.listFollowings({
-    limit: query.limit || 24,
-    start: query.start
+  if (req.query.fresh) {
+    req.user.clearFollowings(next);
+    return;
+  }
+  return next();
+}, function(req, res, next) {
+  req.user.listFollowings({
+    limit: req.query.limit || 24,
+    start: req.query.start
   }, function(err, result) {
     if (err) {
       res.statusCode = err.code || 200;

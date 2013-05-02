@@ -30,9 +30,9 @@ mixin mixed_rating_text(subject_id)
       - if (item1.rated === item2.rated)
         p #{people._name}和#{other._name}都给了#{item.rated}星
     - else
-      if item1 && item1.rated
+      - if (item1 && item1.rated)
         p #{people._name}给了#{item1.rated}星
-      if item2 && item2.rated
+      - if (item2 && item2.rated)
         p #{other._name}给了#{item2.rated}星
 
 mixin rate_stars(i)

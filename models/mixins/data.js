@@ -6,6 +6,10 @@ var redis = central.redis;
  * format a cache key
  */
 exports.cache_key = function(key) {
+  var self = this;
+  if (Array.isArray(key)) {
+    return key.map(function(item) { return self.cache_key(item); });
+  }
   var ret = ['dbj', this.kind, this.id];
   if (key) ret.push(key);
   return ret.join(':');
@@ -16,7 +20,7 @@ exports.cache_key = function(key) {
  */
 exports.data = function(key, val, cb) {
   if (typeof val === 'function') return this._get_data(key, val);
-  return this._set_data(key, val, cb);
+  return this._set_data.apply(this, arguments);
 };
 
 exports._get_data = function(key, cb) {
@@ -36,6 +40,10 @@ exports._set_data = function(key, val, cb) {
   key = this.cache_key(key);
   val = JSON.stringify(val);
   redis.client.set(key, val, cb);
+};
+exports._del_data = function(key, cb) {
+  key = this.cache_key(key);
+  redis.client.del(key, cb);
 };
 
 exports.expire = function(key, milliseconds, cb) {

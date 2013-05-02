@@ -14,11 +14,15 @@ Do('lodash', function() {
   }
 
   var followings = $('#followings');
+  var loading_html = followings.html();
 
   var start = 48, limit = 24;
 
-  function first_pull() {
-    $.getJSON(API_FOLLOWINGS, { limit: start }, function(res, err) {
+  function first_pull(fresh) {
+    $.getJSON(API_FOLLOWINGS, {
+      fresh: fresh,
+      limit: 48
+    }, function(res, err) {
       if (res.r) {
         if (res.msg === 'pulling') {
           res.msg === '同步正在进行..';
@@ -36,7 +40,6 @@ Do('lodash', function() {
   first_pull();
 
   followings.delegate('.btn-more', 'click', function(e) {
-
     e.preventDefault();
 
     var node = $(this);
@@ -61,5 +64,11 @@ Do('lodash', function() {
       }
       followings.find('ul').append(tmpl_friends_items(res));
     });
+  });
+
+  $('body').delegate('.clear-followings', 'click', function(e) {
+    e.preventDefault();
+    followings.html(loading_html);
+    first_pull(true);
   });
 });
