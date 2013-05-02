@@ -15,7 +15,8 @@ var grades = {
   800: '情投意合',
   1200: '情同手足',
   1600: '心有灵犀',
-  2000: '生死与共',
+  2000: '同甘共苦',
+  3000: '生死与共',
 };
 
 
@@ -40,6 +41,7 @@ exports.clickGrade = function(num) {
     if (parseInt(k) < num) continue;
     return grades[k];
   }
+  return '爆表';
 };
 
 function swap(obj, a, b) {
