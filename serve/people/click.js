@@ -11,12 +11,14 @@ var User = require(cwd + '/models/user').User;
 var Interest = require(cwd + '/models/interest');
 var Subject = require(cwd + '/models/subject');
 
-function getInterest(user, book_ids, callback) {
+function getInterest(user, subject_ids, callback) {
   Interest.book.findByUser(user.id, {
-    book_id: {
-      $in: book_ids
+    query: {
+      subject_id: {
+        $in: subject_ids
+      },
     },
-    limit: 0
+    limit: null
   }, callback);
 }
 
@@ -92,7 +94,10 @@ function getAllInterests(req, res, next) {
 }
 
 function getAllBooks(req, res, next) {
-  Subject.book.gets(res.data.all_book_ids, function(err, items) {
+  Subject.book.gets(res.data.all_book_ids, {
+    fields: 'simple'
+  }, function(err, items) {
+    //console.log(items[0]);
     if (err) return next(err);
     res.data.all_books = makeDict(items, 'id');
     next();

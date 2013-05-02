@@ -21,6 +21,26 @@ function Book(info) {
 util.inherits(Book, Subject);
 utils.extend(Book, Subject);
 
+var gets = Book.gets;
+Book.gets = function(ids, opts, cb) {
+  if (typeof opts === 'object') {
+    switch(opts.fields) {
+    case 'simple':
+      opts.fields = null;
+      opts.fields = {
+        title: 1,
+        'images': 1,
+        author: 1,
+        publisher: 1,
+        translator: 1,
+        rated: 1,
+      }
+      break;
+    }
+  }
+  gets.call(Book, ids, opts, cb);
+};
+
 Book.prototype.kind = Book._collection = 'book';
 
 module.exports = Book;
