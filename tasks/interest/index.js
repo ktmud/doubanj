@@ -45,7 +45,7 @@ collect = User.ensured(function(user, arg) {
   // halt if syncing is already running
   if (user.last_synced_status === 'ing' && !arg.force && !arg._from_halt) {
     message('EXIT collect for %s due to runing..', uid, raven_extra);
-    arg.error('RUNNING');
+    arg.error(new Error('Already running collecting process.'));
     return;
   }
 

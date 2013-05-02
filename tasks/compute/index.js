@@ -21,11 +21,12 @@ var book_task = require('./book');
 var compute, _compute;
 compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, arg, next) {
   var user = arg.user;
-  var raven_extra = { extra: { uid: user.uid || user._id }, tags: { task: 'compute' } };
 
   if (!user) {
-    return arg.error('NO_USER');
+    return arg.error(new Error('A user for compute is required.'));
   }
+
+  var raven_extra = { extra: { uid: user.uid || user._id }, tags: { task: 'compute' } };
 
   var called = false;
   var timeouts = {};
@@ -38,7 +39,7 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
   }
 
   var error_cb = function(err) {
-    err = err || 'UNKNOWN';
+    err = err || new Error('UNKNOWN');
 
     clear_timeouts();
 
@@ -52,7 +53,7 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
     if (called) return;
     called = true;
 
-    if (err === 'RUNNING') {
+    if (err.message === 'RUNNING') {
       arg.error(err);
     } else {
       var stats_fail = user.stats_fail || 0;
@@ -77,20 +78,23 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
 
   if (user.last_synced_status !== 'succeed') {
     if (user.syncTimeout()) {
+      var err = new Error('Syncing timeout');
       // reset user data
       user.update({
         invalid: 0,
         last_synced_status: 'TIMEOUT',
       }, function() {
-        error_cb('TIMEOUT');
+        error_cb(err);
       });
       return;
     }
-    return error_cb('NOT_READY');
+    return error_cb(new Error('User stats not ready'));
   }
 
   // already running
-  if (user.stats_status == 'ing' && !arg.force && !arg._from_halt) return error_cb('RUNNING');
+  if (user.stats_status == 'ing' && !arg.force && !arg._from_halt) {
+    return error_cb(new Error('RUNNING'));
+  }
 
   // not ready
   if (user.invalid) return error_cb(user.invalid);
@@ -113,7 +117,7 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
     mongo.queue(function(db, next) {
       // 20 minutes timeout
       timeouts[ns] = setTimeout(function() {
-        error_cb('TIMEOUT');
+        error_cb(new Error('Compute timeout'));
       }, 1200000);
 
       // rung single job
