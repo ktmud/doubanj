@@ -5,13 +5,14 @@ var async = require('async');
 var lodash = require('lodash');
 
 var KEY_CLICK_BOOK_SCORE = require('../../models/consts').KEY_CLICK_BOOK_SCORE;
+var ONE_DAY = 60 * 60 * 24;
 
 function getIds(query) {
   return function getDoneIds(u, cb) {
     var opts = {
       // only get subject_ids
       fields: { subject_id: 1, _id: -1 },
-      limit: 40000,
+      limit: 30000,
     };
 
     if (query) {
@@ -123,6 +124,11 @@ function main(users, callback) {
         ret.love_hate = lodash.intersection(res[2][0], res[3][1]);
         // 你不喜欢，他却给高分的
         ret.hate_love = lodash.intersection(res[2][1], res[3][0]);
+      }
+
+      // 如果收藏数量实在太大的，过期时间设置得长一点
+      if (Math.max(res[1][0].length, res[1][1].length) > 10000) {
+        ret.expires_in = 7 * ONE_DAY;
       }
 
       // 占比

@@ -18,6 +18,7 @@ var task = central.task;
 var consts = require('../consts');
 
 var ONE_DAY = 60 * 60 * 24 * 100;
+var FRIENDSHIP_EXPIRES = 2 * ONE_DAY;
 
 
 /**
@@ -50,7 +51,7 @@ exports.listFollowings = function(query, cb) {
 
     self.data('following_sites', function(err, sites) {
       var _start = ids.length;
-      if (sites && typeof sites === 'object') {
+      if (_start && sites && typeof sites === 'object') {
         _start += Object.keys(sites).length;
       }
       log('Pulling followings for [%s] from: %s (current: %s)', self.uid, _start, start);
@@ -68,7 +69,7 @@ exports.listFollowings = function(query, cb) {
           end(ids);
         });
         // expire friendships in 2 days.
-        self.expire('followings', 2 * ONE_DAY);
+        self.expire('followings', FRIENDSHIP_EXPIRES);
       });
     });
   });
@@ -122,7 +123,7 @@ exports.pullFollowings = function(start, cb) {
             verbose('Save pulled followings sites: (%s, %s)', err, r);
             cb(err, ids);
           });
-          self.expire('following_sites', 30 * ONE_DAY);
+          self.expire('following_sites', FRIENDSHIP_EXPIRES);
         });
 
       });

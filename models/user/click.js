@@ -76,7 +76,7 @@ exports.setClick = function(other, val, cb) {
   var self = this;
   var key = self._clickKey(other);
   redis.client.set(key, JSON.stringify(val), cb);
-  redis.client.expire(key, CLICK_EXPIRES);
+  redis.client.expire(key, val && val.expires_in || CLICK_EXPIRES);
 };
 exports.click_url = function(other, tail) {
   var other_uid = typeof other !== 'object' ? other : (other.uid || other.id);
