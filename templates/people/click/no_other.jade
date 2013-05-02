@@ -1,0 +1,15 @@
+extend ./index
+
+block title
+  title #{people._name} 与 #{other._name} 的契合指数
+
+block main 
+  .vmiddle
+    .alert.alert-error
+      p 用户 #{other._name} 并不存在
+    hr
+    small
+      a(href="#{people.url()}") 回#{people.name}的豆瓣酱
+
+block sidebar
+block switch 

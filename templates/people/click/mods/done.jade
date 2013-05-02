@@ -25,13 +25,13 @@ h2 都不喜欢的书
 mixin book_list(clicks.hate.slice(0, 6), null, mixed_rating_stars_mixin)
 hr
 h2 #{people._name}读过的#{other._name}想读的书
-  if clicks.done_wish.length
+  if clicks.done_wish.length && other.book_stats.wish
     - n = clicks.done_wish.length
     small (共#{n}本, 占#{other._name}全部想读的 #{(n / other.book_stats.wish.total).toFixed(3)}%)
 mixin book_list(clicks.done_wish.slice(0, 6))
 hr
 h2 #{other._name}读过的#{people._name}想读的书
-  if clicks.wish_done.length
+  if clicks.wish_done.length && people.book_stats.wish
     - n = clicks.wish_done.length
     small (共#{n}本, 占#{people._name}全部想读的 #{(n / people.book_stats.wish.total).toFixed(3)}%)
 mixin book_list(clicks.wish_done.slice(0, 6))

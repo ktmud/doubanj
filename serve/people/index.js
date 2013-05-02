@@ -15,6 +15,20 @@ function attach(context_name, fn) {
 
 var tasks = require(central.cwd + '/tasks');
 
+/**
+ * Error handler for people page
+ */
+app.use('/people/', function(err, req, res, next) {
+  var c = res.data || {};
+  var people = c.people;
+
+  c.err = err;
+
+  res.statusCode = people ? 500 : 404;
+
+  return res.render('people/failed', c);
+});
+
 app.get(/^\/people\/[^\/]+$/, function(req, res, next) {
   return res.redirect(301, req._parsedUrl.pathname + '/');
 });
@@ -26,10 +40,8 @@ app.get(/^(\/api)?\/people\/([^\/]+)\/?.*$/, utils.getUser({
   var people = res.data && res.data.people;
 
   var err = res.data && res.data.err;
-  if (!people || people.invalid == 'NO_USER') {
-    res.statusCode = err ? 500 : 404;
-    res.data.err = res.data.err || res.statusCode;
-    return res.render('people/failed', res.data);
+  if (!people || people.invalid === 'NO_USER') {
+    return next(404);
   }
   if (uid === people.id && people.uid && people.uid !== people.id) {
     return res.redirect(301, req._parsedUrl.pathname.replace(uid, people.uid));

@@ -70,14 +70,14 @@ function main(users, callback) {
   var p_perstep = 90 / tasks.length;
   var _t_save_progress = setTimeout(function(){}, 0);
 
-  function save(users, result, callback) {
+  function save(result, callback) {
     users[0].setClick(users[1], result, callback);
   }
 
-  function saveClicks(users, result) {
-    save(users, result, function() {
+  function saveClicks(result) {
+    save(result, function() {
       // 如果还有最终结果，得再存一次
-      if (finalResult) save(users, finalResult);
+      if (finalResult) save(finalResult);
     });
   }
 
@@ -147,19 +147,19 @@ function main(users, callback) {
       // 每多一个共同感兴趣的图书标签，指数+30
       ret.score += (ret.mutual_tags.length * 30);
 
-      saveScore(users, ret.score);
+      saveScore(ret.score);
 
       ret.p = 100;
     }
 
     finalResult = ret;
 
-    save(users, ret, function(e) {
+    save(ret, function(e) {
       callback(e || err, ret);
     });
   });
 
-  function saveScore(users, score) {
+  function saveScore(score) {
     var user_ids = lodash(users).pluck('id').object([]).value();
 
     for (var k in user_ids) {

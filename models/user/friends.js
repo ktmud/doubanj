@@ -28,7 +28,7 @@ exports.listFollowings = function(query, cb) {
   var self = this;
   self.data('followings', function(err, ids) {
     if (err) {
-      error('get followings from redis failed: %s', err);
+      error('get followings from redis failed: ', err);
       return cb(err);
     }
 
@@ -57,7 +57,7 @@ exports.listFollowings = function(query, cb) {
       log('Pulling followings for [%s] from: %s (current: %s)', self.uid, _start, start);
       self.pullFollowings(_start, function(err, _ids) {
         if (err) {
-          error('Pulling followings failed: %s', err);
+          error('Pulling followings failed: ', err);
           return cb(err);
         }
 

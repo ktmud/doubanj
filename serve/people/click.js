@@ -42,7 +42,14 @@ app.param('other', function(req, res, next, other_uid) {
   }
 
   function done(err, other) {
-    if (err || !other) return next(err || 404);
+    if (err) return next(err);
+
+    if (!other) {
+      res.statusCode = 404;
+      res.data.other = { _name: other_uid };
+      res.render('people/click/no_other', res.data);
+      return;
+    }
 
     if (people.id === other.id) {
       return res.redirect(people.url());

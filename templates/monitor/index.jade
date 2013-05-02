@@ -1,0 +1,62 @@
+extend ../layout/basic
+
+block main
+  style
+    .monitor-overview { font-size: 20px; }
+    .monitor-overview .mod { margin-bottom: 50px; }
+    .users a { margin: 0 4px; display: inline-block; font-size: 14px; }
+  h1 监控中心
+  if err
+    pre.alert.alert-error
+      !{err}
+  hr
+  .monitor-overview.row
+    .span6
+      h2 队列
+      mixin queue_item(central._interest_queue.queue, '采集')
+      mixin queue_item(central._compute_queue.queue, '统计')
+      - queue = central._click_queue.queue
+      .mod
+        p 契合：#{String(queue.length)}
+        if queue.length
+          mixin click_queue_users(queue)
+    .span6
+      h2 统计
+      .mod
+        p 全部用户
+          strong #{total}
+          人，已统计
+          strong #{n_succeed}
+          ，队列中
+          strong #{n_ing}
+      if timeouted.length
+        .mod
+          h3 超时
+            strong #{timeouted.length}
+            人
+          p.users
+            each u in timeouted
+              a(href="/people/#{u.uid}/", target="dbj-monitor-user") #{u.name || u.uid}
+        
+
+mixin queue_item(queue, title)
+  .mod
+    p #{title}：#{String(queue.length)}
+    if queue.length
+      mixin queue_users(queue)
+
+mixin queue_users(queue, param_name)
+  - param_name = param_name || 'user'
+  p.users
+    each uid in queue.map(function(arg) { return arg[1][param_name]; }).slice(0, 40)
+      if (typeof uid === 'object')
+        uid = uid.uid
+      a(href="/people/#{uid}/", target="dbj-monitor-user") #{uid}
+      &nbsp;
+
+mixin click_queue_users(queue)
+  p.users
+    each uid in queue.map(function(arg) { return arg[1].users; }).slice(0, 40)
+      - uid = uid.map(function(item) { if (typeof item === 'object') { item = item.uid } return item; })
+      a(href="/people/#{uid[0]}/click/#{uid[1]}", target="dbj-monitor-user") #{uid[0]} + #{uid[1]}
+      &nbsp;

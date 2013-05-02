@@ -33,6 +33,9 @@ module.exports = {
     ttl: 7 * 24 * 60 * 60, // in seconds
   },
 
+  // 管理员的豆瓣 uid
+  admin_users: ['jyyjcc'],
+
   douban: {
     limit: 10, // request limit per minute
     key: '',

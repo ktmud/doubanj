@@ -173,7 +173,13 @@ User.get = function(uid, options, cb) {
     }
     // haven't got douban account info yet
     if (!u.name) {
-      return u.pull(cb);
+      u.pull(function(err) {
+        if (err && err.statusCode == 404) {
+          return cb(null, null);
+        }
+        return cb(err);
+      });
+      return;
     }
     return cb(null, u);
   });
