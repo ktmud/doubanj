@@ -1,0 +1,28 @@
+extend ./about
+
+block title
+  title 在豆瓣酱上的隐私问题
+
+block main
+  h1 隐私问题
+  p 豆瓣酱通过收集你在豆瓣上的
+    strong 公开数据
+    为你计算统计报表。
+  p
+    strong.text-warning 任何人
+    都可以查看
+    strong.text-warning 其他人
+    公开资料的统计数据。
+  h2 「授权访问豆瓣账号」意味着什么
+  p 通过授权豆瓣酱访问你的豆瓣账号，你可以在豆瓣酱看到自己的友邻列表。
+  p 每次访问别人的页面时，都会自动生成你们的
+    a(href="/about/click") 契合指数。
+  p 如果你们的契合指数较高，
+    strong 即使对方没有关注你
+    ，你也可能出现在TA的「我的」页面。
+  p.muted (未来可能提供选项停用此策略)
+  ol 
+  h2 我不想我的信息以这种方式被展示
+  p 如果你不希望自己的资料在豆瓣酱上展示，请
+      a(href="mailto:support@doubanj.com") 与我们联系
+  p.muted (现在还没有人提这种要求，所以如果你提了的话我还得想一下应该怎么办)

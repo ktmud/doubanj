@@ -12,6 +12,9 @@ module.exports = function(app, central) {
   app.get('/about/click', function(req, res, next) {
     res.render('misc/about_click');
   });
+  app.get('/about/privacy', function(req, res, next) {
+    res.render('misc/about_privacy');
+  });
 
   app.get('/donate', function(req, res, next) {
     res.render('misc/donate');
