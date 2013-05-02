@@ -7,7 +7,7 @@ block message
     if err.n
       p.muted
         small 你前面还有#{err.n}位用户
-  else if (err && err.statusCode !== 404 && err !== 404)
+  else if (err && err.statusCode != 404 && err != 404)
     h1 OH, NO!
     p 获取用户出错了
   else
