@@ -17,7 +17,7 @@
     "redis": "~0.8.2",
     "redis-cached": "~0.0.1",
     "connect-redis": "~1.4.5",
-    "resumable": "~0.0.1",
+    "resumable": "~0.0.1-1",
     "hiredis": "~0.1.15",
     "async": "~0.2.7",
     "express-istatic": "~0.1.0",

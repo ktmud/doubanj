@@ -30,7 +30,7 @@ collect = User.ensured(function(user, arg) {
 
   // try update user info
   if (arg.fresh && !arg._from_halt) {
-    process.nextTick(function() {
+    setImmediate(function() {
       user.pull();
     });
   }
