@@ -177,7 +177,7 @@ User.get = function(uid, options, cb) {
         if (err && err.statusCode == 404) {
           return cb(null, null);
         }
-        return cb(err);
+        return cb(err, u);
       });
       return;
     }

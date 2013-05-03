@@ -3,6 +3,8 @@ var task = require(cwd + '/lib/task');
 
 var exports = module.exports;
 
+var DB_RESPOND_DELAY = 5000;
+
 /**
 * reset queue status
 */
@@ -73,7 +75,7 @@ exports.progresses = function() {
 exports.progressInterval = function(remaining, delay) {
   var n = this.queue_length();
   delay = delay * n;
-  return remaining < 10000 ? 4000 : delay + 2000;
+  return remaining < 10000 ? DB_RESPOND_DELAY : delay + 2000;
 };
 exports.queue_length = function() {
   return central._interest_queue && central._interest_queue.queue.length || 1;
@@ -128,7 +130,7 @@ exports.syncRemaining = function() {
 
   var n = this.queue_length();
 
-  return (task.API_REQ_DELAY + 4000) * n * Math.ceil((total - synced) / perpage);
+  return (task.API_REQ_DELAY + DB_RESPOND_DELAY) * n * Math.ceil((total - synced) / perpage);
 };
 
 exports.isSyncing = function() {

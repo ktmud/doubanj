@@ -18,8 +18,7 @@ Do.ready(function() {
 
         updateProgress(d.percents);
 
-        var remaining = d.remaining;
-        updateRemains(remaining);
+        updateRemains(d);
 
         if (d.stats_status && d.stats_status !== 'ing') {
           setTimeout(function() {
@@ -28,11 +27,11 @@ Do.ready(function() {
           return;
         }
 
-        if (remaining < 300000) {
-          check(d.interval);
+        if (d.remaining < 300000) {
+          check(d.interval || 5000);
         }
       });
-    }, dur || 5000);
+    }, dur || 3000);
   }
   check();
 
@@ -43,17 +42,27 @@ Do.ready(function() {
     });
   }
   var remains = $('#remains');
-  function updateRemains(t) {
-    var text = '同步仍在进行，请耐心等待..';
-    if (t > 300000) {
-      text = '至少要五分钟以上，刷会儿广播再回来吧';
-    } else if (t > 60000) {
-      text = '预计还要' + datetime.mili2chinese(t, true) + '左右';
+  function updateRemains(d) {
+    var t = d.remaining;
+    var text = '';
+    
+    if (d.book_synced_n < d.book_n) {
+      text = '<p><small>'
+      text += '已同步 ' + d.book_synced_n + '/' + d.book_n + ' 本图书收藏，';
+      if (d.queue_length > 2) {
+        text += '共有' + d.queue_length + '人同时在排队';
+      }
+      text += '</small>'
+    }
+
+    if (t > 60000) {
+      text += '<p>预计还需要' + datetime.mili2chinese(t, true) + '左右';
     } else if (t > 5000) {
-      text = '只剩下大概' + datetime.mili2chinese(t);
+      text += '<p>只剩下大概' + datetime.mili2chinese(t);
     } else if (t) {
       text = '马上就好';
     }
+    text = text || '同步仍在进行，请耐心等待..';
     remains.html(text);
   }
 
