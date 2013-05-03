@@ -37,6 +37,9 @@ block main
           p.users
             each u in timeouted
               a(href="/people/#{u.uid}/", target="dbj-monitor-user") #{u.name || u.uid}
+      p csrf to use:
+      pre
+        | #{_csrf}
         
 
 mixin queue_item(queue, title)
