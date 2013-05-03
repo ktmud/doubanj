@@ -6,10 +6,24 @@
   li
     list-style: none;
     float: left;
-    margin: 5px;
-    width: 92px;
-    height: 80px;
+    margin: 5px 5px;
+    width: 96px;
+    height: 84px;
+    .dot
+      position: absolute;
+      top: 9px;
+      right: 22%;
   a
     display: block;
+    padding: 12px 0 4px;
+    &:hover
+      text-decoration: none;
+      background: #f0f6f9;
   img
     margin-bottom: 2px;
+    border-radius: 2px;
+
+@media (max-width: 460px)
+  .users-avatar li
+    width: 84px;
+    margin: 5px 3px;

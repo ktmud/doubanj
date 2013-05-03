@@ -382,7 +382,9 @@ utils.extend(User.prototype, require('./click'));
  */
 utils.extend(User.prototype, require('./friends'));
 
-User.prototype.listFollowings = User.extended(User.prototype.listFollowings, { fields: { uid: 1, avatar: 1, name: 1 } });
+User.prototype.listFollowings = User.extended(User.prototype.listFollowings, {
+  fields: { uid: 1, avatar: 1, name: 1, stats_p: 1, last_synced_status: 1 }
+});
 
 
 /**

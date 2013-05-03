@@ -25,8 +25,8 @@ Do('lodash', function() {
     }, function(res, err) {
       if (res.r) {
         if (res.msg === 'pulling') {
-          res.msg === '同步正在进行..';
-          setTimeout(pull, 10000);
+          res.msg = '同步正在进行..';
+          setTimeout(first_pull, 10000);
         }
         followings.find('.alert').addClass('alert-error').html(res.msg || '出错啦!');
         return;
@@ -35,6 +35,7 @@ Do('lodash', function() {
         preprocess(res.items);
       }
       followings.html(tmpl_friends(res));
+      followings.find('ul').html(tmpl_friends_items(res));
     });
   }
   first_pull();

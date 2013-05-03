@@ -30,3 +30,9 @@ include ./mixins.jade
       p 访问友邻们的页面，会自动生成你们的
         a(href="/about/click", target="_blank") 契合指数
       p 得分最高的友邻会出现在这里
+
+if top_click_users.length
+  .mod
+    small
+      p 只有当你访问了某人的豆瓣酱报表，才会尝试计算你们的契合指数。计算结果也会出现在对方的记录里（即使你不是他的友邻）。
+      p(style="margin-bottom:0") 所以如果上面出现了你不认识的人，则有可能是对方主动访问了你的页面。

@@ -1,9 +1,11 @@
-form(method="post", action="/queue")
+form.vmiddle(method="post", action="/queue")
   input(type="hidden", name="_csrf", value=_csrf)
   input(type="hidden", name="uid", value=uid)
-  div.vmiddle
-    p
-      button.btn.btn-primary 开始为 #{name} 制造美味豆瓣酱
-    if req.user && req.user !== people
-      hr
-      small.muted 为TA制造豆瓣酱，查看你们的兴趣投好指数
+  p
+    button.btn.btn-primary 开始为 #{name} 制造美味豆瓣酱
+  if req.user
+    hr
+    if req.user == people
+      small.muted 分析你的阅读历史
+    else
+      small.muted 为TA制造豆瓣酱，查看你们的契合指数
