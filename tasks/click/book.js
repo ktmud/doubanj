@@ -7,12 +7,20 @@ var lodash = require('lodash');
 var KEY_CLICK_BOOK_SCORE = require('../../models/consts').KEY_CLICK_BOOK_SCORE;
 var ONE_DAY = 60 * 60 * 24;
 
+function sum(a, b) { 
+  return (a || 0) + (b || 0);
+}
+
+function min(a, b) {
+  return Math.min(a || 0, b || 0);
+}
+
 function getIds(query) {
   return function getDoneIds(u, cb) {
     var opts = {
       // only get subject_ids
       fields: { subject_id: 1, _id: -1 },
-      limit: 30000,
+      limit: 50000,
     };
 
     if (query) {
@@ -90,6 +98,99 @@ function main(users, callback) {
     next(null, result);
   }
 
+  function saveScore(score) {
+    var user_ids = lodash(users).pluck('id').object([]).value();
+
+    for (var k in user_ids) {
+      user_ids[k] = score;
+    }
+
+    async.map(users, function(item, callback) {
+      item.data(KEY_CLICK_BOOK_SCORE, callback);
+    }, function(err, all_scores) {
+      all_scores = all_scores.map(function(item, i) {
+        if (!item || typeof item !== 'object') item = {};
+        item = lodash.extend(item, user_ids);
+        delete item[users[i].id];
+        return item;
+      });
+      users.forEach(function(user, i) {
+        user.data(KEY_CLICK_BOOK_SCORE, all_scores[i]);
+      });
+    });
+  }
+
+  function getRatios(ret, ids_list) {
+    var ratios = {};
+    var all_ids = {
+      done: ids_list[0],
+      wish: ids_list[1],
+      love: ids_list[2],
+      hate: ids_list[3],
+      commented: ids_list[4],
+
+      wish_done: ids_list[0],
+      done_wish: ids_list[1],
+      hate_love: ids_list[2],
+      love_hate: ids_list[3],
+    };
+    for (var k in ret) {
+      var ids = ret[k];
+      if (!all_ids[k]) continue;
+      ratios[k] = all_ids[k].map(function(item, i) {
+        return ids.length / item.length;
+      });
+    }
+    return ratios;
+  }
+
+  function calcScore(r, all_ids) {
+    var i = 0;
+    var factors = {
+      done: 2.5,
+      wish: 1.2,
+      love: 3.5,
+      // TODO: 不喜欢的书一般都很少，这个比例的权重理应与绝对值相关
+      hate: 0.5,
+      commented: 2,
+
+      done_wish: 1.5,
+      wish_done: 1.5,
+      hate_love: -0.8, // 偏好上的差异理应最大程度影响评分
+      love_hate: -0.8
+    };
+
+    for (var k in r) {
+      if (r[k]) {
+        i += r[k].reduce(min) * factors[k];
+      }
+    }
+
+    return Math.round(i * 1000);
+  }
+
+  // 可信度，收藏数量越接近，越为可信
+  function reliability(all_ids) {
+    var lens = all_ids[0].map(function(item) { return item.length; });
+    var max = Math.max.apply(Math, lens);
+    var min = Math.min.apply(Math, lens);
+    return Number((100 - (max - min) / max * 100).toFixed(2));
+  }
+
+  function getMutual(list) {
+    return lodash.reduce(list, function(a, b) {
+      b = lodash(b).pluck('_id')
+          .object(lodash.pluck(b, 'count'))
+          .value();
+      return a.filter(function(item) {
+          if (item._id in b) {
+            item.count_b = b[item._id];
+            return true;
+          }
+        });
+    });
+  }
+
   async.parallel(tasks, function(err, res) {
     clearTimeout(_t_save_progress);
 
@@ -159,106 +260,6 @@ function main(users, callback) {
     });
   });
 
-  function saveScore(score) {
-    var user_ids = lodash(users).pluck('id').object([]).value();
-
-    for (var k in user_ids) {
-      user_ids[k] = score;
-    }
-
-    async.map(users, function(item, callback) {
-      item.data(KEY_CLICK_BOOK_SCORE, callback);
-    }, function(err, all_scores) {
-      all_scores = all_scores.map(function(item, i) {
-        if (!item || typeof item !== 'object') item = {};
-        item = lodash.extend(item, user_ids);
-        delete item[users[i].id];
-        return item;
-      });
-      users.forEach(function(user, i) {
-        user.data(KEY_CLICK_BOOK_SCORE, all_scores[i]);
-      });
-    });
-  }
-
-  function getRatios(ret, ids_list) {
-    var ratios = {};
-    var all_ids = {
-      done: ids_list[0],
-      wish: ids_list[1],
-      love: ids_list[2],
-      hate: ids_list[3],
-      commented: ids_list[4],
-
-      wish_done: ids_list[0],
-      done_wish: ids_list[1],
-      hate_love: ids_list[2],
-      love_hate: ids_list[3],
-    };
-    for (var k in ret) {
-      var ids = ret[k];
-      if (!all_ids[k]) continue;
-      ratios[k] = all_ids[k].map(function(item, i) {
-        return ids.length / item.length;
-      });
-    }
-    return ratios;
-  }
-
-  function sum(a, b) { 
-    return (a || 0) + (b || 0);
-  }
-
-  function min(a, b) {
-    return Math.min(a || 0, b || 0);
-  }
-
-  function calcScore(r, all_ids) {
-    var i = 0;
-    var factors = {
-      done: 2.5,
-      wish: 1.2,
-      love: 3.5,
-      // TODO: 不喜欢的书一般都很少，这个比例的权重理应与绝对值相关
-      hate: 0.5,
-      commented: 2,
-
-      done_wish: 1.5,
-      wish_done: 1.5,
-      hate_love: -0.8, // 偏好上的差异理应最大程度影响评分
-      love_hate: -0.8
-    };
-
-    for (var k in r) {
-      if (r[k]) {
-        i += r[k].reduce(min) * factors[k];
-      }
-    }
-
-    return Math.round(i * 1000);
-  }
-
-  // 可信度，收藏数量越接近，越为可信
-  function reliability(all_ids) {
-    var lens = all_ids[0].map(function(item) { return item.length; });
-    var max = Math.max.apply(Math, lens);
-    var min = Math.min.apply(Math, lens);
-    return Number((100 - (max - min) / max * 100).toFixed(2));
-  }
-
-  function getMutual(list) {
-    return lodash.reduce(list, function(a, b) {
-      b = lodash(b).pluck('_id')
-          .object(lodash.pluck(b, 'count'))
-          .value();
-      return a.filter(function(item) {
-          if (item._id in b) {
-            item.count_b = b[item._id];
-            return true;
-          }
-        });
-    });
-  }
 }
 
 module.exports = main;

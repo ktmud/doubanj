@@ -76,6 +76,10 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
     called = true;
   };
 
+  if (new Date() - user.last_statsed < 60000) {
+    return error_cb(new Error('Compute again too soon'));
+  }
+
   if (user.last_synced_status !== 'succeed') {
     if (user.syncTimeout()) {
       var err = new Error('Syncing timeout');

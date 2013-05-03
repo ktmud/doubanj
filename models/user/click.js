@@ -1,7 +1,7 @@
 var redis = central.redis;
 
 // 过期时间，单位 秒
-var CLICK_EXPIRES = 60 * 120;
+var CLICK_EXPIRES = 60 * 60 * 12;
 
 if (central.conf.debug) {
   CLICK_EXPIRES = 120;
