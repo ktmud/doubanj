@@ -149,7 +149,7 @@ FetchStream.prototype.fetch = function(start, cb) {
 
   //console.log(n);
   task.api(function(oauth2, next) {
-    log('fetching %s~%s...', start, start + self.perpage);
+    log('fetching [%s] %s~%s...', self.uid, start, start + self.perpage);
 
     var client = oauth2.clientFromToken(self.douban_token);
 
