@@ -11,7 +11,9 @@ var Resumable = require('resumable');
 
 var User = require('../models/user');
 
-['interest', 'compute', 'click'].forEach(function(item) {
+var mods = ['interest', 'compute', 'click'];
+
+mods.forEach(function(item) {
   var mod = module.exports[item] = require('./' + item);
 
   var queue = new Resumable({
@@ -47,8 +49,15 @@ var User = require('../models/user');
   });
 
   queue.on('dumped', function() {
-    log('Task queue for ' + item + ' dumped.');
+    log('Queue %s dumped.', queue.key);
   });
 
   module.exports[item + '_queue'] = queue;
+
 });
+
+module.exports._keyprefix = function(prefix) {
+  mods.forEach(function(item) {
+    module.exports[item + '_queue'].key = prefix + item;
+  });
+}

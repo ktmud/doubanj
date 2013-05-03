@@ -8,6 +8,8 @@ var log = require('debug')('dbj:tool:update');
 var User = require('../models/user');
 var tasks = require('../tasks');
 
+tasks._keyprefix('dbj-cron-update-');
+
 var oneday = 60 * 60 * 24 * 1000;
 var oneweek = oneday * 7;
 
