@@ -51,7 +51,7 @@ module.exports = function(db, next) {
 
   db.collection('user', function(err, r) {
     log('ensuring database "users"...');
-    var n = 4;
+    var n = 5;
     function _tick(err, r) {
       n--;
       if (err) console.error(err);
@@ -59,9 +59,10 @@ module.exports = function(db, next) {
     }
     //r.ensureIndex({ 'id': 1 }, index_options, _tick);
     r.ensureIndex({ 'uid': 1 }, index_options, _tick); 
+    r.ensureIndex({ 'book_synced_n': 1 }, sparse_option, _tick); 
     r.ensureIndex({ 'last_statsed': 1 }, sparse_option, _tick);
     r.ensureIndex({ 'last_synced': 1 }, sparse_option, _tick);
-    r.ensureIndex({ 'last_synced_status': 1 }, sparse_option, _tick);
+    r.ensureIndex({ 'last_synced_status': 1, 'book_n': -1 }, sparse_option, _tick);
     //r.ensureIndex({ 'mtime': 1 }, _tick); 
   });
 

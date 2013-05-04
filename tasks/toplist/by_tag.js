@@ -7,26 +7,16 @@ var verbose = debug('dbj:toplist:by_tag:verbose');
 var error = debug('dbj:toplist:by_tag:error');
 
 // reduce to top 100 subjects
-var reduce = function(tags, vals) { 
-  var ret = [];
-  vals.forEach(function(item, i) {
-    if (item.arr) {
-      ret.concat(item.arr);
-    } else {
-      ret.push(item);
-    }
-  });
-  ret = ret.sort(function(a, b) {
-    return b.count - a.count;
-  }).slice(0, 100);
+//var reduce = function(tag, vals) { 
+  //vals = Array.prototype.concat.apply([], vals);
+  //vals = vals.sort(function(a, b) {
+    //return b.count - a.count;
+  //}).slice(0, 100);
 
-  return { arr: ret };
-};
+  //return vals;
+//};
 
-var finalize = function(key, reduced) {
-  if (reduced.arr) return reduced.arr;
-  return [reduced];
-};
+var noop = function(){};
 
 function users_by_tag(ns, status, done) {
   done = done || function(){};
@@ -35,41 +25,51 @@ function users_by_tag(ns, status, done) {
   
   var stats_status = status || 'all';
   
-  // map out all the tags
-  var map = function() {
-    if (!this[ns + '_stats']) return;
-    var result = this[ns + '_stats'][stats_status];
-    var top_tags = result && result.top_tags;
-
-    var user_id = this._id;
-
-    if (top_tags) {
-      top_tags.forEach(function(item, i) {
-        emit(item._id, { _id: user_id, count: item.count });
-      });
-    }
-  };
-
   var out_coll = ['top', ns, status, 'user_by_tag'].join('_');
 
   mongo.queue(function(db, next) {
 
     log('[%s] started...', out_coll);
 
-    db.collection('user').mapReduce(map, reduce, {
-      scope: {
-        ns: ns,
-        stats_status: stats_status
-      },
-      finalize: finalize,
-      //out: { inline: 1 },
-      out: { replace: out_coll },
-    }, function(err, coll) {
-      next();
-      if (err) {
-        error('top %s %s users by tag failed: ', ns, stats_status, err)
-        return done(err);
+    var query = { last_synced_status: 'succeed' };
+
+    // 至少总共读过50本书才可能进榜吧
+    // { book_stats.done.total: { $gt: 50 } }
+    query[ns + '_n'] = { $gt: 50 };
+
+    var stream = db.collection('user').find(query).stream();
+
+    var out_collection = db.collection(out_coll);
+
+
+    out_collection.ensureIndex({ tagname: 1, count: 1 }, { background: true }, noop);
+
+    function update_tags_coll(user_id, top_tags){
+      top_tags.forEach(function(item, i) {
+        out_collection.update({ _id: user_id + '::' + i }, {
+          $set: { tagname: item._id, count: item.count }
+        }, { upsert: true, w: -1 });
+      });
+    }
+
+    stream.on('data', function(doc) {
+      if (!doc[ns + '_stats']) return;
+      var result = doc[ns + '_stats'][stats_status];
+      var top_tags = result && result.top_tags;
+
+      if (top_tags) {
+        update_tags_coll(doc._id, top_tags);
       }
+    });
+
+    stream.on('error', function(err) {
+      next();
+      error('[%s] failed: ', out_coll, err)
+      done(err);
+    });
+
+    stream.on('close', function(err) {
+      next();
       log('[%s] generated.', out_coll);
       done();
     });
@@ -81,31 +81,46 @@ function subjects_by_tag(ns, done) {
 
   if (!ns) return done(new Error('Namespace needed'));
   
-  // map out all the tags
-  var map = function() {
-    if (!this.tags || !this.tags.length) return;
-
-    var id = this._id;
-    this.tags.forEach(function(item, i) {
-      emit(item.name, { _id: id, count: item.count });
-    });
-  };
   var out_coll = ['top', ns, 'by_tag'].join('_');
 
   mongo.queue(function(db, next) {
 
     log('[%s] started...', out_coll);
 
-    db.collection(ns).mapReduce(map, reduce, {
-      //out: { inline: 1 },
-      finalize: finalize,
-      out: { replace: out_coll },
-    }, function(err, coll) {
+    // 至少有十个人打分的图书才有可能进入热门榜吧
+    var query = {
+      'raters': { $gt: 10 }
+    };
+
+    var stream = db.collection(ns).find(query).stream();
+
+    var out_collection = db.collection(out_coll);
+
+    out_collection.ensureIndex({ tagname: 1, count: 1 }, { background: true }, noop);
+
+    function update_tags_coll(subject_id, top_tags){
+      top_tags.forEach(function(item, i) {
+        out_collection.update({ _id: subject_id + '::' + i }, {
+          // 豆瓣API返回的 tag 格式为
+          // { name: 'xxx', title: 'xxx', count: 10 }
+          $set: { tagname: item.name, count: item.count }
+        }, { upsert: true, w: -1 });
+      });
+    }
+
+    stream.on('data', function(doc) {
+      if (!doc.tags) return;
+      update_tags_coll(doc._id, doc.tags);
+    });
+
+    stream.on('error', function(err) {
       next();
-      if (err) {
-        error('top %s by tag failed: ', ns, err)
-        return done(err);
-      }
+      error('[%s] failed: ', out_coll)
+      done(err);
+    });
+
+    stream.on('close', function(err) {
+      next();
       log('[%s] generated.', out_coll);
       done();
     });

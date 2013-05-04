@@ -24,11 +24,11 @@ app.param('tagname', function(req, res, next, tagname) {
     limit = limit || 18;
 
     return function(callback) {
-      toplist.tops_by_tag(tagname, obj_name, function(err, results) {
-        if (results) {
-          results = results.value;
-          c[obj_name + 's'] = results.slice(start, start + limit);
-        }
+      toplist.tops_by_tag(tagname, obj_name, {
+        start: start,
+        limit: limit
+      }, function(err, results) {
+        c[obj_name + 's'] = results;
         callback(err);
       });
     }
