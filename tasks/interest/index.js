@@ -86,8 +86,8 @@ collect = User.ensured(function(user, arg) {
     require('../compute')[arg.ns]({
        user: user,
        force: true,
-       success: function() {
-          run_toplist(collector);
+       success: function(user, all_results) {
+          run_toplist(user, all_results);
        },
     });
   });
@@ -95,7 +95,12 @@ collect = User.ensured(function(user, arg) {
   collector.run();
 });
 
-function run_toplist(collector) {
+function is_night() {
+  var h = (new Date()).getHours();
+  return h > 1 && h < 9;
+}
+
+function run_toplist(user, all_results) {
   var toplist = require('../toplist');
 
   try {
@@ -104,18 +109,28 @@ function run_toplist(collector) {
 
   var jobs = [];
   
+  var total = all_results.book_stats.n_done;
+
+  if (central.DEBUG) total = 20000;
+
   // 收藏数量太少的用户对最终结果应该也没什么影响
-  if (collector.total > 1000) {
-    jobs = [
-      async.apply(toplist.hardest_reader, 'last_30_days'),
-      async.apply(toplist.hardest_reader, 'last_12_month'),
-      async.apply(toplist.hardest_reader, 'all_time'),
-      // 某个tag下的热门图书
-      async.apply(toplist.by_tag.subjects, 'book'),
-    ];
+  if (total > 200) {
+    jobs.push(async.apply(toplist.hardest_reader, 'last_30_days'));
   }
-  if (collector.total > 200) {
-    jobs.push(async.apply(toplist.by_tag.users, 'book', 'done'));
+  if (total > 500) {
+    jobs.push(async.apply(toplist.hardest_reader, 'last_12_month'));
+  }
+  if (total > 1000) {
+    jobs.push(async.apply(toplist.hardest_reader, 'all_time'));
+
+    /**
+     * Use crontab to do this when in production
+     */
+    if (central.DEBUG) {
+      // 某个tag下的热门图书
+      jobs.push(async.apply(toplist.by_tag.subjects, 'book'));
+      jobs.push(async.apply(toplist.by_tag.users, 'book', 'done'));
+    }
   }
 
   toplist._timer = setTimeout(function() {
@@ -123,7 +138,7 @@ function run_toplist(collector) {
     if (central._compute_queue.queue.length) return;
     // generate toplist one by one
     if (jobs.length) async.series(jobs);
-  }, 300000); // 5 minutes of free
+  }, central.DEBUG ? 2000 : 300000); // 5 minutes of free
 }
 
 function collect_in_namespace(ns) {

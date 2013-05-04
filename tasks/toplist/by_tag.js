@@ -53,6 +53,9 @@ function users_by_tag(ns, status, done) {
   var out_coll = ['top', ns, status, 'user_by_tag'].join('_');
 
   mongo.queue(function(db, next) {
+
+    log('[%s] started...', out_coll);
+
     db.collection('user').mapReduce(map, reduce, {
       scope: {
         ns: ns,
@@ -70,7 +73,7 @@ function users_by_tag(ns, status, done) {
       log('[%s] generated.', out_coll);
       done();
     });
-  }, 5);
+  }, 4);
 }
 
 function subjects_by_tag(ns, done) {
@@ -90,6 +93,9 @@ function subjects_by_tag(ns, done) {
   var out_coll = ['top', ns, 'by_tag'].join('_');
 
   mongo.queue(function(db, next) {
+
+    log('[%s] started...', out_coll);
+
     db.collection(ns).mapReduce(map, reduce, {
       //out: { inline: 1 },
       finalize: finalize,
@@ -103,7 +109,7 @@ function subjects_by_tag(ns, done) {
       log('[%s] generated.', out_coll);
       done();
     });
-  }, 5);
+  }, 4);
 }
 
 module.exports = {

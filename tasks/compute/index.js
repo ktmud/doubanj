@@ -69,9 +69,9 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
     next();
   };
 
-  var succeed_cb = function() {
+  var succeed_cb = function(user, all_results) {
     if (called) return;
-    arg.success();
+    arg.success(user, all_results);
     next();
     called = true;
   };
@@ -165,7 +165,7 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
               if (err) {
                 error_cb(err);
               } else {
-                succeed_cb(user);
+                succeed_cb(user, all_results);
               }
               next();
             });

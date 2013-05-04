@@ -20,6 +20,9 @@ init:
 update:
 	@export DEBUG="dbj:* -*:verbose" && ./tools/update.js
 
+toplist:
+	@export DEBUG="dbj:*" && ./tools/toplist.js
+
 init_bootstrap:
 	git submodule init
 	git submodule update
