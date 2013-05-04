@@ -22,7 +22,7 @@ Do('lodash', 'd3', 'chart/all', function(_require) {
     return 'http://' + ns + '.douban.com/subject_search?search_text=' + encodeURIComponent(txt);
   }
   function tag_url(ns, txt) {
-    return 'http://' + ns + '.douban.com/tag/' + encodeURIComponent(txt);
+    return '/tag/' + encodeURIComponent(txt);
   }
 
   // Abbreviations for publisher / autho

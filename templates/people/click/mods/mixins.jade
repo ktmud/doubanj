@@ -59,7 +59,9 @@ mixin book_list(ids, head, tail)
         - continue
       - subject = all_books[i]
       li
-        !{head && head(i)}
+        if head
+          .rbox-supple
+            !{head(i)}
         a(href="http://book.douban.com/subject/#{subject.id}/", target="db-#{subject.type}") 
           if subject.images
             .pic
@@ -69,4 +71,6 @@ mixin book_list(ids, head, tail)
             p.meta.authors !{subject.author.join(', ')}
           if subject.publisher
             p.meta.publisher #{subject.publisher}
-        !{tail && tail(i)}
+        if tail
+          .rbox-supple
+            !{tail(i)}

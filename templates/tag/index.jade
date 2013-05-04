@@ -1,0 +1,22 @@
+extend ../layout/basic
+
+block title
+  title 标签: #{tagname} - 豆瓣酱
+
+block head_more
+  style
+    !{istatic('css/tag.css')}
+
+block main
+  .row
+    .span9
+      h1 豆瓣上「#{tagname}」相关的书和人 
+        a.btn.btn-mini.btn-compact(href="http://book.douban.com/tag/#{tagname}") 去豆瓣 ⇗ 
+      if books 
+        include ./mods/books.jade
+        hr
+      if book_done_users
+        include ./mods/users.jade
+    .span3
+      p.well.small
+        这个页面只包括同步过数据到豆瓣酱的用户，更多相关信息，请去豆瓣网查询

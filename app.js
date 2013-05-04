@@ -10,8 +10,10 @@
   //next && next();
 //});
 
-var mo_url = require('url');
+var URL = require('url');
 var express = require('express');
+
+var connect_domain = require('./lib/connect_domain');
 var central = require('./lib/central');
 var passport = require('./lib/passport');
 var serve = require('./serve');
@@ -33,6 +35,8 @@ module.exports.boot = function() {
   app.set('view cache', !central.conf.debug);
   app.set('views', __dirname + '/templates');
 
+  app.use(connect_domain());
+
   app.use(express.static(central.assets.root, { maxAge: TWO_WEEKS }));
 
   app.use(express.methodOverride());
@@ -53,7 +57,7 @@ module.exports.boot = function() {
     res.locals._csrf = req.session._csrf;
     req.is_ssl = req.headers['x-forwarded-proto'] === 'https';
     res.locals.static = function(url) {
-      if (req.is_ssl) return mo_url.resolve(central.conf.https_root, url);
+      if (req.is_ssl) return URL.resolve(central.conf.https_root, url);
       return central.assets.fileUrl(url);
     };
     res.locals.req = req;

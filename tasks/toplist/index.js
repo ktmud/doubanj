@@ -63,9 +63,10 @@ function generate_hardest_reader(period, cb) {
       log('Toplist for %s generated', out_coll);
       coll.ensureIndex({ value: -1 }, { background: true }, cb);
     });
-  });
+  }, 5); // 5 means low priority
 }
 
 module.exports = {
   hardest_reader: generate_hardest_reader,
+  by_tag: require('./by_tag'),
 };

@@ -1,0 +1,19 @@
+.mod
+  h2 热门图书
+  ol.rbox-list.interest-rboxes
+    each book in books
+      if !book
+        - continue
+      li 
+        a(href="http://book.douban.com/subject/#{book.id}/", target="db-#{book.type}") 
+          if book.images
+            .pic
+              img(src=book.images.medium)
+          p.title #{book.title}
+          if book.author
+            p.meta.authors !{book.author.join(', ')}
+          if book.publisher
+            p.meta.publisher #{book.publisher}
+          .rbox-supple
+            strong #{book._tag_count}
+            | 人标记

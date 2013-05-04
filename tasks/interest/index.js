@@ -3,6 +3,7 @@
 */
 var central = require(process.cwd() + '/lib/central');
 var utils = central.utils;
+var async = require('async');
 
 var raven = central.raven;
 
@@ -86,23 +87,44 @@ collect = User.ensured(function(user, arg) {
        user: user,
        force: true,
        success: function() {
-          var toplist = require('../toplist');
-
-          try {
-            clearTimeout(toplist._timer);
-          } catch (e) {}
-
-          toplist._timer = setTimeout(function() {
-            toplist.hardest_reader('last_30_days');
-            toplist.hardest_reader('last_12_month');
-            toplist.hardest_reader('all_time');
-          }, 300000); // 5 minutes of free
-       }
+          run_toplist(collector);
+       },
     });
   });
 
   collector.run();
 });
+
+function run_toplist(collector) {
+  var toplist = require('../toplist');
+
+  try {
+    clearTimeout(toplist._timer);
+  } catch (e) {}
+
+  var jobs = [];
+  
+  // 收藏数量太少的用户对最终结果应该也没什么影响
+  if (collector.total > 1000) {
+    jobs = [
+      async.apply(toplist.hardest_reader, 'last_30_days'),
+      async.apply(toplist.hardest_reader, 'last_12_month'),
+      async.apply(toplist.hardest_reader, 'all_time'),
+      // 某个tag下的热门图书
+      async.apply(toplist.by_tag.subjects, 'book'),
+    ];
+  }
+  if (collector.total > 200) {
+    jobs.push(async.apply(toplist.by_tag.users, 'book', 'done'));
+  }
+
+  toplist._timer = setTimeout(function() {
+    // if there are ongoing computings, abort
+    if (central._compute_queue.queue.length) return;
+    // generate toplist one by one
+    if (jobs.length) async.series(jobs);
+  }, 300000); // 5 minutes of free
+}
 
 function collect_in_namespace(ns) {
   return function(arg) {

@@ -16,6 +16,10 @@
       color: #45b;
       font-size: 14px;
       margin: 0.8em 0 0;
+    .rbox-supple
+      margin-left: -9px;
+      margin-top: 7px;
+      border-top: 1px solid #f98;
 
   p
     margin: 0.5em 0 0.3em;
@@ -33,6 +37,25 @@
     vertical-align: top;
     display inline-block
     margin 10px 8px 30px
+
+.rbox-supple
+  border: 1px solid #ddd;
+  border-top: 0;
+  background: #fafafa;
+  padding: 10px;
+  font-size: 12px;
+  border-radius: 0 0 3px 3px;
+  position: absolute;
+  width: 106px;
+  display: none;
+
+li:hover .rbox-supple
+  display: block;
+
+.mixed-stars
+  text-align: center
+  .splitter
+    color: #999;
 
 .interest-rboxes
   img
@@ -54,12 +77,24 @@
     height: 1.3em;
     overflow: hidden;
 
+  .rbox-supple
+    width: 75px;
+
   p.tags
     font-size: 12px;
     font-weight: 100;
     color: #b3b3b3;
     height: 2.4em;
     text-align: left;
+
+  a:hover
+    background: #fafdff;
+    border-color: #90d0ec;
+    .rbox-supple
+      border-color: #90d0ec;
+      border-top-color: #d9e3ef;
+      background: #fff;
+
 
 @media (max-width: 768px)
   .rbox-list

@@ -1,0 +1,15 @@
+.mod
+  h2 读过相关图书最多的人
+  mixin people_wall(book_done_users)
+
+mixin people_wall(people)
+  ol.rbox-list.people-rboxes
+    for p in people
+      li
+        a(href="#{p.url()}", title="#{p.name}#{p.signature ? ' (' + p.signature + ')' : ''}")
+          .pic
+            img(src="#{p.avatar}", width=48, height=48, alt="#{p.name}")
+          p.title #{p.name}
+          .rbox-supple 读过
+            strong #{p._tag_count}
+            | 本

@@ -37,12 +37,10 @@ module.exports = function(app, central) {
     res.redirect('/people/' + uid + '/');
   });
 
-  ['people', 'api', 'misc', 'top', 'mine', 'queue', 'auth', 'monitor'].forEach(function(item) {
+  ['people', 'api', 'misc', 'top', 'mine', 'queue', 'auth', 'tag', 'monitor'].forEach(function(item) {
     require('./' + item)(app, central);
   });
 
-  //var raven = require('raven');
-  //app.use(raven.middleware.express(central.raven.client));
   app.use(utils.errorHandler({ dump: central.conf.debug }));
   app.use(utils.errorHandler.notFound);
 };

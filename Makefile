@@ -1,6 +1,6 @@
 start:
 	#@export DEBUG="dbj:*" && forever -w app.js
-	@export DEBUG="dbj:*" && supervisor -w 'lib,serve,models,app.js,node_modules/jade,node_modules/passport-douban,conf,tasks,Gruntfile.js' -p 800 app.js 
+	@export DEBUG="dbj:*" && supervisor -w 'lib,serve,models,app.js,conf,tasks,Gruntfile.js' -p 1000 app.js 
 
 grunt:
 	@export DEBUG="dbj:*" && grunt

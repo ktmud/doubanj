@@ -3,7 +3,7 @@ mixin tagcloud(tags, ns)
   .tagcloud
     each tag in tags
       if tag && tag._id
-        a.tag-item(href="http://" + ns + '.douban.com/tag/' + encodeURIComponent(tag._id), target="_blank")
+        a.tag-item(href='/tag/' + encodeURIComponent(tag._id), target="_blank")
           strong #{tag._id}
           | &nbsp;
           span.muted (#{tag.count}#{tag.count_b ? ':' + tag.count_b : ''})
