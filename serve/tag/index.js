@@ -36,7 +36,7 @@ app.param('tagname', function(req, res, next, tagname) {
 
   async.parallel([
     get_ids('book', query.book_start),
-    get_ids('book_done_user', query.user_start, 24)
+    get_ids('book_done_user', query.user_start, 32)
   ], next);
 }, function(req, res, next) {
   var c = res.data;

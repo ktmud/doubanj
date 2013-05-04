@@ -44,7 +44,7 @@
   background: #fafafa;
   padding: 10px;
   font-size: 12px;
-  border-radius: 0 0 3px 3px;
+  border-radius(0 0 3px 3px);
   position: absolute;
   width: 106px;
   display: none;
@@ -73,12 +73,9 @@ li:hover .rbox-supple
   p.title
     font-size: 13px;
   p
-    width: 79px;
+    width: 80px;
     height: 1.3em;
     overflow: hidden;
-
-  .rbox-supple
-    width: 75px;
 
   p.tags
     font-size: 12px;
@@ -86,6 +83,16 @@ li:hover .rbox-supple
     color: #b3b3b3;
     height: 2.4em;
     text-align: left;
+
+  .rbox-supple
+    width: 70px;
+
+  a
+    padding: 3px 5px 7px;
+    .rbox-supple
+      margin-left: -6px;
+      margin-top: 5px;
+
 
   a:hover
     background: #fafdff;
