@@ -1,7 +1,7 @@
 #history.row.mod
   - statuses = [istatus.status]
   - legend = istatus.status === 'all'
-  .span12
+  .col.col-lg-12
     if legend
       small.pull-right.bar-style-toggler
         label
@@ -12,7 +12,7 @@
           分组
     h3 阅读编年史
       a.anchor(href="#history") #
-  .span12
+  .col.col-lg-12
     .chart
       ul.nav.nav-pills.nav-pills-small.chart-filter
         li.active
@@ -25,7 +25,7 @@
           a(href="time:last_year") 去年
       .chart-bar#d-by_updated(data-legend=legend, data-bar=people.book_csv('by_updated_month', statuses), data-y="本", data-periodic="true")
       .caption 每月阅读量
-  .span12
+  .col.col-lg-12
     .chart
       .chart-bar#d-by_pubdate(data-legend=legend, data-bar=people.book_csv('by_pubdate_decades', statuses), data-y="本")
       .caption 收藏图书的出版年代

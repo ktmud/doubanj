@@ -5,7 +5,7 @@ block head_more
 
 block main 
   .row
-    .span9
+    .col.col-lg-9
       block article
         h1 #{name} 的豆瓣酱
         if people.invalid && !people.last_synced
@@ -36,7 +36,7 @@ block main
         else
           .vmiddle
             include ./cases/wait
-    .span3
+    .col.col-lg-3
       block sidebar
         if (!req.url.split('/').pop() && req.user && req.user !== people && people.book_stats && !people.isEmpty('book'))
           include ./mods/click

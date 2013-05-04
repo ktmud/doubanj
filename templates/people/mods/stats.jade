@@ -12,16 +12,16 @@ else if people.stats_fail
 else
   .alert.alert-info(style="padding: 10px;")
     .row
-      .span8
+      .col.col-lg-8
         if people.isSyncing()
           正在同步最新数据
           | ，以下是基于同步于 #{strftime(FULL_TIME, people.last_synced)} 的数据生成的结果
         else
           正在重新生成报表
           | ，以下是 #{strftime(FULL_TIME, last_statsed || people.last_synced)} 生成的结果
-      .span3
+      .col.col-lg-3
         include ../mods/progress
-      .span1
+      .col.col-lg-1
         a.btn.btn-mini.pull-right(href="?recount") 刷新
 
 section

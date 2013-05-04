@@ -11,7 +11,7 @@ block main
       !{err}
   hr
   .monitor-overview.row
-    .span6
+    .col.col-lg-6
       h2 队列
       mixin queue_item(central._interest_queue.queue, '采集')
       mixin queue_item(central._compute_queue.queue, '统计')
@@ -20,7 +20,7 @@ block main
         p 契合：#{String(queue.length)}
         if queue.length
           mixin click_queue_users(queue)
-    .span6
+    .col.col-lg-6
       h2 统计
       .mod
         p 全部用户

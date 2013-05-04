@@ -9,7 +9,7 @@ if !locals.navbar_links
     a.navbar-brand(href=conf.site_root) #{conf.site_name}
 
     .nav-collapse.collapse
-      .nav
+      ul.nav
         each link in navbar_links
           li(class=link.active ? 'active' : null)
             a(href=link.href, title=link.title, target=link.target) #{link.text}

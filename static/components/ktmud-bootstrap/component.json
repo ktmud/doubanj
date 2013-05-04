@@ -1,6 +1,10 @@
 {
   "name": "bootstrap",
   "version": "3.0.0",
+  "main": [
+    "./docs/assets/js/bootstrap.js",
+    "./docs/assets/css/bootstrap.css"
+  ],
   "scripts": [
     "./docs/assets/js/bootstrap.js"
   ],
@@ -8,11 +12,14 @@
     "./docs/assets/css/bootstrap.css"
   ],
   "fonts": [
-    "./docs/assets/fonts/glyphiconshalflings-regular.eot",
-    "./docs/assets/fonts/glyphiconshalflings-regular.otf",
-    "./docs/assets/fonts/glyphiconshalflings-regular.svg",
-    "./docs/assets/fonts/glyphiconshalflings-regular.ttf",
-    "./docs/assets/fonts/glyphiconshalflings-regular.woff"
+    "./fonts/glyphiconshalflings-regular.eot",
+    "./fonts/glyphiconshalflings-regular.otf",
+    "./fonts/glyphiconshalflings-regular.svg",
+    "./fonts/glyphiconshalflings-regular.ttf",
+    "./fonts/glyphiconshalflings-regular.woff"
   ],
+  "dependencies": {
+    "jquery": "~1.8.0"
+  },
   "repo": "https://raw.github.com/ktmud/bootstrap"
 }
