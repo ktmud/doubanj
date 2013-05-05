@@ -18,7 +18,7 @@ init:
 	@cp -iv ./conf/development.conf.tmpl.js ./conf/development.conf.js
 
 update:
-	@export DEBUG="dbj:* -*:verbose" && ./tools/update.js
+	@export NODE_ENV=production && export DEBUG="dbj:* -*:verbose" && ./tools/update.js
 
 toplist:
 	@export DEBUG="dbj:*" && ./tools/toplist.js
