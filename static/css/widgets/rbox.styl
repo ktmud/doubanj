@@ -2,6 +2,7 @@
   margin 0
   a
     display: block;
+    position: relative;
     padding: 8px
     border 1px solid #e0e0e0
     color: #333;
@@ -17,8 +18,6 @@
       font-size: 14px;
       margin: 0.8em 0 0;
     .rbox-supple
-      margin-left: -9px;
-      margin-top: 7px;
       border-top: 1px solid #f98;
 
   p
@@ -44,10 +43,12 @@
   background: #fafafa;
   padding: 10px;
   font-size: 12px;
-  border-radius(0 0 3px 3px);
   position: absolute;
-  width: 128px;
+  right: -1px;
   display: none;
+  width: 106px;
+  border-radius(0 0 3px 3px);
+  box-sizing(content-box);
 
 li:hover .rbox-supple
   display: block;
@@ -91,7 +92,7 @@ li:hover .rbox-supple
     padding: 3px 5px 7px;
     .rbox-supple
       margin-left: -6px;
-      margin-top: 5px;
+      margin-top: 7px;
 
 
   a:hover
