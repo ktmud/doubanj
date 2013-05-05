@@ -4,7 +4,7 @@ block left
   .vmiddle#click-loading
       .click-progress.progress.progress-striped.active
         .progress-bar(style="width:1%")
-      small.muted 正在生成#{people._name}和#{other._name}的契合指数
+      small.text-muted 正在生成#{people._name}和#{other._name}的契合指数
   script
     !{istatic('js/mine/click.js')}
     Do.loadClick('#{people.uid}', '#{other.uid}', '#click-loading', function() {

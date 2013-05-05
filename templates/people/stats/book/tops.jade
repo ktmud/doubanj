@@ -32,7 +32,7 @@
 
 mixin small_list(items, prop, suffix)
   - suffix = suffix || ''
-  ol.muted.list-small
+  ol.text-muted.list-small
     each b in items
       li
         a(href="http://book.douban.com/subject/#{b._id || b.id}/", target="db-book") #{trunc(b.title, 9)}

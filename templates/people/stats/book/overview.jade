@@ -11,11 +11,11 @@ include ./mixins
   .col.col-lg-3
     h4 最新收藏
     if locals.latest_interests
-      ul.muted
+      ul.text-muted
         each item in latest_interests
           li 
             mixin interest_item(item, 8)
     else if people.last_synced_status === 'ing'
-      p.muted 正在重新同步...
+      p.text-muted 正在重新同步...
     else
       p 暂时没有

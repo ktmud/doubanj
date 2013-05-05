@@ -23,10 +23,10 @@ include ./mixins.jade
       - share_url += "&name=" + encodeURIComponent(user.name + ' + ' + topper.name + ' 的契合指数 - 豆瓣酱')
       - share_url += "&text=" + encodeURIComponent(share_text)
       a.btn.btn-mini.btn-compact(target="_blank", href="#{share_url}") 告诉他们
-    small.muted
+    small.text-muted
       *只包括已经有报表的友邻
   else
-    .muted
+    .text-muted
       p 访问友邻们的页面，会自动生成你们的
         a(href="/about/click", target="_blank") 契合指数
       p 得分最高的友邻会出现在这里

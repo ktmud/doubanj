@@ -6,7 +6,7 @@ mixin tagcloud(tags, ns)
         a.tag-item(href='/tag/' + encodeURIComponent(tag._id), target="_blank")
           strong #{tag._id}
           | &nbsp;
-          span.muted (#{tag.count}#{tag.count_b ? ':' + tag.count_b : ''})
+          span.text-muted (#{tag.count}#{tag.count_b ? ':' + tag.count_b : ''})
 
 - ns_cats = { 'book': '1001' }
 mixin searchcloud(tags, ns)
@@ -18,7 +18,7 @@ mixin searchcloud(tags, ns)
         span.tag-item
           a(href="http://" + ns + '.douban.com/subject_search?cat=' + cat + '&amp;search_text=' + encodeURIComponent(tag._id),
             target="_blank") #{tag._id}
-          span.muted (#{tag.count})
+          span.text-muted (#{tag.count})
 
 - make_stars = function(star) { if (!star || !star.value) return ''; var n = star.max || 5, s = ''; star = star.value; while (n > 0) { star--; n--; s += star >= 0 ? '&#10029;' : '&#10025' } return s; }
 

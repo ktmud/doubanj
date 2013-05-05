@@ -39,7 +39,7 @@ mixin rate_stars(i)
   if i
     mixin stars(i)
   else
-    small.muted (暂未评价)
+    small.text-muted (暂未评价)
 
 mixin mixed_rating_stars(subject_id)
   - item1 = people._interest_by_subject_id[subject_id]

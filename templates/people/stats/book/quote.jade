@@ -3,7 +3,7 @@ include ./mixins.jade
 #most-commented.row.mod
   .col.col-lg-12
     h4 体悟
-      small.muted (不包括长篇评论)
+      small.text-muted (不包括长篇评论)
       a.anchor(href="#most-commented") #
       if n_comments > most_commented.length
         a.pull-right.btn.btn-mini.btn-compact(href="#{people.url()}quote") 全部 》
@@ -15,4 +15,4 @@ include ./mixins.jade
               mixin comment_item(i)
     else
       .vmiddle
-        p.muted 收藏时写的短评会出现在这里
+        p.text-muted 收藏时写的短评会出现在这里

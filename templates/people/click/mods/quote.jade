@@ -1,7 +1,7 @@
 include ../../stats/book/mixins.jade
 
 mixin comment_item(i)
-  small.pull-right.muted #{strftime('%Y-%m-%d', i.updated)} #{i.status_cn()} 
+  small.pull-right.text-muted #{strftime('%Y-%m-%d', i.updated)} #{i.status_cn()} 
     mixin stars(i.rating)
   if i.subject
     .subject-image

@@ -1,7 +1,7 @@
 include ../../mixins/enable_links.jade
 
 mixin comment_item(i)
-  small.muted.datetime.pull-right #{strftime('%Y-%m-%d', i.updated)}
+  small.text-muted.datetime.pull-right #{strftime('%Y-%m-%d', i.updated)}
   p #{i.status === 'done' ? '评' : i.status_cn()}《
     mixin subject_link(i)
     |》

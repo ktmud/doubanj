@@ -1,3 +1,5 @@
+include ../../people/mixins/interest
+
 .mod
   h2 热门图书
   ol.rbox-list.interest-rboxes
@@ -6,6 +8,10 @@
         - continue
       li 
         a(href="http://book.douban.com/subject/#{book.id}/", target="db-#{book.type}") 
+          if book.rated
+            p.rating
+              mixin stars(Math.round(book.rated / 2))
+              | #{book.rated}
           if book.images
             .pic
               img(src=book.images.medium)
