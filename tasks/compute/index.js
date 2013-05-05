@@ -138,39 +138,37 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
 
         stats[ns] = new Date();
 
-        user.data(ns + '_stats', results, function() {
-          all_results[ns + '_stats'] = results; 
-          all_results[ns + '_stats_error'] = err && err.name || err; 
+        all_results[ns + '_stats'] = results; 
+        all_results[ns + '_stats_error'] = err && err.name || err; 
 
-          var stats_p = all_results.stats_p;
+        var stats_p = all_results.stats_p;
 
-          jobs_percent[ns] = done_percent;
+        jobs_percent[ns] = done_percent;
 
-          for (var j in jobs_percent) {
-            stats_p += (jobs_percent[j] || 0); 
-          }
+        for (var j in jobs_percent) {
+          stats_p += (jobs_percent[j] || 0); 
+        }
 
-          // all works done, safe to save.
-          if (stats_p < 100) return;
+        // all works done, safe to save.
+        if (stats_p < 100) return;
 
-          stats_p = 100;
-          all_results.last_statsed = stats[ns];
-          all_results.stats = stats;
-          all_results.stats_p = stats_p;
-          all_results.stats_status = 'succeed';
+        stats_p = 100;
+        all_results.last_statsed = stats[ns];
+        all_results.stats = stats;
+        all_results.stats_p = stats_p;
+        all_results.stats_status = 'succeed';
 
-          // to ensure all the other writings are done.
-          setTimeout(function() {
-            user.update(all_results, function(err) {
-              if (err) {
-                error_cb(err);
-              } else {
-                succeed_cb(user, all_results);
-              }
-              next();
-            });
-          }, 1000);
-        });
+        // to ensure all the other writings are done.
+        setTimeout(function() {
+          user.update(all_results, function(err) {
+            if (err) {
+              error_cb(err);
+            } else {
+              succeed_cb(user, all_results);
+            }
+            next();
+          });
+        }, 1000);
       }, function(percent) {
         if (called) return;
 

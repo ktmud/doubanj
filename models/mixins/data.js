@@ -2,6 +2,8 @@ var central = require('../../lib/central');
 
 var redis = central.redis;
 
+var noop = function(){};
+
 /**
  * format a cache key
  */
@@ -39,13 +41,13 @@ exports._get_data = function(key, cb) {
 exports._set_data = function(key, val, cb) {
   key = this.cache_key(key);
   val = JSON.stringify(val);
-  redis.client.set(key, val, cb);
+  redis.client.set(key, val, cb || noop);
 };
 exports._del_data = function(key, cb) {
   key = this.cache_key(key);
-  redis.client.del(key, cb);
+  redis.client.del(key, cb || noop);
 };
 
 exports.expire = function(key, milliseconds, cb) {
-  redis.client.pexpire(this.cache_key(key), milliseconds, cb);
+  redis.client.pexpire(this.cache_key(key), milliseconds, cb || noop);
 };
