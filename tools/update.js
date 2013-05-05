@@ -30,6 +30,10 @@ function updateAll(query) {
         log('Skipping %s...', u.name);
         return;
       }
+      if (u.book_n < 100) {
+        log('Skipping %s for too less...', u.name);
+        return;
+      }
 
       stream.pause();
 

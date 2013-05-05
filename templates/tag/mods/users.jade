@@ -8,7 +8,7 @@ mixin people_wall(people)
   ol.rbox-list.people-rboxes
     for p in people
       li
-        a(href="#{p.url()}", title="#{p.name}#{p.signature ? ' (' + p.signature + ')' : ''}")
+        a(href="#{p.url()}read", title="#{p.name}#{p.signature ? ' (' + p.signature + ')' : ''}")
           .pic
             img(src="#{p.avatar}", width=48, height=48, alt="#{p.name}")
           p.title #{p.name}

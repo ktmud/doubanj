@@ -2,7 +2,6 @@
   margin 0
   a
     display: block;
-    position: relative;
     padding: 8px
     border 1px solid #e0e0e0
     color: #333;
@@ -33,6 +32,7 @@
       border-radius(2px)
 
   li
+    position: relative;
     vertical-align: top;
     display inline-block
     margin 10px 8px 30px
@@ -44,9 +44,10 @@
   padding: 10px;
   font-size: 12px;
   position: absolute;
-  right: -1px;
+  right: 0;
   display: none;
   width: 106px;
+  z-index: 1;
   border-radius(0 0 3px 3px);
   box-sizing(content-box);
 
