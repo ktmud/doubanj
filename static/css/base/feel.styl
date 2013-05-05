@@ -1,3 +1,5 @@
+@import 'nib';
+
 sans = STHeiti,"Helvetica Neue",Helvetica,Arial,sans-serif
 h1_size = 1.8em
 h2_size = 1.4em
@@ -15,7 +17,8 @@ p.small
   overflow: hidden;
   background: #ccc;
   border: 1px solid #fff;
-  border-radius: 3px;
+  box-sizing(content-box);
+  border-radius(3px);
 
 .dot-red
   background: #f56;

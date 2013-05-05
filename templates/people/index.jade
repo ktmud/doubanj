@@ -38,7 +38,7 @@ block main
             include ./cases/wait
     .col.col-lg-3
       block sidebar
-        if (!req.url.split('/').pop() && req.user && req.user !== people && people.book_stats && !people.isEmpty('book'))
+        if (!req.url.split('/').pop() && req.user && req.user !== people && people.book_stats)
           include ./mods/click
         if people.created
           include ./mods/intro
