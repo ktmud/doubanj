@@ -10,7 +10,8 @@ html
     block head_more
     script(src=static('/js/do.js'), data-cfg-corelib='main', data-cfg-root=static('/'))
     script
-      Do.urls(!{urlmap('main', 'lodash')});
+      ASSEST_ROOT = '#{conf.assets_root}';
+      Do.urls(!{urlmap('main', 'lodash', 'jiathis')});
     if !conf.debug
       include ../common/track
   body

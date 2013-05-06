@@ -185,7 +185,7 @@ module.exports = function(grunt) {
         tasks: ['dist_js']
       }, 
       css: {
-        files: ['static/css/**/*.styl'],
+        files: ['static/css/**/*.styl', 'static/css/**/*.css'],
         tasks: ['dist_css']
       }
     },
