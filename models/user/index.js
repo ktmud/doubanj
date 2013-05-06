@@ -262,7 +262,9 @@ User.prototype.merge = function(data, cb) {
   if (data.uid) {
     data.uid = String(data.uid).toLowerCase();
   }
-  data.created = new Date(data.created);
+  if (typeof data.created === 'string') {
+    data.created = new Date(data.created);
+  }
   data._id = data.id;
   delete data.id;
 
