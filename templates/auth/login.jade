@@ -12,8 +12,7 @@ block main
     .col.col-lg-12.douban-login
       h2 通过豆瓣验证登录
       p
-        a(href="/auth/douban", title="使用豆瓣账号登录")
-          img(alt="使用豆瓣账号登录", src="#{static('/pics/login_with_douban_32.png')}")
+        include ./mods/douban
     //.col.col-lg-.splitter
     //.col.col-lg-6
     //include ./mods/login_form.jade

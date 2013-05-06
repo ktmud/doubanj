@@ -6,11 +6,14 @@ block main
   form.vmiddle.form-inline(id="start-form", action="/")
     div
       label(for="uid")
-        输入你的豆瓣ID或个人主页地址：
+        输入你的豆瓣个人主页地址：
     p
       input#uid.col-lg-7.col-sm-9(name="q", required, type="text", size="26", placeholder="http://www.douban.com/people/.../")
       &nbsp;
       button.btn.btn-primary(type="submit") 开始
+    .hr-or
+      span 或
+    include ./auth/mods/douban
 
   hr
   include ./widgets/latest_synced
