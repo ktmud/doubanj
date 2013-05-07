@@ -25,16 +25,6 @@ function updateAll(query) {
     stream.on('data', function(doc) {
       var u = new User(doc);
 
-      // 一周之内更新过的用户就不再更新
-      if (u.invalid || u.last_synced_status === 'ing' || now - u.last_synced < oneweek) {
-        log('Skipping %s...', u.name);
-        return;
-      }
-      if (u.book_n < 100) {
-        log('Skipping %s for too less...', u.name);
-        return;
-      }
-
       stream.pause();
 
       u.pull(function() {
@@ -65,4 +55,15 @@ function updateAll(query) {
   });
 }
 
-setTimeout(updateAll, 2000, null);
+setTimeout(updateAll, 2000, {
+  last_synced_status: {
+    $ne: 'ing'
+  },
+  book_n: {
+    $gt: 100
+  },
+  // 一周之内更新过的用户就不再更新
+  last_synced: {
+    $lt: new Date(new Date() - oneweek)
+  },
+});
