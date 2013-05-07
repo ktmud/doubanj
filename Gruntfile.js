@@ -275,10 +275,12 @@ module.exports = function(grunt) {
 
       var contents = grunt.file.read(p);
 
+      // 先看有没有表示可以 wrap 为 CommonJS 模块的标识
       if (opts.wrap && contents.search(opts.wrap) == -1) {
         grunt.log.writeln('Wont\'t wrap "' + p + '"');
         return contents;
       }
+      // 即使有标识，但是明确声明了不 wrap ，那也跳过
       if (contents.search(opts.nowrap) !== -1) return contents;
 
       var tmpl_opt = { data: data };
