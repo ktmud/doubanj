@@ -36,15 +36,17 @@ h2 #{other._name}读过的#{people._name}想读的书
     small (共#{n}本, 占#{people._name}全部想读的 #{(n / people.book_stats.wish.total).toFixed(3)}%)
 mixin book_list(clicks.wish_done.slice(0, 6))
 hr
+
 if clicks.ratios.love_hate[0]
   h2 #{people._name}喜欢#{other._name}却不喜欢的书
       - n = clicks.love_hate.length
       small  (共#{n}本, 占#{people._name}全部喜欢的#{(clicks.ratios.love_hate[0] * 100).toFixed(2)}%)
-  hr
   mixin book_list(clicks.love_hate.slice(0, 6), null, mixed_rating_stars_mixin)
+  hr
+
 if clicks.ratios.hate_love[0]
   h2 #{people._name}不喜欢#{other._name}却喜欢的书
       - n = clicks.hate_love.length
       small  (共#{n}本, 占#{people._name}全部不喜欢的#{(clicks.ratios.hate_love[0] * 100).toFixed(2)}%)
-  hr
   mixin book_list(clicks.hate_love.slice(0, 6), null, mixed_rating_stars_mixin)
+  hr

@@ -164,7 +164,7 @@ FetchStream.prototype.fetch = function(start, cb) {
       // release pool client
       setTimeout(next, oauth2.req_delay);
 
-      var code = err && err.statusCode || res.statusCode;
+      var code = err && err.statusCode || res && res.statusCode;
       if (code !== 200) {
         var err_code = ERRORS[String(code)];
         self.user.invalid = err_code || 1;
