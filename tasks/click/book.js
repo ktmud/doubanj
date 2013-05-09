@@ -120,6 +120,9 @@ function main(users, callback) {
     });
   }
 
+  /**
+   * 计算每个领域交叉图书占个人总收藏的比例
+   */
   function getRatios(ret, ids_list) {
     var ratios = {};
     var all_ids = {
@@ -144,7 +147,7 @@ function main(users, callback) {
     return ratios;
   }
 
-  function calcScore(r, all_ids) {
+  function calcScore(ratios, all_ids) {
     var i = 0;
     var factors = {
       done: 2.5,
@@ -160,9 +163,10 @@ function main(users, callback) {
       love_hate: -0.8
     };
 
-    for (var k in r) {
-      if (r[k]) {
-        i += r[k].reduce(min) * factors[k];
+    for (var k in ratios) {
+      if (ratios[k]) {
+        // 取各人比例中的最小值来计算
+        i += ratios[k].reduce(min) * factors[k];
       }
     }
 
