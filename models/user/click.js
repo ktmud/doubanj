@@ -4,7 +4,7 @@ var redis = central.redis;
 var CLICK_EXPIRES = 60 * 60 * 12;
 
 if (central.conf.debug) {
-  CLICK_EXPIRES = 120;
+  CLICK_EXPIRES = 30;
 }
 
 var grades = {
@@ -61,7 +61,7 @@ exports.getClick = function(other, cb) {
     } catch (e) {}
     //ret = null;
     if (!err && ret && typeof ret.ratios === 'object') {
-      // 需要交换值
+      // 这种比较与计算结果时的 sort 一致
       if (self.id > other.id) {
         swap(ret, 'love_hate', 'hate_love');
         swap(ret, 'done_wish', 'wish_done');
@@ -86,5 +86,6 @@ exports.click_url = function(other, tail) {
 };
 
 exports._clickKey = function(other) {
+  // key 只需保证唯一，先后顺序其实并不重要
   return 'click_' + [this.id, other.id].sort().join('_');
 };

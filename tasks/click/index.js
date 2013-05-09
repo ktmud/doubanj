@@ -38,8 +38,12 @@ var compute = task.compute_pool.pooled(function calculateClick(computings, arg, 
       is_valid = false;
       break;
     }
+    // 需要按照用户 id 排序
+    // 为避免数字implicit类型转化，
+    // 不要直接相减
     users = users.sort(function(a, b) {
-      return a.id - b.id;
+      if (a.id > b.id) return 1;
+      return -1;
     });
   } else {
     is_valid = false;
