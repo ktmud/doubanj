@@ -3,6 +3,8 @@ html
   head
     meta(charset='utf-8')
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    script
+        var _speedMark = new Date();
     block title
       title #{typeof title === 'undefined' ? conf.site_name : title}
     link(rel='stylesheet', href=static('/css/bootstrap.css'))
