@@ -56,7 +56,7 @@ Pie.prototype.draw = function() {
       .attr("class", "arc");
 
   g.append("path").attr("d", arc)
-      .style("fill", function(d) { return color(d.data.value); });
+      .style("fill", function(d) { return color(d.data.label); });
 
   // default text x y
   var textY = options.textY, textX = options.textX;
