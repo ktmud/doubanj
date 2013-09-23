@@ -6,7 +6,7 @@ include ../mixins/interest
 .pull-right
   include ../mods/share.html
 h2 #{people.name} 的读书酱
-  a.btn.btn-xs(href=people.db_url('book'), target="db-profile")   读书主页 ⇗
+  a.btn.btn-success.btn-xs(href=people.db_url('book'), target="db-profile")   读书主页 ⇗
 hr
 include ./book/overview
 
@@ -24,4 +24,4 @@ include ./book/tops
 include ./book/favs
 
 hr
-a.pull-right.btn.btn-small.btn-success(href=people.url() + 'read') &gt; 只看读过的书
+a.pull-right.btn.btn-small.btn-info(href=people.url() + 'read') &gt; 只看读过的书

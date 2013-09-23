@@ -18,11 +18,11 @@ block main
     include ./auth/mods/douban
 
 block ending
-  script
+  script.
     Do.urls(!{urlmap('d3')});
     !{istatic('js/homepage/ticker.js')}
   // preload the d3 library
-  script(async)
+  script(async).
     Do('d3');
 
 block navbar_form

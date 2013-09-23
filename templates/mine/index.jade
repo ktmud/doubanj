@@ -26,7 +26,7 @@ block main
         include ./mods/tmpl_friends_list.html
         small.pull-right
           a.text-muted(href="http://www.douban.com/people/doubanj_com/status/1153013059/", target="_blank") 有关头像上的彩色小点
-    script
+    script.
       window._uid_ = '#{user.uid || user.id}';
       !{istatic('js/mine/booter.js')}
 

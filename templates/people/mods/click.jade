@@ -11,6 +11,6 @@
         .progress-bar(style="width:5%")
       small.text-muted 正在生成你们的契合指数
     include ./tmpl_click.html
-    script
+    script.
       !{istatic('js/mine/click.js')}
       Do.loadClick('#{req.user.uid}', '#{people.uid}', '#aside-click');

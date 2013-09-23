@@ -13,8 +13,8 @@ if !coll
 else
   include ./book/tags
 
-  n_comments = most_commented.length
-  most_commented = central.utils.shuffle(most_commented).slice(0,3)
+  - n_comments = most_commented.length
+  - most_commented = central.utils.shuffle(most_commented).slice(0,3)
   include ./book/quote
 
   hr

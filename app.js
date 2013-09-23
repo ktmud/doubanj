@@ -53,8 +53,10 @@ module.exports.boot = function() {
 
   app.locals(central.template_helpers);
 
+  app.use(express.csrf());
+
   app.use(function(req, res, next) {
-    res.locals._csrf = req.session._csrf;
+    res.locals._csrf = req.csrfToken();
     req.is_ssl = req.headers['x-forwarded-proto'] === 'https';
     res.locals.static = function(url) {
       if (req.is_ssl) return URL.resolve(central.conf.https_root, url);
@@ -63,8 +65,6 @@ module.exports.boot = function() {
     res.locals.req = req;
     next();
   });
-
-  app.use(express.csrf());
 
   serve(app, central);
 

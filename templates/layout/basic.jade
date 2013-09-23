@@ -3,7 +3,7 @@ html
   head
     meta(charset='utf-8')
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    script
+    script.
         var _speedMark = new Date();
     block title
       title #{typeof title === 'undefined' ? conf.site_name : title}
@@ -11,7 +11,7 @@ html
     link(rel='stylesheet', href=static('/css/base.css'))
     block head_more
     script(src=static('/js/do.js'), data-cfg-corelib='main', data-cfg-root=static('/'))
-    script
+    script.
       ASSEST_ROOT = '#{conf.assets_root}';
       Do.urls(!{urlmap('main', 'lodash', 'jiathis')});
     if !conf.debug

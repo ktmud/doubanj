@@ -165,7 +165,7 @@ app.get('/people/:uid/quote', function(req, res, next) {
   }
 
   var perpage = res.data.perpage = Math.max(20, parseInt(req.query.perpage, 10)) || 20;
-  var start = req.query.start = Math.max(0, parseInt(req.query.start, 10)) || 0;
+  var start = res.data.page_start= req.query.start = Math.max(0, parseInt(req.query.start, 10)) || 0;
 
   res.data.title = people.name + '的阅读体悟';
 

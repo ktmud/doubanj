@@ -25,9 +25,12 @@ block article
               mixin comment_item(i)
       .pager-center
         mixin paginator(req.query.start, commented_total, perpage, 4)
+        span.text-muted &nbsp;#{page_start + 1}-#{page_start + most_commented.length}/#{commented_total}
     else
       p 还没有撰写过任何阅读体悟哦
   hr
-  .mod
-    a.pull-right.btn.btn-small(href="http://#{ns}.douban.com/people/#{uid}/reviews", target="db-review") 去看#{people.name}的长评 ⇗
-    a.btn.btn-small.btn-success(href="#{people.url()}read") &lt; 返回 #{people.name}读过的书
+  .mod(style="text-align:center")
+    a.pull-right.btn.btn-success.btn-small(href="http://#{ns}.douban.com/people/#{uid}/reviews", target="db-review") 去看#{people.name}的长评 ⇗
+    if req.user != people
+      a.btn.btn-default.btn-small(href="#{user.click_url(people)}/quote", target="dbj-click") 看看我和#{people.name}对同一本书的不同评价
+    a.pull-left.btn.btn-small.btn-default(href="#{people.url()}read") &lt; 返回 #{people.name}读过的书
