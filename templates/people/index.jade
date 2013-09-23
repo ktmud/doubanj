@@ -9,7 +9,7 @@ block main
       block article
         h1 #{name} 的豆瓣酱
         if people.invalid && !people.last_synced
-          p.vmiddle.alert.alert-error 获取用户信息不小心失败了，休息一会再重试看看吧
+          p.vmiddle.alert.alert-danger 获取用户信息不小心失败了，休息一会再重试看看吧
         else if !people.last_synced_status
           // 根本没有同步过
           include ./cases/never
@@ -30,7 +30,7 @@ block main
             include ./cases/sync_failed
         else if people.syncTimeout()
           .vmiddle
-            p.alert.alert-error 抱歉，同步数据超时了，重试看看吧
+            p.alert.alert-danger 抱歉，同步数据超时了，重试看看吧
             hr
             include ./mods/resync 
         else

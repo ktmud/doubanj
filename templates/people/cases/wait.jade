@@ -1,7 +1,7 @@
 - need_resync = people.needResync()
 .vmiddle
   if need_resync
-    .alert.alert-error 上一次同步数据似乎出错了，重试一下吧
+    .alert.alert-danger 上一次同步数据似乎出错了，重试一下吧
   else
     include ../mods/progress
     p#remains.text-muted

@@ -6,7 +6,7 @@ if !people.isIng()
     | ，报表生成于 
     time #{strftime(FULL_TIME, people.stats.book)}
 else if people.stats_fail
-  .alert.alert-error(style="padding: 10px;")
+  .alert.alert-danger(style="padding: 10px;")
     计算最新报表时出错了，可能是服务器故障，也可能是你的数据太变态了
     a.btn.btn-mini.btn-danger.pull-right(href="#{people.url()}?recount") 重试
 else
