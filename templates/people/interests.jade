@@ -3,7 +3,7 @@ include ./mixins/interest
 
 block main 
   if !interests
-    p.alert 此用户的数据还未准备好，请过一会儿再回来
+    p.alert.alert-warning 此用户的数据还未准备好，请过一会儿再回来
   else 
     .people-info
       h1 用户 #{people.screen_name || people.uid} 的#{ns_name}收藏

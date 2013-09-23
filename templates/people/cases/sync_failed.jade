@@ -1,5 +1,5 @@
 - if (conf.debug || (new Date() - people.last_synced > 120000))
-  p.alert 上次同步数据时出错了，试试重新同步吧
+  p.alert.alert-warning 上次同步数据时出错了，试试重新同步吧
   include ../mods/resync
 else
   .alert.alert-error

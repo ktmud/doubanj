@@ -7,10 +7,12 @@ block main
     div
       label(for="uid")
         输入你的豆瓣个人主页地址：
-    p
-      input#uid.col-lg-7.col-sm-9(name="q", required, type="text", size="26", placeholder="http://www.douban.com/people/.../")
-      &nbsp;
-      button.btn.btn-primary(type="submit") 开始
+    div
+      .form-group
+        input#uid.form-control(name="q", required, type="text", size="50", placeholder="http://www.douban.com/people/.../")
+      .form-group
+        &nbsp;
+        button.btn.btn-primary(type="submit") 开始
     .hr-or
       span 或
     include ./auth/mods/douban
