@@ -41,6 +41,10 @@ function norm_subject(s, ns) {
     // zero is ignored
     s.rated = parseFloat(s.rating.average, 10) || null;
   }
+  // remove useless props
+  delete s.url;
+  delete s.alt;
+
   return s;
 }
 function norm_interest(i) {
