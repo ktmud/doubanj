@@ -11,7 +11,7 @@ block main
   .row
     .col.col-lg-9
       h1 豆瓣上「#{tagname}」相关的书和人 
-        a.btn.btn-mini.btn-compact(href="http://book.douban.com/tag/#{tagname}", target="_blank") 去豆瓣 ⇗ 
+        a.btn.btn-xs(href="http://book.douban.com/tag/#{tagname}", target="_blank") 去豆瓣 ⇗ 
       if books 
         include ./mods/books.jade
         hr

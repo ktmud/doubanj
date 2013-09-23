@@ -22,7 +22,7 @@ include ./mixins.jade
       - share_url = "http://shuo.douban.com/!service/share?image=&href=" + encodeURIComponent(target_url)
       - share_url += "&name=" + encodeURIComponent(user.name + ' + ' + topper.name + ' 的契合指数 - 豆瓣酱')
       - share_url += "&text=" + encodeURIComponent(share_text)
-      a.btn.btn-mini.btn-compact(target="_blank", href="#{share_url}") 告诉他们
+      a.btn.btn-xs(target="_blank", href="#{share_url}") 告诉他们
     small.text-muted
       *只包括已经有报表的友邻
   else

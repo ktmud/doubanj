@@ -6,7 +6,7 @@ include ./mixins.jade
       small.text-muted (不包括长篇评论)
       a.anchor(href="#most-commented") #
       if n_comments > most_commented.length
-        a.pull-right.btn.btn-mini.btn-compact(href="#{people.url()}quote") 全部 》
+        a.pull-right.btn.btn-xs(href="#{people.url()}quote") 全部 》
     if most_commented
       ul.comments-list
         each i in most_commented

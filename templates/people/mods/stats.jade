@@ -8,7 +8,7 @@ if !people.isIng()
 else if people.stats_fail
   .alert.alert-danger(style="padding: 10px;")
     计算最新报表时出错了，可能是服务器故障，也可能是你的数据太变态了
-    a.btn.btn-mini.btn-danger.pull-right(href="#{people.url()}?recount") 重试
+    a.btn.btn-xs.btn-danger.pull-right(href="#{people.url()}?recount") 重试
 else
   .alert.alert-info(style="padding: 10px;")
     .row
@@ -22,7 +22,7 @@ else
       .col.col-lg-3
         include ../mods/progress
       .col.col-lg-1
-        a.btn.btn-mini.pull-right(href="?recount") 刷新
+        a.btn.btn-default.btn-xs.pull-right(href="?recount") 刷新
 
 section
   include ../stats/book
