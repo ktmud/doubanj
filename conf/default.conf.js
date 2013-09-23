@@ -34,7 +34,7 @@ module.exports = {
   },
 
   // 管理员的豆瓣 uid
-  admin_users: ['jyyjcc'],
+  admin_users: ['yajc'],
 
   douban: {
     limit: 10, // request limit per minute
