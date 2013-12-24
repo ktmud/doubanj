@@ -829,6 +829,12 @@ function jiathis_sendto(a) {
     A = 'http://s.jiathis.com/',
     X = (cu.name && cu.url) ? "&acn=" + d(cu.name) + "&acu=" + d(cu.url) : "",
     B = A + W + G + T + F + E + K + P + R + S + X + C;
+
+  // douban url hack
+  if (a == 'douban') {
+    B = 'http://www.douban.com/share/service?href=' + d(U) + '&comment=' + d(c.summary);
+  }
+
   if (a == 'copy' || a == 'fav' || a == 'print' || a == 'weixin') {
     $CKE.open(B);
     if (a == 'copy') {

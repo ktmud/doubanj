@@ -19,9 +19,9 @@ include ./mixins.jade
       - share_text = '#豆瓣酱# 目前为止，和我读书品味最接近的友邻是 @' + topper.id
       - if (top_click_users.length > 1) share_text += ' 和 ' + top_click_users.slice(1).map(function(item) { return '@' + item.id; }).join(' ')
       - target_url = user.url() + 'click/' + topper.uid
-      - share_url = "http://shuo.douban.com/!service/share?image=&href=" + encodeURIComponent(target_url)
+      - share_url = "http://www.douban.com/share/service?href=" + encodeURIComponent(target_url)
       - share_url += "&name=" + encodeURIComponent(user.name + ' + ' + topper.name + ' 的契合指数 - 豆瓣酱')
-      - share_url += "&text=" + encodeURIComponent(share_text)
+      - share_url += "&comment=" + encodeURIComponent(share_text)
       a.btn.btn-xs(target="_blank", href="#{share_url}") 告诉他们
     small.text-muted
       *只包括已经有报表的友邻
