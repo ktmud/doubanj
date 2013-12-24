@@ -31,6 +31,6 @@ block article
   hr
   .mod(style="text-align:center")
     a.pull-right.btn.btn-success.btn-small(href="http://#{ns}.douban.com/people/#{uid}/reviews", target="db-review") 去看#{people.name}的长评 ⇗
-    if req.user != people
+    if req.user && req.user != people
       a.btn.btn-default.btn-small(href="#{user.click_url(people)}/quote", target="dbj-click") 看看我和#{people.name}对同一本书的不同评价
     a.pull-left.btn.btn-small.btn-default(href="#{people.url()}read") &lt; 返回 #{people.name}读过的书
