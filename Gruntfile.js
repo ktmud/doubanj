@@ -65,34 +65,6 @@ module.exports = function(grunt) {
         ]
       }
     },
-    //istatic: {
-    //main: {
-    //repos: {
-    //'twitter/bootstrap': {
-    //commit: '3.0.0-wip',
-    //file: {
-    //'./docs/assets/js/bootstrap.js': 'static/dist/bootstrap.js',
-    //'./docs/assets/css/bootstrap.css': 'static/dist/bootstrap.css',
-    //'./docs/assets/fonts': 'static/dist/fonts'
-    //}
-    //}
-    //}
-    //}
-    //},
-    //copy: {
-      //deps: {
-        //files: [
-          //{
-            //expand: true,
-            //src: [
-              //'**',
-            //],
-            //cwd: 'static/components/bootstrap/docs/assets/fonts/',
-            //dest: 'static/dist/fonts/',
-          //}
-        //]
-      //},
-    //},
     includes: {
       options: {
         includeRegexp: /^\s*(?:\/\/|\/\*)?\s*[\@\#]*(?:include|import)\s+[\"\'\(]*([^\"\'\)]+)[\"\'\)]*\s*(?:\*\/)?$/,
@@ -183,7 +155,7 @@ module.exports = function(grunt) {
       js: {
         files: ['static/js/**/*.js'],
         tasks: ['dist_js']
-      }, 
+      },
       css: {
         files: ['static/css/**/*.styl', 'static/css/**/*.css'],
         tasks: ['dist_css']
