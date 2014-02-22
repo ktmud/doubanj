@@ -6,8 +6,7 @@ grunt:
 	@export DEBUG="dbj:*" && grunt
 
 build:
-	@npm install --production
-	@export DEBUG="dbj:*" && grunt build
+	@export NODE_ENV="production" && npm install --production && export DEBUG="dbj:*" && grunt build
 
 watch:
 	@export DEBUG="dbj:*" && grunt watch
