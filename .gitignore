@@ -8,6 +8,7 @@ stable_cache
 var/*.log
 conf/*
 tmp/
+bower_components/
 static/hash.json
 static/source_hash.json
 static/build

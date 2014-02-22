@@ -40,8 +40,8 @@
     "express": "~3.4.0"
   },
   "devDependencies": {
-    "grunt-ozjs": "~0.2.0",
-    "colors": ">= 0.0.1",
+    "colors": "*",
+    "bower": "*",
     "mocha": "*"
   },
   "engines": {

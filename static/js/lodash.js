@@ -1,1 +1,1 @@
-// @import ../components/ktmud-lodash/lodash.js
+// @import ../../bower_components/lodash/dist/lodash.js

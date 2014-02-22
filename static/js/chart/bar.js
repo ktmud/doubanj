@@ -130,7 +130,7 @@ Bar.prototype._prepare = function(data) {
       .range([height, 0]);
 
   self.svg = self.container.select('svg > g');
-      
+
   if (self.svg.empty()) {
     self.svg = self.container.append("svg")
       .attr("width", options.width)
@@ -185,7 +185,7 @@ Bar.prototype.time_filter = function(a, b) {
     var m = a.match(reg_period);
     var punc = m[1], unit = m[3];
     var n = parseInt(m[2], 10);
-    
+
     a = new Date();
 
     if (punc === '-') {
@@ -196,7 +196,7 @@ Bar.prototype.time_filter = function(a, b) {
     if (unit === 'd') {
       a = +a + one_day * n;
     } if (unit === 'm') {
-      a = +a + n * one_day * 31 
+      a = +a + n * one_day * 31
     } else if (unit === 'y') {
       a = a.setFullYear(a.getFullYear() + n);
     }
@@ -243,6 +243,7 @@ Bar.prototype.grouped = function transitionGrouped(dur) {
   var y = self.y, x = self.x, n = self.n;
 
   y.domain([0, self.yGroupMax]);
+  console.log(y)
 
   self.style = 'grouped';
 

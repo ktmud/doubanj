@@ -1,11 +1,9 @@
+// @import ../../bower_components/jquery/dist/jquery.js
 require.register("jquery", function(exports, require, module){
-// @import ../components/component-jquery/index.js
+  module.exports = window.jQuery
 });
 require.register("main", function(exports, require, module) {
-  // expose to window
-  window.jQuery = window.$ = require('/jquery');
-  window.Sizzle = $.find;
-  // @import ../components/ktmud-bootstrap/js/bootstrap.js
+  // @import ../../bower_components/bootstrap/dist/js/bootstrap.js
 });
 require.register("utils/datetime", function(exports, require, module) {
   // @import ./utils/datetime.js
