@@ -7,7 +7,7 @@ var lodash = require('lodash');
 var KEY_CLICK_BOOK_SCORE = require('../../models/consts').KEY_CLICK_BOOK_SCORE;
 var ONE_DAY = 60 * 60 * 24;
 
-function sum(a, b) { 
+function sum(a, b) {
   return (a || 0) + (b || 0);
 }
 
@@ -20,7 +20,7 @@ function getIds(query) {
     var opts = {
       // only get subject_ids
       fields: { subject_id: 1, _id: -1 },
-      limit: 50000,
+      limit: 30000,
     };
 
     if (query) {
@@ -37,7 +37,7 @@ function getIds(query) {
 
 function intersects(query) {
   return function(users, next) {
-    async.map(
+    async.mapSeries(
       users,
       getIds(query),
       function(err, results) {
@@ -105,6 +105,7 @@ function main(users, callback) {
       user_ids[k] = score;
     }
 
+    // 更新全部评分排名
     async.map(users, function(item, callback) {
       item.data(KEY_CLICK_BOOK_SCORE, callback);
     }, function(err, all_scores) {
