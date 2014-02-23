@@ -69,9 +69,13 @@ tasks.getQueueLength = function(name) {
     })
     return total
   }
-  var queue = tasks['_' + name + '_queue']
+  var queue = tasks.getQueue(name)
   if (queue) {
     return queue.queue.length
   }
   return 0
+}
+
+tasks.getQueue = function(name) {
+  return tasks[name + '_queue']
 }

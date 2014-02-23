@@ -13,9 +13,9 @@ block main
   .monitor-overview.row
     .col.col-lg-6
       h2 队列
-      mixin queue_item(central._interest_queue.queue, '采集')
-      mixin queue_item(central._compute_queue.queue, '统计')
-      - queue = central._click_queue.queue
+      mixin queue_item('interest', '采集')
+      mixin queue_item('compute', '统计')
+      - queue = get_queue('click').queue
       .mod
         p 契合：#{String(queue.length)}
         if queue.length
@@ -37,12 +37,15 @@ block main
           p.users
             each u in timeouted
               a(href="/people/#{u.uid}/", target="dbj-monitor-user") #{u.name || u.uid}
+      .mod
+        图书 #{n_book} 本，收藏记录 #{n_book_interest} 条
       p csrf to use:
       pre
         | #{_csrf}
         
 
 mixin queue_item(queue, title)
+  - queue = get_queue(queue).queue
   .mod
     p #{title}：#{String(queue.length)}
     if queue.length
