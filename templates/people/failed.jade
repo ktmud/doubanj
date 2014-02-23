@@ -10,6 +10,9 @@ block message
   else if (err && err.statusCode != 404 && err != 404)
     h1 OH, NO!
     p 获取用户出错了
+    if people
+      hr
+      include ./mods/resync.jade
   else
     h1 OH, NO!
     p 找不到此用户

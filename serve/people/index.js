@@ -19,10 +19,6 @@ var tasks = require(central.cwd + '/tasks');
  * Error handler for people page
  */
 app.use('/people/', function(err, req, res, next) {
-  if (err instanceof Error) {
-    return next(err);
-  }
-
   var c = res.data || {};
   var people = c.people;
 
