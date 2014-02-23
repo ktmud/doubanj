@@ -125,7 +125,7 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
 
     jobs_percent[ns] = 0
 
-    mongo.queue(function(db, next) {
+    mongo.queue(function(db, release) {
       // 10 minutes timeout
       timeouts[ns] = setTimeout(function() {
         error_cb(new Error('Compute timeout'))
@@ -133,13 +133,12 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
 
       // rung single job
       job(db, user, function(err, results) {
-        if (err && !results) {
-          error_cb(err)
-          return next()
-        }
 
-        // already failed, no need to save..
-        if (called) return
+        release()
+
+        if (err && !results) {
+          return error_cb(err)
+        }
 
         clearTimeout(timeouts[ns])
 
@@ -170,13 +169,10 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
         succeed_cb(user, all_results)
       }, function progress(percent) {
         if (called) return
-
         // update computing percentage
         var stats_p = all_results.stats_p
         var p = percent * done_percent / 100
-
         if (stats_p > p + 5) return
-
         user.update({ stats_p: p })
       })
     }, 5)
