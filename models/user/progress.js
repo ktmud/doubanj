@@ -1,14 +1,15 @@
-var cwd = process.cwd();
-var task = require(cwd + '/lib/task');
+var cwd = process.cwd()
+var task = require('../../lib/task')
+var tasks = require('../../tasks/')
 
-var exports = module.exports;
+var proto = module.exports;
 
 var DB_RESPOND_DELAY = 5000;
 
 /**
 * reset queue status
 */
-exports.reset = function(cb) {
+proto.reset = function(cb) {
   this.update({
     stats_p: 0,
     stats_status: null,
@@ -22,7 +23,7 @@ exports.reset = function(cb) {
 /**
 * Mark sync start
 */
-exports.markSync = function(cb) {
+proto.markSync = function(cb) {
   this.update({
     stats_p: 0,
     stats_status: null,
@@ -33,14 +34,14 @@ exports.markSync = function(cb) {
 /**
 * is syncing or statsing, not finished yet
 */
-exports.isIng = function() {
+proto.isIng = function() {
   return this.last_synced_status === 'ing' || this.stats_status === 'ing';
 };
 
 /**
 * total progress in percent
 */
-exports.progress = function() {
+proto.progress = function() {
   var ps = this.progresses();
   var n = 0;
   ps.forEach(function(item) {
@@ -51,7 +52,7 @@ exports.progress = function() {
 /**
 * @return {array}
 */
-exports.progresses = function() {
+proto.progresses = function() {
   var ps = [0, 0];
   var user = this;
   // got douban account info
@@ -72,16 +73,16 @@ exports.progresses = function() {
 /**
 * interval for checking progress
 */
-exports.progressInterval = function(remaining, delay) {
+proto.progressInterval = function(remaining, delay) {
   var n = this.queue_length();
   delay = delay * n;
   return remaining < 10000 ? DB_RESPOND_DELAY : delay + 2000;
 };
-exports.queue_length = function() {
-  return central._interest_queue && central._interest_queue.queue.length || 1;
+proto.queue_length = function() {
+  return tasks.getQueueLength('interest')
 };
 
-exports.isEmpty = function(ns) {
+proto.isEmpty = function(ns) {
   if (!ns) return null;
   return this[ns+'_n'] === 0;
 };
@@ -89,7 +90,7 @@ exports.isEmpty = function(ns) {
 /**
 * total remaining
 */
-exports.remaining = function() {
+proto.remaining = function() {
   var ret = this.syncRemaining();
   if (ret === null) return null;
 
@@ -102,7 +103,7 @@ exports.remaining = function() {
 
   return ret + sr;
 };
-exports.statsRemaining = function() {
+proto.statsRemaining = function() {
   var user = this;
 
   var total = user.book_n;
@@ -119,7 +120,7 @@ exports.statsRemaining = function() {
 /**
 * expected remaing time for finish collectng job
 */
-exports.syncRemaining = function() {
+proto.syncRemaining = function() {
   var user = this;
   var total = user.book_n;
   var synced = user.book_synced_n;
@@ -133,28 +134,28 @@ exports.syncRemaining = function() {
   return (task.API_REQ_DELAY + DB_RESPOND_DELAY) * n * Math.ceil((total - synced) / perpage);
 };
 
-exports.isSyncing = function() {
+proto.isSyncing = function() {
   return this.last_synced_status === 'ing'
 };
 
 /**
 * is syncing timeout
 */
-exports.syncTimeout = function() {
+proto.syncTimeout = function() {
   var remaining = this.remaining();
   // 30 minutes by default
   if (remaining === null || this.last_synced === null) return false;
 
   return new Date() - this.last_synced > remaining + 300000;
 };
-exports.syncFailed = function() {
+proto.syncFailed = function() {
   return this.last_synced_status !== 'ing' || this.last_synced_status !== 'succeed';
 };
 
 /**
 * syncing timeout or failed
 */
-exports.needResync = function() {
+proto.needResync = function() {
   var user = this;
   return !user.isIng() || (!user.stats && user.syncTimeout());
 }

@@ -119,10 +119,10 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
     jobs_percent[ns] = 0;
 
     mongo.queue(function(db, next) {
-      // 20 minutes timeout
+      // 10 minutes timeout
       timeouts[ns] = setTimeout(function() {
         error_cb(new Error('Compute timeout'));
-      }, 1200000);
+      }, 600000);
 
       // rung single job
       job(db, user, function(err, results) {
@@ -138,15 +138,15 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
 
         stats[ns] = new Date();
 
-        all_results[ns + '_stats'] = results; 
-        all_results[ns + '_stats_error'] = err && err.name || err; 
+        all_results[ns + '_stats'] = results;
+        all_results[ns + '_stats_error'] = err && err.name || err;
 
         var stats_p = all_results.stats_p;
 
         jobs_percent[ns] = done_percent;
 
         for (var j in jobs_percent) {
-          stats_p += (jobs_percent[j] || 0); 
+          stats_p += (jobs_percent[j] || 0);
         }
 
         // all works done, safe to save.

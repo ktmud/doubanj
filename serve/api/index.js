@@ -1,4 +1,5 @@
 var error = require('debug')('dbj:api');
+var tasks = require('../../tasks')
 
 module.exports = function(app, central) {
   var utils = central.utils;
@@ -36,7 +37,7 @@ module.exports = function(app, central) {
         r: 0,
         interval: people.progressInterval(remaining, delay),
         is_ing: people.isIng(),
-        queue_length: central._interest_queue.queue.length,
+        queue_length: tasks.getQueueLength('interest'),
         book_n: people.book_n,
         book_synced_n: people.book_synced_n,
         //last_synced: people.last_synced,

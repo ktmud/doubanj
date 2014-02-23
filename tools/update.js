@@ -8,7 +8,7 @@ var log = require('debug')('dbj:tool:update');
 var User = require('../models/user');
 var tasks = require('../tasks');
 
-tasks._keyprefix('dbj-cron-update-');
+tasks.setKeyPrefix('dbj-cron-update-');
 
 var oneday = 60 * 60 * 24 * 1000;
 var oneweek = oneday * 7;
@@ -16,7 +16,7 @@ var oneweek = oneday * 7;
 function updateAll(query) {
   var now = new Date();
 
-  if (tasks.interest.queue.queue.length) {
+  if (tatks.getQueueLength()) {
     log('There are unfinished task. Exit.');
     return;
   }
@@ -29,7 +29,7 @@ function updateAll(query) {
 
       u.pull(function() {
         tasks.interest.collect_book({
-          user: u, 
+          user: u,
           force: true,
           fresh: false,
           success: function() {

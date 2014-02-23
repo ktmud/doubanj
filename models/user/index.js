@@ -1,3 +1,6 @@
+module.exports = User;
+module.exports.User = User;
+
 var debug = require('debug');
 var async = require('async');
 var util = require('util');
@@ -104,7 +107,7 @@ User.latestSynced = function(cb) {
   mongo(function(db) {
     var collection = db.collection(USER_COLLECTION);
     collection.find({
-      stats_p: 100 
+      stats_p: 100
     }, {
       sort: {
         last_statsed: -1
@@ -167,7 +170,7 @@ User.get = function(uid, options, cb) {
     if (err) return cb(err);
     // got a 404
     if (!u) {
-      // try get user info from 
+      // try get user info from
       var info = parseInt(uid) ? { '_id': uid } : { uid: uid };
       u = User(info);
     }
@@ -394,6 +397,3 @@ User.prototype.listFollowings = User.extended(User.prototype.listFollowings, {
  */
 utils.extend(User.prototype, require('../mixins/data'));
 
-
-module.exports = User;
-module.exports.User = User;
