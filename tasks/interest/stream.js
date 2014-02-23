@@ -13,7 +13,7 @@ function FetchStream(arg) {
   var user = this.user = arg.user;
 
   var is_fresh = 'fresh' in arg ? arg.fresh : false;
-  
+
   if (typeof user[ns + '_n'] !== 'number') {
     is_fresh = true;
   }
@@ -168,7 +168,7 @@ FetchStream.prototype.fetch = function(start, cb) {
       if (code !== 200) {
         var err_code = ERRORS[String(code)];
         self.user.invalid = err_code || 1;
-        return self.emit('error', err_code || new Error('douban api responded with ' + code)); 
+        return self.emit('error', err_code || new Error('douban api responded with ' + code));
       }
       if (err) {
         return self.emit('error', err);
@@ -232,32 +232,32 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
         verbose('Saving subjects...');
         var col_s = db.collection(ns);
         //col_s.remove({ _id: { $in: sids } }, function(err, r) {
-          //col_s.insert(subjects, { continueOnError: true }, function(err, res) {
-            //verbose('saving complete.');
-            //cb && cb(null, data);
-            //self.emit('saved', data);
-          //});
+        col_s.insert(subjects, { continueOnError: true }, function(err, res) {
+          verbose('saving complete.');
+          cb && cb(null, data);
+          self.emit('saved', data);
+        });
         //});
 
-        function save_subject(i) {
-          var s = subjects[i];
+        //function save_subject(i) {
+          //var s = subjects[i];
 
-          if (!s) {
-            verbose('all subjects in saving queue.');
-            cb && cb(null, data);
-            self.emit('saved', data);
-            return;
-          }
-          //log('updating subject %s', s.id);
-          // we just don't care whether it will succeed.
-          var _id = s._id;
-          delete s._id;
-          col_s.update({ '_id': _id }, { $set: s }, { upsert: true, w: -1 });
+          //if (!s) {
+            //verbose('all subjects in saving queue.');
+            //cb && cb(null, data);
+            //self.emit('saved', data);
+            //return;
+          //}
+          ////log('updating subject %s', s.id);
+          //// we just don't care whether it will succeed.
+          //var _id = s._id;
+          //delete s._id;
+          //col_s.update({ '_id': _id }, { $set: s }, { upsert: true, w: -1 });
 
-          // let's save next subject
-          save_subject(i + 1);
-        }
-        save_subject(0);
+          //// let's save next subject
+          //save_subject(i + 1);
+        //}
+        //save_subject(0);
       });
     });
   });
@@ -296,7 +296,7 @@ FetchStream.prototype.updateUser = function(cb) {
     });
   } else {
     self.user.update(obj, cb);
-  } 
+  }
 };
 
 module.exports = FetchStream;

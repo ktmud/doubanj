@@ -51,6 +51,7 @@ app.get(/^(\/api)?\/people\/([^\/]+)\/?.*$/, utils.getUser({
     return res.redirect(301, req._parsedUrl.pathname.replace(uid, people.uid));
   }
   res.data.name = people.name || people.uid
+
   next()
 });
 

@@ -137,7 +137,7 @@ function run_toplist(user, total) {
     if (tasks.getQueueLength()) return;
     // generate toplist one by one
     if (jobs.length) async.series(jobs);
-  }, central.DEBUG ? 2000 : 10000); // 5 minutes of free
+  }, central.DEBUG ? 2000 : 600 * 1000); // 10 minutes of free
 }
 
 function collect_in_namespace(ns) {

@@ -22,11 +22,8 @@ module.exports = function(options) {
       return notFound(req, res, next);
     }
 
-    if (err.stack) {
-      error(err.stack);
-    } else {
-      error(err);
-    }
+    //error(err);
+    error(err.toString());
 
     if (typeof err === 'string') {
       res._exception = err;
@@ -35,7 +32,7 @@ module.exports = function(options) {
     }
 
     req.session.onesalt = Date.now();
-    
+
     raven.express(err, req, res);
 
     if (res.headerSent) return res.end();

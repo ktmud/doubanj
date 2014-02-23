@@ -1,25 +1,26 @@
 /**
 * Book Interests Analytics Configuration
 */
-var utils = require('../utils');
-var common = require('./common');
-var debug = require('debug');
-var log = debug('dbj:task:compute:book:info');
-var error = debug('dbj:task:compute:book:error');
-var verbose = debug('dbj:task:compute:book:verbose');
+var async = require('async')
+var utils = require('../utils')
+var common = require('./common')
+var debug = require('debug')
+var log = debug('dbj:task:compute:book:info')
+var error = debug('dbj:task:compute:book:error')
+var verbose = debug('dbj:task:compute:book:verbose')
 
-var AggStream = common.AggStream;
+var AggStream = common.AggStream
 
-var cwd = process.cwd();
-var raven = require(cwd + '/lib/raven');
-var consts = require(cwd + '/models/consts');
+var cwd = process.cwd()
+var raven = require(cwd + '/lib/raven')
+var consts = require(cwd + '/models/consts')
 
-var interest_statuses = consts.INTEREST_STATUS_ORDERED.book;
+var STATUSES = consts.INTEREST_STATUS_ORDERED.book
 
 var conf_book = {
   // count by appearence
   top: ['tags', 'author', 'translator', 'publisher'],
-  // doesn't need unwind 
+  // doesn't need unwind
   $top_u: ['publisher'],
   $top_k: {
     'tags': 'name'
@@ -28,7 +29,7 @@ var conf_book = {
   // sorting by prop value, return a 'most_xxx' list
   // by default, will count 'least_xxx' too
   // can set `[ { pages: -1 } ]` (means descending by pages) to avoid.
-  // use 
+  // use
   //   {
   //     '$name': 'most_abced',
   //     '$limit': 10,
@@ -56,123 +57,106 @@ var conf_book = {
       periods: ['year']
     }
   }
-};
-var agg_param_book = common.aggParam(conf_book);
-var agg_param_interest = common.agg_param_interest;
+}
+var AGG_PARAM_BOOK = common.aggParam(conf_book)
+var AGG_PARAM_INTEREST = common.agg_param_interest
 
-var DB_INTEREST = 'book_interest';
-var DB_BOOK = 'book';
-module.exports = function(db, user, cb, ondata) {
-  var col_s = db.collection(DB_BOOK);
-  var col_i = db.collection(DB_INTEREST);
+var DB_INTEREST = 'book_interest'
+var DB_BOOK = 'book'
 
-  var uid = user.uid || user.id;
-  var ifilter = { 'user_id': user._id }
+module.exports = function(db, user, callback, progress) {
+  callback = callback || function() {}
+  progress = progress || function() {}
 
-  var results = {};
-  var last_err = null;
-
-  var called = false;
-  var err_cb = function(err) {
-    last_err = err;
-    error('Aggregation failed: %s', err);
-    //if (called) return;
-    //called = true;
-    //cb && cb(err);
-  };
-
-  var n_phrase = 1;
-
-  function tick() {
-    var percent = Object.keys(results).length / n_phrase * 100;
-    if (percent >= 100) {
-      finish();
-    } else {
-      ondata && ondata(percent);
-    }
-  }
-  function finish() {
-    var total = results.total = results.all.total;
-    interest_statuses.forEach(function(item) {
-      var n = results[item];
-      n = n && n.total || 0;
-      results['n_' + item] = n;
-      results['ratio_' + item] = (n / total * 100).toFixed(2);
-    });
-    cb(last_err, results);
-  }
+  var uid = user.uid || user.id
 
   // find out all collected books by user
-  col_i.find(ifilter, { fields: { subject_id: 1, status: 1 } }).toArray(function(err, docs) {
-    if (err) {
-      raven.error(err, {
-        message: 'getting interests failed',
-        tags: { task: 'aggregate' },
-        extra: { stage: 'getting interest', uid: uid }
-      });
-      cb && cb(err);
-      return;
-    }
+  db.collection(DB_INTEREST).find(
+    { user_id: user._id },
+    { fields: { subject_id: 1, status: 1 } }
+  ).toArray(function(err, docs) {
+    if (err) return callback(err);
+    run(sidsByStatus(docs))
+  })
 
+  function sidsByStatus(docs) {
     // filter out subject ids by status
-    var all_sids = [];
-    var by_status = {};
+    var all_sids = []
+    var by_status = {}
     docs.forEach(function(i) {
-      all_sids.push(i.subject_id);
-      var arr = by_status[i.status] || [];
-      arr.push(i.subject_id);
-      by_status[i.status] = arr;
-    });
-    by_status['all'] = all_sids;
-
-    function agg_by_status(i_status) {
-      if (!(i_status in by_status)) return;
-      var sids = by_status[i_status];
-
-      verbose('Agg %s book for %s ...', i_status, uid);
-
-      n_phrase++;
-
-      var agger = new AggStream({
-        uid: uid,
-        params: agg_param_book,
-        collection: DB_BOOK,
-        prefilter: { $match: { _id: { $in: sids } }, }
-      });
-
-      agger.once('error', err_cb);
-      agger.once('close', function() {
-        this.fillup();
-
-        var r = this.results;
-        r.total = sids.length;
-
-        results[i_status || 'all'] = r;
-        tick();
-      });
-
-      agger.run();
-    }
-
-    for (var s in by_status) agg_by_status(s);
-
-    calcInterests();
-  });
-
-  function calcInterests() {
-    var iagger = new AggStream({
-      uid: uid,
-      params: agg_param_interest,
-      collection: DB_INTEREST,
-      prefilter: { $match: ifilter } 
-    });
-    iagger.once('error', err_cb);
-    iagger.once('close', function() {
-      this.fillup();
-      results['interest'] = this.results;
-      tick();
-    });
-    log('Agg book interests for %s ...', uid);
-    iagger.run();
+      all_sids.push(i.subject_id)
+      var arr = by_status[i.status] || []
+      arr.push(i.subject_id)
+      by_status[i.status] = arr
+    })
+    by_status['all'] = all_sids
+    return by_status;
   }
-};
+
+  var total_step;
+
+  function agg(i, name, options) {
+    return function(callback) {
+      var agger = new AggStream(options)
+      agger.once('error', callback)
+      agger.once('close', function() {
+        this.fillup()
+        progress(i / total_step * 100)
+        callback(null, this.results)
+      })
+      log('Agg %s for %s ...', name, uid)
+      agger.run()
+    }
+  }
+
+  function run(sids_by_status) {
+    var statuses = ['all'].concat(STATUSES)
+    var actions = statuses.map(function(st, i) {
+      var sids = sids_by_status[st]
+      if (!sids) {
+        return function(next) { next(null) }
+      }
+      var options = {
+        uid: uid,
+        params: AGG_PARAM_BOOK,
+        collection: DB_BOOK,
+        prefilter: {
+          $match: { _id: { $in: sids } },
+        }
+      }
+      return agg(i + 1, st + ' book', options)
+    })
+
+    actions.push(agg(actions.length + 1, 'book interest', {
+      uid: uid,
+      params: AGG_PARAM_INTEREST,
+      collection: DB_INTEREST,
+      prefilter: {
+        $match: { user_id: user._id }
+      }
+    }))
+
+    total_step = actions.length
+
+    async.series(actions, function(err, computed) {
+      if (err) return callback(err)
+
+      var interest = computed.pop()
+      var n_all = sids_by_status['all'].length
+
+      var results = {
+        total: n_all,
+        interest: interest
+      }
+
+      statuses.forEach(function(item, i) {
+        results[item] = computed[i]
+        var n = sids_by_status[item]
+        n = n && n.length || 0
+        results['n_' + item] = n
+        results['ratio_' + item] = (n / n_all * 100).toFixed(2)
+      })
+      callback(null, results)
+    })
+  }
+}
