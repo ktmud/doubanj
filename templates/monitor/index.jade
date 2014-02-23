@@ -38,7 +38,11 @@ block main
             each u in timeouted
               a(href="/people/#{u.uid}/", target="dbj-monitor-user") #{u.name || u.uid}
       .mod
-        图书 #{n_book} 本，收藏记录 #{n_book_interest} 条
+        | 图书
+        span.num #{n_book}
+        | 本，收藏记录
+        span.num #{n_book_interest}
+        | 条
       p csrf to use:
       pre
         | #{_csrf}

@@ -13,7 +13,7 @@ html
     script(src=static('/js/do.js'), data-cfg-corelib='main', data-cfg-root=static('/'))
     script.
       ASSEST_ROOT = '#{conf.assets_root}';
-      Do.urls(!{urlmap('main', 'lodash', 'jiathis')});
+      Do.urls(!{urlmap('main', 'lodash', 'jiathis', 'd3')});
     if !conf.debug
       include ../common/track
   body
