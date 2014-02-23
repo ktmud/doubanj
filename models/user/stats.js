@@ -2,6 +2,7 @@
 * Stats result decorations for d3.js input
 */
 var consts = require('../consts');
+var User = require('./index')
 
 var INTEREST_STATUS_ORDERED = consts.INTEREST_STATUS_ORDERED;
 var INTEREST_STATUS_LABELS = consts.INTEREST_STATUS_LABELS;
@@ -117,7 +118,7 @@ var ns_csvs = {
         return r.join(',');
       });
       ret.unshift(th);
-      
+
       return ret.join('\n');
     }
   },
@@ -146,7 +147,7 @@ function export_csv(ns) {
 }
 
 /**
-* Keywords treemap JSON 
+* Keywords treemap JSON
 */
 function export_keywords(ns) {
   return function(status) {
@@ -224,11 +225,11 @@ function export_tags(ns) {
   }
 }
 
-module.exports = {
-  notReady: function() {
-    return this.stats_fail || this.invalid || this.stats_status !== 'succeed';
-  },
-  book_tags: export_tags('book'),
-  book_keywords: export_keywords('book'),
-  book_csv: export_csv('book'),
-};
+
+User.prototype.notReady = function() {
+  return this.stats_fail || this.invalid || this.stats_status !== 'succeed';
+}
+User.prototype.book_tags = export_tags('book')
+User.prototype.book_keywords = export_keywords('book')
+User.prototype.book_csv = export_csv('book')
+

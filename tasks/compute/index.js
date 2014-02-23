@@ -71,9 +71,18 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
 
   var succeed_cb = function(user, all_results) {
     if (called) return;
-    arg.success(user, all_results);
-    next();
     called = true;
+    // to ensure all the other writings are done.
+    setTimeout(function() {
+      user.update(all_results, function(err) {
+        if (err) {
+          error_cb(err);
+        } else {
+        }
+        arg.success(user, all_results);
+        next();
+      });
+    }, 1000);
   };
 
   if (new Date() - user.last_statsed < 60000) {
@@ -154,21 +163,14 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
 
         stats_p = 100;
         all_results.last_statsed = stats[ns];
+
         all_results.stats = stats;
+
         all_results.stats_p = stats_p;
         all_results.stats_status = 'succeed';
 
-        // to ensure all the other writings are done.
-        setTimeout(function() {
-          user.update(all_results, function(err) {
-            if (err) {
-              error_cb(err);
-            } else {
-              succeed_cb(user, all_results);
-            }
-            next();
-          });
-        }, 1000);
+        succeed_cb(user, all_results);
+
       }, function(percent) {
         if (called) return;
 

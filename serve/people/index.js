@@ -39,7 +39,7 @@ app.get(/^\/people\/[^\/]+$/, function(req, res, next) {
 app.get(/^(\/api)?\/people\/([^\/]+)\/?.*$/, utils.getUser({
   fn: function(req) { return req.params[1]; }
 }), function(req, res, next) {
-  var uid = req.params[1]; 
+  var uid = req.params[1];
 
   var people = res.data && res.data.people;
 
@@ -50,15 +50,8 @@ app.get(/^(\/api)?\/people\/([^\/]+)\/?.*$/, utils.getUser({
   if (uid === people.id && people.uid && people.uid !== people.id) {
     return res.redirect(301, req._parsedUrl.pathname.replace(uid, people.uid));
   }
-
   res.data.name = people.name || people.uid
-
-  if (people.book_stats) return next();
-  people.data('book_stats', function(err, ret) {
-    if (err) return next(err);
-    people.book_stats = ret;
-    next();
-  });
+  next()
 });
 
 var attach_latest = attach('latest_interests', function(req, res, cb) {

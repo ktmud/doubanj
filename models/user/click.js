@@ -1,4 +1,5 @@
 var redis = central.redis;
+var User = require('./index')
 
 // 过期时间，单位 秒
 var CLICK_EXPIRES = 60 * 60 * 12;
@@ -23,7 +24,7 @@ var grades = {
 /**
  * progress of calculating click
  */
-exports.clickProgress = function(other, cb) {
+User.prototype.clickProgress = function(other, cb) {
   if (!(other instanceof this.constructor)) return null;
   this.getClick(other, function(err, r) {
     if (err) return cb(err);
@@ -35,7 +36,7 @@ exports.clickProgress = function(other, cb) {
 /**
  * return a click grading text
  */
-exports.clickGrade = function(num) {
+User.prototype.clickGrade = function(num) {
   num = parseInt(num);
   for (var k in grades) {
     if (parseInt(k) < num) continue;
@@ -53,7 +54,7 @@ function swap(obj, a, b) {
 /**
  * Get click for the other one
  */
-exports.getClick = function(other, cb) {
+User.prototype.getClick = function(other, cb) {
   var self = this;
   redis.client.get(self._clickKey(other), function(err, ret) {
     try {
@@ -74,18 +75,18 @@ exports.getClick = function(other, cb) {
     return cb(err, ret);
   });
 };
-exports.setClick = function(other, val, cb) {
+User.prototype.setClick = function(other, val, cb) {
   var self = this;
   var key = self._clickKey(other);
   redis.client.set(key, JSON.stringify(val), cb);
   redis.client.expire(key, val && val.expires_in || CLICK_EXPIRES);
 };
-exports.click_url = function(other, tail) {
+User.prototype.click_url = function(other, tail) {
   var other_uid = typeof other !== 'object' ? other : (other.uid || other.id);
   return this.url() + 'click/' + other_uid + (tail || '');
 };
 
-exports._clickKey = function(other) {
+User.prototype._clickKey = function(other) {
   // key 只需保证唯一，先后顺序其实并不重要
   return 'click_' + [this.id, other.id].sort().join('_');
 };
