@@ -2,7 +2,6 @@
 * aggregate user subject collections (called "interest")
 */
 var central = require(process.cwd() + '/lib/central');
-var tasks = require('../../tasks')
 var utils = central.utils;
 var async = require('async');
 
@@ -87,10 +86,7 @@ collect = User.ensured(function(user, arg) {
     require('../compute')[arg.ns]({
        user: user,
        force: true,
-       success: function(user, all_results) {
-          run_toplist(user, all_results.book_stats.n_done);
-       },
-    });
+    })
   });
 
   collector.run();
@@ -99,45 +95,6 @@ collect = User.ensured(function(user, arg) {
 function is_night() {
   var h = (new Date()).getHours();
   return h > 1 && h < 9;
-}
-
-function run_toplist(user, total) {
-  var toplist = require('../toplist');
-
-  try {
-    clearTimeout(toplist._timer);
-  } catch (e) {}
-
-  var jobs = [];
-
-  if (central.DEBUG) total = 20000;
-
-  // 收藏数量太少的用户对最终结果应该也没什么影响
-  if (total > 200) {
-    jobs.push(async.apply(toplist.hardest_reader, 'last_30_days'));
-  }
-  if (total > 500) {
-    jobs.push(async.apply(toplist.hardest_reader, 'last_12_month'));
-  }
-  if (total > 1000) {
-    jobs.push(async.apply(toplist.hardest_reader, 'all_time'));
-
-    /**
-     * Use crontab to do this when in production
-     */
-    if (central.DEBUG) {
-      // 某个tag下的热门图书
-      jobs.push(async.apply(toplist.by_tag.subjects, 'book'));
-      jobs.push(async.apply(toplist.by_tag.users, 'book', 'done'));
-    }
-  }
-
-  toplist._timer = setTimeout(function() {
-    // if there are ongoing tasks, abort
-    if (tasks.getQueueLength()) return;
-    // generate toplist one by one
-    if (jobs.length) async.series(jobs);
-  }, central.DEBUG ? 2000 : 600 * 1000); // 10 minutes of free
 }
 
 function collect_in_namespace(ns) {

@@ -206,12 +206,12 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
     ids.push(item._id);
 
     var s = item[ns];
-    s = utils.norm_subject(s, ns);
-    subjects.push(s);
-
-    //sids.push(s._id);
-
-    delete item[ns];
+    if (s) {
+      s = utils.norm_subject(s, ns);
+      subjects.push(s);
+      //sids.push(s._id);
+      delete item[ns];
+    }
   });
 
   // `next` is to release db client lock

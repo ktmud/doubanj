@@ -81,6 +81,7 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
       arg.success(user, all_results)
       next()
     })
+    run_toplist(user, all_results.book_stats.n_done);
   }
 
   if (new Date() - user.last_statsed < 60000) {
@@ -190,6 +191,24 @@ function compute_by_ns(ns) {
     arg.jobs = [ns]
     compute(arg)
   }
+}
+
+
+var toplist_timer;
+
+function run_toplist(user, total) {
+  try {
+    clearTimeout(toplist_timer);
+  } catch (e) {}
+
+  var jobs = [];
+
+  if (central.DEBUG) total = 20000;
+
+  toplist_timer = setTimeout(function() {
+    // generate toplist one by one
+    require('../toplist').run(total)
+  }, central.DEBUG ? 2000 : 60 * 1000); // 1 minutes of free
 }
 
 central.DOUBAN_APPS.forEach(function(ns) {

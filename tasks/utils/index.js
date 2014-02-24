@@ -11,6 +11,9 @@ function norm_status(s) {
 
 var parsers = require('./parser');
 function norm_subject(s, ns) {
+  if (!s) {
+    return s
+  }
   s._id = String(s.id);
   delete s.id;
 
@@ -25,7 +28,7 @@ function norm_subject(s, ns) {
       ori = s['ori_' + k] = s[k]; // backup original value
       s[k] = parsers[k](s[k]);
       if (s[k] && ori && s[k] === null) {
-        console.log('invalid %s %s', k, ori); 
+        console.log('invalid %s %s', k, ori);
         raven.message('invalid %s %s', k, ori, {
           tags: { parsing: k },
           extra: {

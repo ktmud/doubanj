@@ -52,7 +52,6 @@ names.forEach(function(item) {
   });
 
   tasks[item + '_queue'] = queue;
-
 });
 
 tasks.setKeyPrefix = function(prefix) {

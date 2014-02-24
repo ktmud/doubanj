@@ -1,3 +1,5 @@
+var async = require('async')
+var tasks = require('../../tasks')
 var central = require('../../lib/central');
 var mongo = central.mongo;
 
@@ -66,7 +68,33 @@ function generate_hardest_reader(period, cb) {
   }, 5); // 5 means low priority
 }
 
-module.exports = {
-  hardest_reader: generate_hardest_reader,
-  by_tag: require('./by_tag'),
-};
+exports.hardest_reader = generate_hardest_reader
+exports.by_tag = require('./by_tag')
+
+
+function breakable(period) {
+  return function(callback) {
+    // if some task is running, break
+    if (tasks.getQueueLength()) {
+      return callback()
+    }
+    generate_hardest_reader(period, callback)
+  }
+}
+
+exports.run = function(total) {
+  var jobs = []
+  // 收藏数量太少的用户对最终结果应该也没什么影响
+  if (total > 200) {
+    jobs.push(breakable('last_30_days'))
+  }
+  if (total > 500) {
+    jobs.push(breakable('last_12_month'))
+  }
+  if (total > 2000) {
+    jobs.push(breakable('all_time'))
+  }
+  if (jobs.length) {
+    async.series(jobs);
+  }
+}
