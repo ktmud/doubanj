@@ -15,7 +15,6 @@ var mongo = central.mongo;
 var raven = central.raven;
 
 var compute = task.compute_pool.pooled(function calculateClick(computings, arg, next) {
-
   var called = false;
 
   var error_cb = function(err) {
