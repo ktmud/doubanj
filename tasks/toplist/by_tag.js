@@ -7,7 +7,7 @@ var verbose = debug('dbj:toplist:by_tag:verbose');
 var error = debug('dbj:toplist:by_tag:error');
 
 // reduce to top 100 subjects
-//var reduce = function(tag, vals) { 
+//var reduce = function(tag, vals) {
   //vals = Array.prototype.concat.apply([], vals);
   //vals = vals.sort(function(a, b) {
     //return b.count - a.count;
@@ -22,13 +22,12 @@ function users_by_tag(ns, status, done) {
   done = done || function(){};
 
   if (!ns || !status) return done(new Error('Namespace and status needed'));
-  
+
   var stats_status = status || 'all';
-  
+
   var out_coll = ['top', ns, status, 'user_by_tag'].join('_');
 
   mongo.queue(function(db, next) {
-
     log('[%s] started...', out_coll);
 
     var query = { last_synced_status: 'succeed' };
@@ -80,11 +79,10 @@ function subjects_by_tag(ns, done) {
   done = done || function(){};
 
   if (!ns) return done(new Error('Namespace needed'));
-  
+
   var out_coll = ['top', ns, 'by_tag'].join('_');
 
   mongo.queue(function(db, next) {
-
     log('[%s] started...', out_coll);
 
     // 至少有十个人打分的图书才有可能进入热门榜吧

@@ -76,13 +76,14 @@ function breakable(period) {
   return function(callback) {
     // if some task is running, break
     if (tasks.getQueueLength()) {
+      log('Exit compute toplist %s due to running computing.', period)
       return callback()
     }
     generate_hardest_reader(period, callback)
   }
 }
 
-exports.run = function(total) {
+exports.run = function(total, callback) {
   var jobs = []
   // 收藏数量太少的用户对最终结果应该也没什么影响
   if (total > 200) {
@@ -95,6 +96,6 @@ exports.run = function(total) {
     jobs.push(breakable('all_time'))
   }
   if (jobs.length) {
-    async.series(jobs);
+    async.series(jobs, callback);
   }
 }
