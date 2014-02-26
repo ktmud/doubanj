@@ -71,7 +71,7 @@ function main(users, callback) {
     asyncTask({ status: 'wish' }),
     asyncTask({ 'rating.value': { '$gt': '3' } }),
     asyncTask({ 'rating.value': { '$lt': '3' } }),
-    asyncTask({ commented: { $ne: null } }),
+    asyncTask({ status: 'done', commented: { $ne: null } }),
   ];
 
   var progress = 10, finalResult;

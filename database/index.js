@@ -6,13 +6,12 @@ var log = debug('dbj:database');
 // unique key index option
 var index_options = {
   unique: true,
-  background: true,
   dropDups: true,
   w: 1
 };
 var sparse_option = {
-  sparse: 1,
   background: true,
+  sparse: 1,
 };
 
 module.exports = function(db, next) {
@@ -24,10 +23,9 @@ module.exports = function(db, next) {
       if (err) console.error(err);
       if (n <= 0) tick();
     }
-    //r.ensureIndex({ 'id': 1 }, index_options, _tick);
-    r.ensureIndex({ 'user_id': 1, }, sparse_option, _tick);
-    r.ensureIndex({ 'subject_id': 1, }, sparse_option, _tick);
-    r.ensureIndex({ 'status': 1, }, sparse_option, _tick);
+    r.ensureIndex({ 'user_id': 1, 'status': 1, }, sparse_option, _tick);
+    r.ensureIndex({ 'subject_id': 1 }, sparse_option, _tick);
+    r.ensureIndex({ 'status': 1, 'commented': -1 }, sparse_option, _tick);
     r.ensureIndex({ 'updated': -1, }, sparse_option, _tick);
     r.ensureIndex({ 'rating.value': -1, }, sparse_option, _tick);
   });
@@ -41,7 +39,6 @@ module.exports = function(db, next) {
       if (n <= 0) tick();
     }
 
-    //r.ensureIndex({ 'id': 1 }, index_options, _tick);
     r.ensureIndex({ 'raters': -1 }, sparse_option, _tick);
     r.ensureIndex({ 'rated': -1 }, sparse_option, _tick);
     r.ensureIndex({ 'pages': -1 }, sparse_option, _tick);
@@ -57,7 +54,6 @@ module.exports = function(db, next) {
       if (err) console.error(err);
       if (n <= 0) tick();
     }
-    //r.ensureIndex({ 'id': 1 }, index_options, _tick);
     r.ensureIndex({ 'uid': 1 }, index_options, _tick);
     r.ensureIndex({ 'book_synced_n': 1 }, sparse_option, _tick);
     r.ensureIndex({ 'last_statsed': 1 }, sparse_option, _tick);
