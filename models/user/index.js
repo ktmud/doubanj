@@ -77,14 +77,7 @@ User.getFromMongo = function(uid, options, cb) {
 
   mongo(function(db) {
     var collection = db.collection(USER_COLLECTION)
-    var query = isdigit(uid) ? { _id: uid } : {
-      '$or': [
-        // local id
-        { '_id': uid },
-        // douban's uid
-        { 'uid': uid },
-      ]
-    }
+    var query = isdigit(uid) ? { _id: uid } : { uid: uid }
     collection.findOne(query, options, function(err, r) {
       if (err) {
         error('get user from mongo failed: %s', err)
