@@ -10,18 +10,16 @@ var error = debug('dbj:toplist:error');
 
 var ONE_MONTH = 60 * 60 * 24 * 1000 * 30.5;
 
-function generate_hardest_reader(period, cb) {
+function aggregate_hardest_reader(period, cb) {
   cb = cb || function(){};
-
-  var map = function() { emit(this.user_id, 1); };
-  var reduce = function(k, vals) { return Array.sum(vals); };
-
-  // at least three words will be consider useful
-  var query = { commented: { $gt: 2 } };
-
   period = period || 'all_time';
 
+  var out_coll = 'book_done_count_' + period;
   var now = new Date();
+  var query = {
+    status: 'done',
+    commented: { $gt: 3 }
+  }
   switch(period) {
     case 'last_30_days':
       query.updated = {
@@ -48,27 +46,38 @@ function generate_hardest_reader(period, cb) {
       break;
   }
 
-  var out_coll = 'book_done_count_' + period;
+  var pipe = [
+    { $match: query },
+    { $sort: { user_id: 1 } },
+    { $project: { user_id: 1 } },
+    { $group: {
+        _id: "$user_id",
+        value: { $sum: 1 }
+    }}
+  ]
 
   mongo.queue(function(db, next) {
-    db.collection('book_interest').mapReduce(map, reduce, {
-      query: query,
-      sort: { user_id: 1 },
-      //out: { inline: 1 },
-      out: { replace: out_coll },
-    }, function(err, coll) {
+    var out = db.collection(out_coll)
+    db.collection('book_interest').aggregate(pipe, function(err, results) {
       next();
       if (err) {
         error('Toplist failed: ', err)
         return cb(err);
       }
-      log('Toplist for %s generated', out_coll);
-      coll.ensureIndex({ value: -1 }, { background: true }, cb);
+      if (!results.length) {
+        return cb();
+      }
+      log('Toplist for %s generated.', out_coll);
+      async.series([
+        out.remove.bind(out),
+        out.insert.bind(out, results),
+        out.ensureIndex.bind(out, { value: -1 }, { background: true })
+      ], cb)
     });
   }, 5); // 5 means low priority
 }
 
-exports.hardest_reader = generate_hardest_reader
+exports.hardest_reader = aggregate_hardest_reader
 exports.by_tag = require('./by_tag')
 
 
@@ -79,7 +88,7 @@ function breakable(period) {
       log('Exit compute toplist %s due to running computing.', period)
       return callback()
     }
-    generate_hardest_reader(period, callback)
+    aggregate_hardest_reader(period, callback)
   }
 }
 
@@ -96,6 +105,6 @@ exports.run = function(total, callback) {
     jobs.push(breakable('all_time'))
   }
   if (jobs.length) {
-    async.series(jobs, callback);
+    async.series(jobs, callback)
   }
 }
