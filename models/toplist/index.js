@@ -1,38 +1,38 @@
+exports.getToplistKey = function(namespace, period) {
+  return namespace + '_done_count_' + period
+}
 
-function tops_by_tag(tagname, obj_name, options, cb) {
+exports.tops_by_tag = function tops_by_tag(tagname, obj_name, options, cb) {
   if (typeof options === 'function') {
-    cb = options;
-    options = {};
+    cb = options
+    options = {}
   }
 
-  options = options || {};
+  options = options || {}
 
-  var start = options.start || 0;
-  var limit = options.limit || 24;
+  var start = options.start || 0
+  var limit = options.limit || 24
 
   central.mongo(function(db) {
     db.collection(['top', obj_name, 'by_tag'].join('_'))
-      .find({ tagname: tagname }, { 
+      .find({ tagname: tagname }, {
         sort: { count: -1 },
         fields: { count: 1 },
-        limit: limit, 
+        limit: limit,
         skip: start
       }).toArray(function(err, results) {
-        if (err) return cb(err);
+        if (err) return cb(err)
 
         results.forEach(function(item) {
-          var tmp = item._id.split('::');
-          item._id = tmp[0];
+          var tmp = item._id.split('::')
+          item._id = tmp[0]
           // 在自身所有标签里的排名
-          item.self_order = tmp[1];
-        });
+          item.self_order = tmp[1]
+        })
 
-        return cb(err, results);
-      });
-  });
+        return cb(err, results)
+      })
+  })
 }
 
-module.exports = {
-  tops_by_tag: tops_by_tag,
-  book: require('./book')
-};
+exports.book = require('./book')
