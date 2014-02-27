@@ -57,7 +57,7 @@ module.exports = function(db, next) {
     r.ensureIndex({ 'book_synced_n': 1 }, sparse_option, _tick);
     r.ensureIndex({ 'last_statsed': 1 }, sparse_option, _tick);
     r.ensureIndex({ 'last_synced': 1 }, sparse_option, _tick);
-    r.ensureIndex({ 'last_synced_status': 1, 'book_n': -1 }, sparse_option, _tick);
+    r.ensureIndex({ 'last_synced_status': 1, 'book_stats.n_done': -1 }, sparse_option, _tick);
     //r.ensureIndex({ 'mtime': 1 }, _tick);
   });
 

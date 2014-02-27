@@ -34,7 +34,7 @@ function users_by_tag(ns, status, done) {
 
     // 至少总共读过50本书才可能进榜吧
     // { book_stats.done.total: { $gt: 50 } }
-    query[ns + '_n'] = { $gt: 50 };
+    query[ns + '_stats.n_done'] = { $gt: 50 };
 
     var stream = db.collection('user').find(query).stream();
 
@@ -61,13 +61,13 @@ function users_by_tag(ns, status, done) {
       }
     });
 
-    stream.on('error', function(err) {
+    stream.once('error', function(err) {
       next();
       error('[%s] failed: ', out_coll, err)
       done(err);
     });
 
-    stream.on('close', function(err) {
+    stream.once('close', function(err) {
       next();
       log('[%s] generated.', out_coll);
       done();
