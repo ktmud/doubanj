@@ -61,6 +61,7 @@ function aggregate_hardest_reader(period, cb) {
   ]
 
   mongo.queue(function(db, next) {
+    log('Generating Toplist for %s...', key)
     db.collection('book_interest').aggregate(pipe, function(err, results) {
       next()
       if (err) {
