@@ -5,12 +5,6 @@ var mongo = central.mongo
 
 var User = require('../user')
 
-var redis = central.redis
-function hardest_reader(period, cb) {
-  var key = getToplistKey('book', period)
-  cached.get(key, cb)
-}
-
 var people_fields = { _id: 1, uid: 1, name: 1, avatar: 1, 'book_stats.all.top_tags': 1, signature: 1 }
 
 var banned_tags = [
@@ -40,19 +34,34 @@ function is_serious_reading(tags) {
 }
 
 function get_hardest_reader(period, cb) {
-  hardest_reader(period, function(err, ids) {
-    if (!ids) {
-      return cb(null, [])
+  var key = getToplistKey('book', period)
+  var cached_items_key = key + '_cached';
+
+  cached.get(cached_items_key, function(err, items) {
+    if (items) {
+      return cb(err, items)
     }
+    cached.get(key, function(err, ids) {
+      if (err || !ids) {
+        return cb(err, [])
+      }
+      getReal(ids)
+    })
+  })
+
+  function getReal(ids) {
     User.gets(ids, {
       fields: people_fields
     }, function(err, users) {
+      if (err || !users) {
+        return cb(err, [])
+      }
       users = users.filter(function(item, i) {
         if (item) {
           try {
             // there are useless type of books in he/she's collection
             if (is_serious_reading(item.book_stats.all.top_tags.slice(0,12))) {
-              item._count = ids[i].value
+              item.book_quote_n = ids[i].value
               return true
             }
           } catch (e) {}
@@ -60,8 +69,10 @@ function get_hardest_reader(period, cb) {
         return false
       })
       cb(err, users)
+      cached.set(cached_items_key, users, function(){})
     })
-  })
+  }
+
 }
 
 exports.hardest_reader = get_hardest_reader

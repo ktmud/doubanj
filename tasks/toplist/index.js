@@ -57,7 +57,7 @@ function aggregate_hardest_reader(period, cb) {
         value: { $sum: 1 }
     }},
     { $sort: { value: -1 } },
-    { $limit: 100 }
+    { $limit: 300 }
   ]
 
   mongo.queue(function(db, next) {
@@ -70,6 +70,7 @@ function aggregate_hardest_reader(period, cb) {
       }
       log('Toplist for %s generated.', key)
       cached.set(key, results, cb)
+      cached.del(key + '_cached', function(){})
     })
   }, 5) // 5 means low priority
 }

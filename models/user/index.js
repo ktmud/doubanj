@@ -9,6 +9,7 @@ var log = debug('dbj:user:info')
 var error = debug('dbj:user:error')
 
 var central = require('../../lib/central')
+var cached = require('../../lib/cached')
 
 var cwd = central.cwd
 var conf = central.conf
@@ -91,7 +92,7 @@ User.getFromMongo = function(uid, options, cb) {
   })
 }
 // User as an available constructor
-redis.cached.register(User)
+cached.register(User)
 
 function isdigit(num) {
   return !isNaN(Number(num))
@@ -125,10 +126,7 @@ User.latestSynced = function(cb) {
     })
   })
 }
-/**
-* cache the result in redis for 60 seconds
-*/
-User.latestSynced = redis.cached.wrap(User.latestSynced, 'latest-synced', 60000)
+User.enableCache('latestSynced', 'users:lastSynced', 60000)
 
 /**
 * Count users wish results
@@ -321,6 +319,7 @@ User.prototype.toObject = function() {
     'stats_fail': this.stats_fail,
     'book_stats': this.book_stats,
     'book_n': this.book_n,
+    'book_quote_n': this.book_quote_n,
     'book_synced_n': this.book_synced_n,
     'book_last_synced': this.book_last_synced,
     'book_last_synced_status': this.book_last_synced_status,

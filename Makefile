@@ -1,9 +1,9 @@
 start:
 	#@export DEBUG="dbj:*" && forever -w app.js
-	@export DEBUG="dbj:*" && supervisor -w 'lib,serve,models,app.js,conf,tasks,Gruntfile.js' -p 1000 app.js 
+	@export DEBUG="dbj* cache*" && supervisor -w 'lib,serve,models,app.js,conf,tasks,Gruntfile.js' -p 1000 app.js 
 
 grunt:
-	@export DEBUG="dbj:*" && grunt
+	@export DEBUG="dbj*" && grunt
 
 build:
 	@export NODE_ENV="production" && export DEBUG="dbj:*" && \

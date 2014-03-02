@@ -36,7 +36,7 @@ mixin people_wall(people)
           .pic
             img(src="#{p.avatar}", width=48, height=48, alt="#{p.name}")
           p.title #{p.name}
-          p #{p._count}条体悟
+          p #{p.book_quote_n}条体悟
           mixin tags_list(p.book_stats.all.top_tags)
 
 mixin tags_list(tags)
