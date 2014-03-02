@@ -60,7 +60,7 @@ function get_hardest_reader(period, cb) {
         if (item) {
           try {
             // there are useless type of books in he/she's collection
-            if (is_serious_reading(item.book_stats.all.top_tags.slice(0,12))) {
+            if (is_serious_reading(item.book_stats.all.top_tags.slice(0,10))) {
               item.book_quote_n = ids[i].value
               return true
             }
