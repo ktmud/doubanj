@@ -222,17 +222,14 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
     verbose('Clear exsisting interests...');
     db.collection(ns + '_interest').remove({ _id: { $in: ids } }, function(err, r) {
       if (err) console.error(err, uid);
-
       verbose('Saving interests...');
-
       db.collection(ns + '_interest').insert(items, save_options, function(err, r) {
         if (err) console.error(err, uid);
-
         // save subjects
         verbose('Saving subjects...');
         var col_s = db.collection(ns);
         //col_s.remove({ _id: { $in: sids } }, function(err, r) {
-        col_s.insert(subjects, { continueOnError: true }, function(err, res) {
+        col_s.insert(subjects, save_options, function(err, res) {
           verbose('saving complete.');
           cb && cb(null, data);
           self.emit('saved', data);
