@@ -126,7 +126,7 @@ User.latestSynced = function(cb) {
     })
   })
 }
-User.enableCache('latestSynced', 'users:lastSynced', 60000)
+User.enableCache('latestSynced', 'users:lastSynced', 5)
 
 /**
 * Count users wish results
@@ -297,6 +297,7 @@ User.prototype.toObject = function() {
     //'id': this['id'],
     'alt': this['alt'],
     'uid': this['uid'] || this.id,
+    'name': this['name'],
     'created': this['created'],
     'avatar': this['avatar'],
     'desc': this['desc'],

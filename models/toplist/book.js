@@ -68,6 +68,7 @@ function get_hardest_reader(period, cb) {
         }
         return false
       })
+      users = users.slice(0, 50)
       cb(err, users)
       cached.set(cached_items_key, users, function(){})
     })

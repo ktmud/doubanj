@@ -28,7 +28,7 @@ block main
 mixin people_wall(people)
   ol.rbox-list.people-rboxes.toplist
     //people = people.concat(people, people, people, people, people)
-    for p, i in people.slice(0,30)
+    for p, i in people
       li
         - top_color = i < 5 ? 'background: #93d6ef;' : ''
         .top-n(style=top_color) #{i + 1}

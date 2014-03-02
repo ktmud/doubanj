@@ -16,11 +16,13 @@ block main
     .hr-or
       span 或
     include ./auth/mods/douban
+    //hr
+    //include ./widgets/latest_synced.jade
 
 block ending
   script.
     Do.urls(!{urlmap('d3')});
-    !{istatic('js/homepage/ticker.js')}
+    //!{istatic('js/homepage/ticker.js')}
   // preload the d3 library
   script(async).
     Do('d3');
