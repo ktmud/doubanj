@@ -6,6 +6,7 @@ module.exports = function(app, central) {
     var ns = tmp[0], fn = tmp[1];
 
     return function(req, res, next) {
+      // toplist.book.hardest_reader
       toplist[ns][fn](period, function(err, data) {
         if (err) {
           res.data.errors.push(err);
@@ -15,6 +16,7 @@ module.exports = function(app, central) {
       });
     }
   }
+
   app.get('/top/', function(req, res, next) {
     res.data = res.data || {};
     res.data.errors = [];

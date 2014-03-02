@@ -55,7 +55,9 @@ function aggregate_hardest_reader(period, cb) {
     { $group: {
         _id: "$user_id",
         value: { $sum: 1 }
-    }}
+    }},
+    { $sort: { value: -1 } },
+    { $limit: 100 }
   ]
 
   mongo.queue(function(db, next) {
