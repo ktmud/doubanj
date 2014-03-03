@@ -48,6 +48,7 @@ function aggregate_hardest_reader(period, cb) {
       break
   }
 
+  var limit = period == 'all_time' ? 2000 : 500
   var pipe = [
     { $match: query },
     { $sort: { user_id: 1 } },
@@ -57,7 +58,7 @@ function aggregate_hardest_reader(period, cb) {
         value: { $sum: 1 }
     }},
     { $sort: { value: -1 } },
-    { $limit: 500 }
+    { $limit: limit }
   ]
 
   mongo.queue(function(db, next) {

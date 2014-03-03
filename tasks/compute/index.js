@@ -208,7 +208,7 @@ function run_toplist(user, total) {
   toplist_timer = setTimeout(function() {
     // generate toplist one by one
     require('../toplist').run(total)
-  }, central.DEBUG ? 2000 : 60 * 1000); // 1 minutes of free
+  }, central.DEBUG ? 2000 : 60 * 1000); // 30 minutes of free
 }
 
 central.DOUBAN_APPS.forEach(function(ns) {
