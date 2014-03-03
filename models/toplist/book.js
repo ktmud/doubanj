@@ -87,7 +87,7 @@ function get_hardest_reader(period, cb) {
       })
       users = users.slice(0, 99)
       cb(err, users)
-      cached.set(cached_items_key, users, ONE_HOUR, function(){})
+      cached.set(cached_items_key, users, function(){})
     })
   }
 
