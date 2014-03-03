@@ -279,7 +279,7 @@ FetchStream.prototype.updateUser = function(cb) {
   obj['last_synced_status'] = obj[ns +'_last_synced_status'] = self.status;
 
   log('%s %s: %s/%s, status: %s',
-      self.uid, ns, self._last_fetched, self._last_total, self.status);
+      self.uid, ns, obj[ns + '_synced_n'], obj[ns + '_n'], self.status);
 
   // database option
   obj['$upsert'] = true;
