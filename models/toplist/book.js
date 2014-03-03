@@ -16,8 +16,10 @@ var banned_tags = [
   '推理', '推理小说', '日系推理', '日本推理',
   '写真', '写真集', '摄影', 'PHOTOBOOK', '寫真',
   '绘本', '童话', '童书', '儿童文学', '图画书',
-  '轻小说', '网络小说', '青春', '言情',
+  '轻小说', '輕小說', '漫画与轻小说',
+  '网络小说', '青春', '言情',
   '少年向', '少年漫画', '经典',
+  '乙女向',
   '穿越', '武侠', '奇幻',
   '晋江', '现代都市',
   '漫画', '日本漫画', '漫畫',
@@ -77,7 +79,7 @@ function get_hardest_reader(period, cb) {
         if (item) {
           try {
             // there are useless type of books in he/she's collection
-            if (is_serious_reading(item.book_stats.all.top_tags.slice(0,10))) {
+            if (is_serious_reading(item.book_stats.all.top_tags.slice(0,12))) {
               item.book_quote_n = ids[i].value
               return true
             }
