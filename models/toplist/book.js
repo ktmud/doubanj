@@ -1,7 +1,9 @@
 var central = require('../../lib/central')
+var _ = require('../../lib/utils')
 var cached = require('../../lib/cached')
 var getToplistKey = require('../../models/toplist').getToplistKey
 var mongo = central.mongo
+var verbose = require('debug')('dbj:toplist:verbose')
 
 var User = require('../user')
 
@@ -33,19 +35,34 @@ function is_serious_reading(tags) {
   return true
 }
 
+var ONE_HOUR = 3600
+
 function get_hardest_reader(period, cb) {
   var key = getToplistKey('book', period)
-  var cached_items_key = key + '_cached';
+  var cached_items_key = key + '_cached'
 
   cached.get(cached_items_key, function(err, items) {
     if (items) {
       return cb(err, items)
     }
-    cached.get(key, function(err, ids) {
-      if (err || !ids) {
-        return cb(err, [])
-      }
-      getReal(ids)
+    // get blacklist (currently, can only set it via redis-client)
+    cached.get('user_blacklist', function(err, blacklist) {
+      verbose('Got blacklist: %j', blacklist)
+      // get ids
+      cached.get(key, function(err, ids) {
+        if (ids && ids.length && blacklist && blacklist.length) {
+          ids = ids.filter(function(item) {
+            if (~blacklist.indexOf(item._id)) {
+              return false
+            }
+            return true
+          })
+        }
+        if (err || !ids || !ids.length) {
+          return cb(err, [])
+        }
+        getReal(ids)
+      })
     })
   })
 
@@ -70,7 +87,7 @@ function get_hardest_reader(period, cb) {
       })
       users = users.slice(0, 99)
       cb(err, users)
-      cached.set(cached_items_key, users, function(){})
+      cached.set(cached_items_key, users, ONE_HOUR, function(){})
     })
   }
 

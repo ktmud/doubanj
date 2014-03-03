@@ -29,6 +29,7 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
   var raven_extra = { extra: { uid: user.uid || user._id }, tags: { task: 'compute' } }
 
   var called = false
+  var errored = false
   var timeouts = {}
   var clear_timeouts = function() {
     for (var j in timeouts) {
@@ -50,8 +51,8 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
     err.name = err.name || 'compute fail'
     raven.error(err, raven_extra)
 
-    if (called) return
-    called = true
+    if (errored) return
+    errored = true
 
     if (err.message === 'RUNNING') {
       arg.error(err)
@@ -127,10 +128,10 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
     jobs_percent[ns] = 0
 
     mongo.queue(function(db, release) {
-      // 10 minutes timeout
+      // 30 minutes timeout
       timeouts[ns] = setTimeout(function() {
         error_cb(new Error('Compute timeout'))
-      }, 600000)
+      }, 1800 * 1000)
 
       // rung single job
       job(db, user, function(err, results) {

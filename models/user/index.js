@@ -293,8 +293,7 @@ User.prototype.validPassword = function() {
 User.prototype.toObject = function() {
   var now = new Date()
   return {
-    // douban account
-    //'id': this['id'],
+    '_id': this['_id'],
     'alt': this['alt'],
     'uid': this['uid'] || this.id,
     'name': this['name'],
