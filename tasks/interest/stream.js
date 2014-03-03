@@ -160,9 +160,12 @@ FetchStream.prototype.fetch = function(start, cb) {
     if (self._from) {
       query.from = self._from;
     }
+
+    // release of pool client donsn't need to wait for the request to complete
+    setTimeout(next, oauth2.req_delay);
+
     client.request('GET', self.api_uri, query, function(err, ret, res) {
-      // release pool client
-      setTimeout(next, oauth2.req_delay);
+      verbose('...fetched from douban API done, waiting.')
 
       var code = err && err.statusCode || res && res.statusCode;
       if (code !== 200) {
