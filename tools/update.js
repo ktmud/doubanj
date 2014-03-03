@@ -16,7 +16,7 @@ var oneweek = oneday * 7
 
 function updateAll(query) {
   var now = new Date()
-  var canExit = false
+  var canExit = true
   var blacklist = []
 
   if (tasks.getQueueLength()) {
@@ -36,7 +36,7 @@ function updateAll(query) {
         stream.resume()
       }
       if (canExit) {
-        log('About to exit.')
+        log('Done, exit.')
         process.exit()
       }
     }
@@ -44,6 +44,7 @@ function updateAll(query) {
       if (~blacklist.indexOf(doc._id)) {
         return resume()
       }
+      canExit = false
       var u = new User(doc)
       stream.pause()
       u.pull(function() {
@@ -66,6 +67,7 @@ function updateAll(query) {
     stream.on('close', function() {
       log('=== Stream closed. ===')
       canExit = true
+      resume()
     })
   })
 }
