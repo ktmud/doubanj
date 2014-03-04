@@ -243,7 +243,6 @@ Bar.prototype.grouped = function transitionGrouped(dur) {
   var y = self.y, x = self.x, n = self.n;
 
   y.domain([0, self.yGroupMax]);
-  console.log(y)
 
   self.style = 'grouped';
 

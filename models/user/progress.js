@@ -96,8 +96,8 @@ User.prototype.remaining = function() {
 
   var sr = this.statsRemaining()
 
-  // 10 seconds for stats by default
-  if (ret && sr === null) sr = 10000
+  // 15 seconds for stats by default
+  if (ret && sr === null) sr = 15000
 
   if (ret === 0 && sr === null) return null
 
@@ -112,7 +112,7 @@ User.prototype.statsRemaining = function() {
 
   if (user.isIng()) {
     // At least five seconds
-    return Math.round(Math.sqrt(total) * (100 - (user.stats_p || 0)) * 2.5) + 5000
+    return Math.round(Math.sqrt(total) * (100 - (user.stats_p || 0)) * 10) + 5000
   }
 
   return null

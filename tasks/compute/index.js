@@ -62,7 +62,7 @@ compute = User.ensured(task.compute_pool.pooled(_compute = function(computings, 
       log('resetting %s\'s compute status', user.uid)
       user.update({
         stats_fail: stats_fail + 1,
-        stats_status: err,
+        stats_status: err.message,
       }, function() {
         arg.error(err)
       })
