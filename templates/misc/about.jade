@@ -4,29 +4,27 @@ block head_more
   style.
     h1 { font-size: 2em; margin-bottom: 1em; }
     #main { padding: 60px 20px; max-width: 600px; }
+    ol { margin: 1em 2em 3em; }
 
 block title
   title 关于豆瓣酱(doubanj.com)
 
 block main
   h1 关于 doubanj.com
-  p 有豆瓣怎么能没有豆瓣酱呢？这个网站的存在就是为了提醒你，「豆瓣」这个词并不只代表一个文艺的网站，它还是
-    a(href="http://www.xiachufang.com/search/?keyword=%E8%B1%86%E7%93%A3&cat=1001", target="_blank") 一种食物
-    |哦。
   p 这个看起来很像钓鱼网站的域名，居然一直没有人注册，我感到很奇怪。
-  p 现在我把它拿来用了，做了这样一个网站。当然，目前这些功能，并不是我设想的全部。
-  p 「豆瓣酱」将一直围绕豆瓣网，实现各种豆瓣官方可能来不及做、不屑于做、碍于面子不肯做、做了也没多大好处的功能。
+  p 现在我把它拿来用了，做了这样一个网站。目前这些功能，并不是我设想的全部。
+  p 顶着这个名字，「豆瓣酱」将只能一直围绕豆瓣网，实现各种豆瓣官方可能来不及做、不屑于做、碍于面子不肯做、做了也没多大好处的功能。
   h2#privacy 隐私问题
   p
     a(href="/about/privacy") &raquo; 点这里
   h2#tos 权责声明
-  ul
-    li.text-error 本站与豆瓣官方没有任何形式的隶属关系
-    li.text-error 任何利用本站数据从事商业行为的做法都将受到谴责
+  ol
+    li.text-danger 本站与豆瓣官方没有任何形式的从属关系
     li 我们开放源代码，并且允许利用
        a(href="https://github.com/ktmud/doubanj") 该源码
        | 搭建类似网站
-    li 当然，我们更建议你直接给豆瓣酱贡献你想要的功能
+       p.text-muted.small 当然，更希望你能直接给豆瓣酱贡献你想要的功能
+    li 
   h3 喜欢吗？
   p 觉得豆瓣酱有用吗？欢迎关注
     a(href="http://www.douban.com/people/69795126/") 我们的豆瓣账号

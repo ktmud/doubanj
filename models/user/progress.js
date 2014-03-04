@@ -76,7 +76,7 @@ User.prototype.progresses = function() {
 User.prototype.progressInterval = function(remaining, delay) {
   var n = this.queue_length()
   delay = delay * n
-  return remaining < 10000 ? DB_RESPOND_DELAY : delay + 2000
+  return remaining < 15000 ? DB_RESPOND_DELAY : delay + 4000
 }
 User.prototype.queue_length = function() {
   return tasks.getQueueLength('interest')
@@ -103,6 +103,9 @@ User.prototype.remaining = function() {
 
   return ret + sr
 }
+/**
+ * Approximate remaining time for computing statistics
+ */
 User.prototype.statsRemaining = function() {
   var user = this
 
@@ -112,7 +115,7 @@ User.prototype.statsRemaining = function() {
 
   if (user.isIng()) {
     // At least five seconds
-    return Math.round(Math.sqrt(total) * (100 - (user.stats_p || 0)) * 10) + 5000
+    return Math.round(Math.sqrt(total) * (100 - (user.stats_p || 0)) * 5) + 5000
   }
 
   return null

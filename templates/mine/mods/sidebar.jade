@@ -2,10 +2,9 @@ include ./mixins.jade
 
 .mod
   h2 我的读书酱
+     a.pull-right.btn.btn-xs.btn-default(href=user.url()) &raquo; 详细
   if user.stats
     mixin overview(user)
-    p
-      a(href=user.url()) &raquo; 详细
   else
     .vmiddle
       a.btn.btn-primary(href=user.url()) 点此生成报告

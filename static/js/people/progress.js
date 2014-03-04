@@ -1,6 +1,9 @@
 Do.ready(function() {
 
   var datetime = require('utils/datetime');
+  var prog = $('#progress');
+  var remains = $('#remains');
+  var ad = false; // 是否附上捐赠广告
 
   var total = 0;
   function check(dur) {
@@ -35,24 +38,24 @@ Do.ready(function() {
   }
   check();
 
-  var prog = $('#progress');
   function updateProgress(d) {
     prog.find('.progress-bar').each(function(i, item) {
       $(item).css('width', (d[i] || 0) + '%');
     });
   }
-  var remains = $('#remains');
+
   function updateRemains(d) {
     var t = d.remaining;
     var text = '';
-    
+
+    ad = !ad;
+
     if (d.book_synced_n < d.book_n) {
-      text = '<p><small>'
+      text = '<p class="small">'
       text += '已同步 ' + d.book_synced_n + '/' + d.book_n + ' 本图书收藏，';
       if (d.queue_length > 2) {
         text += '共有' + d.queue_length + '人同时在排队';
       }
-      text += '</small>'
     }
 
     if (t > 60000) {
@@ -62,7 +65,10 @@ Do.ready(function() {
     } else if (t) {
       text = '马上就好';
     }
-    text = text || '同步仍在进行，请耐心等待..';
+    text = text || '<p>同步仍在进行，请耐心等待..</p>';
+    if (ad) {
+      text += '<p class="small">太慢了? <a href="/donate">捐点钱让服务器更快!</a>'
+    }
     remains.html(text);
   }
 
