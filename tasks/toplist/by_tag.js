@@ -24,6 +24,7 @@ function createBatcher(out_collection) {
   var buffer = new Batcher({
     size: 5000,
     timeout: 5000,
+    highWaterMark: 2,
     transform: function(items, callback) {
       var ids = _.pluck(items, '_id')
       // bulk remove, then bulk insert
@@ -85,13 +86,17 @@ function users_by_tag(ns, status, done) {
     out_collection.ensureIndex({ tagname: 1, count: 1 }, { background: true }, noop)
 
     function update_tags_coll(user_id, top_tags){
+      var completed = true
       top_tags.forEach(function(item, i) {
-        buffer.write({
+        completed = buffer.write({
           _id: user_id + '::' + i,
           tagname: item._id,
           count: item.count
         })
       })
+      if (!completed) {
+        highWater(stream, buffer)
+      }
     }
 
     stream.on('data', function(doc) {
@@ -100,6 +105,10 @@ function users_by_tag(ns, status, done) {
       var top_tags = result && result.top_tags
       if (top_tags) {
         update_tags_coll(doc._id, top_tags)
+      }
+      // too much unwritten pause
+      if (buffer.batch.length > 10000) {
+        stream.pause()
       }
     })
     stream.once('close', function() {
@@ -140,16 +149,20 @@ function subjects_by_tag(ns, done) {
     }
 
     function update_tags_coll(subject_id, top_tags){
+      var completed = true
       top_tags.forEach(function(item, i) {
         total++;
         // 豆瓣API返回的 tag 格式为
         // item = { name: 'xxx', title: 'xxx', count: 10 }
-        buffer.write({
+        completed = buffer.write({
           _id: subject_id + '::' + i,
           tagname: item.name,
           count: item.count
         })
       })
+      if (!completed) {
+        highWater(stream, buffer)
+      }
     }
 
     stream.on('data', function(doc) {
@@ -167,6 +180,12 @@ function subjects_by_tag(ns, done) {
   }, 4)
 }
 
+function highWater(stream, buffer) {
+  stream.pause()
+  buffer.once('drain', function() {
+    stream.resume()
+  })
+}
 module.exports = {
   users: users_by_tag,
   subjects: subjects_by_tag,
