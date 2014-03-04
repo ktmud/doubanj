@@ -31,7 +31,7 @@ function createBatcher(out_collection) {
         if (err) {
           console.error(err)
         }
-        out_collection.insert(items, { continueOnError: true }, function(err) {
+        out_collection.insert(items, { w: -1, continueOnError: true }, function(err) {
           if (err) {
             console.error(err)
           } else {
