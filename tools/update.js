@@ -41,6 +41,13 @@ function updateAll(query) {
         process.exit()
       }
     }
+    function resume() {
+      if (tasks.getQueueLength() < 4) {
+        stream.resume()
+      } else {
+        log('[warning] Too many tasks running, wait next..')
+      }
+    }
     stream.on('data', function(u) {
       if (~blacklist.indexOf(u._id)) {
         return resume()
@@ -49,13 +56,14 @@ function updateAll(query) {
       stream.pause()
       counter += 1
       u.pull(function() {
-        stream.resume()
+        resume()
         tasks.interest.collect_book({
           user: u,
           force: true,
           fresh: false
         })
         u.once('computed', function(e) {
+          resume()
           done(e)
         })
       })

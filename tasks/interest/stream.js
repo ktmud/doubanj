@@ -171,7 +171,8 @@ FetchStream.prototype.fetch = function(start, cb) {
       if (code !== 200) {
         var err_code = ERRORS[String(code)];
         self.user.invalid = err_code || 1;
-        return self.emit('error', err_code || new Error('douban api responded with ' + code));
+        err = err || err_code || new Error('douban api responded with ' + code)
+        return self.emit('error', err);
       }
       if (err) {
         return self.emit('error', err);

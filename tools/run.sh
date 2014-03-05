@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 export NODE_ENV=${2:-'development'}
-export DEBUG='dbj:*'
+export DEBUG='dbj:* -*verbose'
 
 if [[ -z $1 ]]; then
   echo
