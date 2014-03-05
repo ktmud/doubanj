@@ -40,12 +40,11 @@ function updateAll(query) {
         process.exit()
       }
     }
-    stream.on('data', function(doc) {
-      if (~blacklist.indexOf(doc._id)) {
+    stream.on('data', function(u) {
+      if (~blacklist.indexOf(u._id)) {
         return resume()
       }
       canExit = false
-      var u = new User(doc)
       stream.pause()
       u.pull(function() {
         tasks.interest.collect_book({
@@ -53,7 +52,7 @@ function updateAll(query) {
           force: true,
           fresh: false,
           success: function() {
-            log('Callback sussess for user %s [%s].', u.uid, u.name)
+            log('Callback succeed for user %s [%s].', u.uid, u.name)
             resume()
           },
           error: function() {
