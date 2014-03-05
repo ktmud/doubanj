@@ -86,6 +86,12 @@ collect = User.ensured(function(user, arg) {
     require('../compute')[arg.ns]({
        user: user,
        force: true,
+       success: function() {
+        user.emit('computed')
+       },
+       error: function(err) {
+        user.emit('computed', err)
+       }
     })
   });
 

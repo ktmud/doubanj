@@ -18,6 +18,7 @@ function updateAll(query) {
   var now = new Date()
   var canExit = true
   var blacklist = []
+  var counter = 0
 
   if (tasks.getQueueLength()) {
     log('There are unfinished task. Exit.')
@@ -31,12 +32,12 @@ function updateAll(query) {
   })
 
   User.stream(query, { limit: null }, function(stream) {
-    function resume() {
-      if (stream.paused) {
-        stream.resume()
+    function done(e) {
+      if (e) {
+        log('Sync and compute error: %s', e)
       }
       if (canExit) {
-        log('Done, exit.')
+        log('==== Updated %s users, exit. ======', counter)
         process.exit()
       }
     }
@@ -46,27 +47,26 @@ function updateAll(query) {
       }
       canExit = false
       stream.pause()
+      counter += 1
       u.pull(function() {
+        stream.resume()
         tasks.interest.collect_book({
           user: u,
           force: true,
-          fresh: false,
-          success: function() {
-            log('Callback succeed for user %s [%s].', u.uid, u.name)
-            resume()
-          },
-          error: function() {
-            log('Callback error for user %s [%s].', u.uid, u.name)
-            resume()
-          }
+          fresh: false
+        })
+        u.once('computed', function(e) {
+          done(e)
         })
       })
       log('Queue user %s [%s]', u.uid, u.name)
     })
     stream.on('close', function() {
-      log('=== Stream closed. ===')
+      log('===== Stream closed. %s users in queue. =====', counter)
       canExit = true
-      resume()
+      if (counter === 0) {
+        done()
+      }
     })
   })
 }
