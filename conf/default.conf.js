@@ -4,7 +4,7 @@ var util = require('util');
  * some default settings
  */
 module.exports = {
-  debug: true,
+  debug: false,
 
   site_name: '豆瓣酱',
 
@@ -29,7 +29,7 @@ module.exports = {
     port: '6379',
     host: '127.0.0.1',
     prefix: 'doubanj_',
-    // only set default ttl when there is a memory limit 
+    // only set default ttl when there is a memory limit
     ttl: 7 * 24 * 60 * 60, // in seconds
   },
 

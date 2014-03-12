@@ -3,6 +3,7 @@
  */
 module.exports = {
   site_name: '豆瓣酱 - 开发模式',
+  debug: true,
   douban: {
     limit: 40, // request limit per minute
     key: '11111', // your douban api key (client_id)
