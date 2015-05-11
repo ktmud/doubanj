@@ -32,6 +32,7 @@
     "oauth": "^0.9.12",
     "grunt": "~0.4.0",
     "bower": "~1.4.1",
+    "grunt-cli": "~0.1.13",
     "grunt-contrib-stylus": "~0.12.0",
     "grunt-contrib-uglify": "~0.3.2",
     "grunt-contrib-clean": "~0.5.0",
@@ -52,7 +53,7 @@
   "subdomain": "doubanj",
   "scripts": {
     "prepublish": "npm prune",
-    "postinstall": "./node_modules/.bin/bower install && grunt build --force",
+    "postinstall": "./node_modules/.bin/bower --allow-root install && ./node_modules/.bin/grunt build --force",
     "test": "make test",
     "start": "node app.js"
   }
