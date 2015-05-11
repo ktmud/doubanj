@@ -43,7 +43,6 @@
   },
   "devDependencies": {
     "colors": "*",
-    "bower": "*",
     "mocha": "*"
   },
   "engines": {
