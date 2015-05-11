@@ -1,6 +1,7 @@
 /**
 * red configuration for different environment.
 */
+var _ = require('lodash');
 
 /**
 * export configurations.
@@ -14,9 +15,14 @@ module.exports = readConfig();
 function readConfig() {
   var NODE_ENV = global.process.env.NODE_ENV || 'development';
   var defaultConf = require('./default.conf.js');
-  var conf = require('./' + NODE_ENV + '.conf.js');
+  var conf = {};
 
-  conf.__proto__ = defaultConf;
+  try {
+    // load from $NODE_ENV.conf.js file
+    conf = require('./' + NODE_ENV + '.conf.js');
+  } catch (e) {}
+
+  conf = _.merge(conf, defaultConf);
 
   removeTailingSlash(conf, 'assets_root');
   removeTailingSlash(conf, 'site_root');

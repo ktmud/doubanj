@@ -4,6 +4,21 @@ var env = process.env;
 var MONGO_HOST = env.MONGODB_HOST ? (env.MONGODB_HOST + ':' + (env.MONGODB_PORT || 27017)) : null;
 var ARR_SPLITTER = /\s*,\s*/g;
 
+function getDoubanMore() {
+  var ret = [];
+  if (env.DOUBAN_APP_MORE) {
+    ret = DOUBAN_APP_MORE.trim().split(ARR_SPLITTER).map(function(item, i) {
+      var tmp = item.split(':');
+      return {
+        key: tmp[0],
+        secret: tmp[1],
+        limit: DOUBAN_APP_MORE_LIMIT || 10
+      }
+    });
+  }
+  return ret;
+}
+
 /**
  * some default settings
  */
@@ -44,17 +59,11 @@ module.exports = {
 
   douban: {
     limit: env.DOUBAN_APP_LIMIT || 10, // request limit per minute
-    key: env.DOUBAN_APP_KEY || '',
-    secret: env.DOUBAN_APP_SECRET || ''
+    key: env.DOUBAN_APP_KEY || 'my',
+    secret: env.DOUBAN_APP_SECRET || 'god'
   },
   // more random api keys for public informations
-  douban_more: [
-    {
-      limit: env.DOUBAN_APP_MORE_LIMIT || 10,
-      key: env.DOUBAN_APP_MORE_KEY || '',
-      secret: env.DOUBAN_APP_MORE_SECRET || ''
-    },
-  ],
+  douban_more: getDoubanMore(),
 
   // google analytics id
   ga_id: ''
