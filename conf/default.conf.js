@@ -7,12 +7,12 @@ var ARR_SPLITTER = /\s*,\s*/g;
 function getDoubanMore() {
   var ret = [];
   if (env.DOUBAN_APP_MORE) {
-    ret = DOUBAN_APP_MORE.trim().split(ARR_SPLITTER).map(function(item, i) {
+    ret = env.DOUBAN_APP_MORE.trim().split(ARR_SPLITTER).map(function(item, i) {
       var tmp = item.split(':');
       return {
         key: tmp[0],
         secret: tmp[1],
-        limit: DOUBAN_APP_MORE_LIMIT || 10
+        limit: env.DOUBAN_APP_MORE_LIMIT || 10
       }
     });
   }
