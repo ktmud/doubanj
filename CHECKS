@@ -1,5 +1,5 @@
-WAIT=10
-TIMEOUT=30
+WAIT=5
+TIMEOUT=25
 ATTEMPTS=5
 
 /              豆瓣酱
