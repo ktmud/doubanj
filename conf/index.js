@@ -22,7 +22,7 @@ function readConfig() {
     conf = require('./' + NODE_ENV + '.conf.js');
   } catch (e) {}
 
-  conf = _.merge(conf, defaultConf);
+  conf = _.merge({}, defaultConf, conf);
 
   removeTailingSlash(conf, 'assets_root');
   removeTailingSlash(conf, 'site_root');
