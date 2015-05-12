@@ -1,20 +1,20 @@
 #hot-tags.row.mod
   - locals.ns = 'book'
-  .col.col-lg-3
+  .col.col-md-3
     h4 个人标注
     - top_tags = s.interest.top_tags
     if top_tags && top_tags.length
       mixin tagcloud(top_tags)
     else
       p.text-muted 懒到没有打过标签
-  .col.col-lg-5
+  .col.col-md-5
     h4 全部热门
     mixin tagcloud(coll.top_tags)
-  .col.col-lg-4
+  .col.col-md-4
     h4 作者
     mixin searchcloud(coll.top_author.slice(0,5))
     h4 译者
     mixin searchcloud(coll.top_translator.slice(0,8))
-  .col.col-lg-12
+  .col.col-md-12
     h4 出版社
     mixin searchcloud(coll.top_publisher.slice(0,12))

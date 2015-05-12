@@ -1,14 +1,14 @@
 include ./mixins
 
 #overview.row.mod
-  .col.col-lg-4
+  .col.col-md-4
     h3 总览
         a.anchor(href="#overview") #
     mixin overview(people)
-  .col.col-lg-5
+  .col.col-md-5
     .chart.chart-pie#d-summary(data-pie=people.book_csv('r_status'))
       .caption 想读/读过/在读图书比例
-  .col.col-lg-3
+  .col.col-md-3
     h4 最新收藏
     if locals.latest_interests
       ul.text-muted

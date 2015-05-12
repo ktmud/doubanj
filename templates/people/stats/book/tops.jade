@@ -1,32 +1,32 @@
 #tops
   .row
-    .col.col-lg-12
+    .col.col-md-12
       h3 阅读之最
         a.anchor(href="#tops") #
   .row.mod
-    .col.col-lg-3
+    .col.col-md-3
       h4 最厚的书
       mixin small_list(coll.most_pages.slice(0,5), 'pages', '页')
-    .col.col-lg-3
+    .col.col-md-3
       h4 最薄的书
       mixin small_list(coll.least_pages.slice(0,5), 'pages', '页')
-    .col.col-lg-3
+    .col.col-md-3
       h4 最贵的书
       mixin small_list(coll.most_price.slice(0,5), 'ori_price')
-    .col.col-lg-3
+    .col.col-md-3
       h4 最便宜的书
       mixin small_list(coll.least_price.slice(0,5), 'ori_price')
   .row.mod
-    .col.col-lg-3
+    .col.col-md-3
       h4 豆瓣评分最高
       mixin small_list(coll.most_rated.slice(0,10), 'rated')
-    .col.col-lg-3
+    .col.col-md-3
       h4 豆瓣评分最低
       mixin small_list(coll.least_rated.slice(0,10), 'rated')
-    .col.col-lg-3
+    .col.col-md-3
       h4 最多人看过
       mixin small_list(coll.most_raters.slice(0,10), 'raters')
-    .col.col-lg-3
+    .col.col-md-3
       h4 最少人看过
       mixin small_list(coll.least_raters.slice(0,10), 'raters')
 

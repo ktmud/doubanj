@@ -9,7 +9,7 @@ block head_more
 
 block main
   .row
-    .col.col-lg-9
+    .col.col-md-9
       h1 豆瓣上「#{tagname}」相关的书和人 
         a.btn.btn-xs(href="http://book.douban.com/tag/#{tagname}", target="_blank") 去豆瓣 ⇗ 
       if books 
@@ -17,7 +17,7 @@ block main
         hr
       if book_done_users
         include ./mods/users.jade
-    .col.col-lg-3
+    .col.col-md-3
       .well
         h3 请注意：
         p
