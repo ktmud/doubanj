@@ -51,7 +51,7 @@ collect = User.ensured(function(user, arg) {
   }
 
   collector.on('error', function(err) {
-    console.trace(err);
+    console.error(err);
     error(err, raven_extra);
 
     collector.status = 'failed';
