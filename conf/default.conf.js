@@ -40,6 +40,7 @@ module.exports = {
   raven: null,
 
   mongo: {
+    url: env.MONGO_URL,
     dbname: env.MONGODB_DATABASE || 'doubanj',
     username: env.MONGODB_USERNAME || null,
     password: env.MONGODB_PASSWORD || null,
@@ -47,6 +48,7 @@ module.exports = {
   },
 
   redis: {
+    url: env.REDIS_URL,
     port: env.REDIS_PORT || '6379',
     host: env.REDIS_IP || '127.0.0.1',
     prefix: 'doubanj_',
