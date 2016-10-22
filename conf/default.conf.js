@@ -48,7 +48,7 @@ module.exports = {
   },
 
   redis: {
-    url: env.REDIS_URL,
+    url: env.REDIS_URL || 'redis://127.0.0.1:6379',
     port: env.REDIS_PORT || '6379',
     host: env.REDIS_IP || '127.0.0.1',
     prefix: 'doubanj_',

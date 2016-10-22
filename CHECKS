@@ -1,5 +1,5 @@
 WAIT=7
 TIMEOUT=25
-ATTEMPTS=5
+ATTEMPTS=3
 
 /              豆瓣酱
