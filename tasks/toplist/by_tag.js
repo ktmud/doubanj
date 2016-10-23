@@ -20,6 +20,10 @@ var error = debug('dbj:toplist:by_tag:error')
 var noop = function(){}
 
 
+/**
+ * Creae a buffer object that accepts `write` options,
+ * but only operates the writing action in batch
+ */
 function createBatcher(out_collection) {
   var buffer = new Batcher({
     size: 5000,
@@ -48,6 +52,11 @@ function createBatcher(out_collection) {
   return buffer
 }
 
+/**
+ * Save users' top tags in given namespace (book,music,music)
+ * and collection status into a new collection for easier
+ * aggregation.
+ */
 function users_by_tag(ns, status, done) {
   done = done || noop
 
@@ -59,19 +68,25 @@ function users_by_tag(ns, status, done) {
   var field_name = [ns_stats, stats_status, 'top_tags'].join('.')
 
   var query = { last_synced_status: 'succeed' }
-  // 至少总共读过50本书才可能进榜吧
-  // { book_stats.done.total: { $gt: 50 } }
-  query[ns + '_stats.n_done'] = { $gt: 50 }
+  // 至少总共读过20本书才可能进榜吧
+  // e.g. { book_stats.done.total: { $gt: 20 } }
+  query[ns + '_stats.n_done'] = { $gt: 20 }
 
-  var fields = {}
+  var fields = {}, queryOpt
   fields[field_name] = 1
+  queryOpt = { fields: fields }
 
   mongo.queue(function(db, next) {
     log('[%s] started...', out_coll)
 
     var out_collection = db.collection(out_coll)
-    var stream = db.collection('user').find(query, { fields: fields }).stream()
+    var stream = db.collection('user').find(query, queryOpt).stream()
     var buffer = createBatcher(out_collection)
+
+    out_collection.ensureIndex({
+      tagname: 1,
+      count: 1
+    }, { background: true }, noop)
 
     function callback(err) {
       if (err) {
@@ -82,8 +97,6 @@ function users_by_tag(ns, status, done) {
       next()
       done(err)
     }
-
-    out_collection.ensureIndex({ tagname: 1, count: 1 }, { background: true }, noop)
 
     function update_tags_coll(user_id, top_tags){
       var completed = true
@@ -106,12 +119,12 @@ function users_by_tag(ns, status, done) {
       if (top_tags) {
         update_tags_coll(doc._id, top_tags)
       }
-      // too much unwritten pause
+      // too much unwritten output data, pause
       if (buffer.batch.length > 10000) {
         stream.pause()
       }
     })
-    stream.once('close', function() {
+    stream.once('end', function() {
       buffer.end()
     })
     stream.once('error', callback)
@@ -151,7 +164,7 @@ function subjects_by_tag(ns, done) {
     function update_tags_coll(subject_id, top_tags){
       var completed = true
       top_tags.forEach(function(item, i) {
-        total++;
+        total++
         // 豆瓣API返回的 tag 格式为
         // item = { name: 'xxx', title: 'xxx', count: 10 }
         completed = buffer.write({
@@ -169,10 +182,11 @@ function subjects_by_tag(ns, done) {
       if (!doc.tags) return
       update_tags_coll(doc._id, doc.tags)
     })
-    stream.once('close', function() {
+    stream.once('end', function() {
       buffer.end()
     })
     stream.once('error', callback)
+
     buffer.once('end', function() {
       log('[%s] total: %s', out_coll, total)
       callback()

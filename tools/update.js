@@ -69,8 +69,8 @@ function updateAll(query) {
       })
       log('Queue user %s [%s]', u.uid, u.name)
     })
-    stream.on('close', function() {
-      log('===== Stream closed. %s users in queue. =====', counter)
+    stream.on('end', function() {
+      log('===== Stream ended. %s users in queue. =====', counter)
       canExit = true
       if (counter === 0) {
         done()

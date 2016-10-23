@@ -21,8 +21,8 @@ function updateAll() {
       log('Deleting stats cache for [%s]', u.name);
       u._del_data('book_stats');
     });
-    stream.on('close', function() {
-      log('=== Stream closed. ===');
+    stream.on('end', function() {
+      log('=== Stream ended. ===');
       setTimeout(process.exit, 200);
     });
   });

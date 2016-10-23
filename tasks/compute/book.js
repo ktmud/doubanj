@@ -99,7 +99,7 @@ module.exports = function(db, user, callback, progress) {
     return function(callback) {
       var agger = new AggStream(options)
       agger.once('error', callback)
-      agger.once('close', function() {
+      agger.once('end', function() {
         this.fillup()
         progress(i / total_step * 100)
         callback(null, this.results)
