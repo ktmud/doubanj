@@ -17,7 +17,11 @@ module.exports = function(grunt) {
       }
     }
   } catch (e) {
-    console.error(e);
+    if (e.code == 'MODULE_NOT_FOUND' || e.code == 'ENOENT') {
+      console.error('No existing static hashmap.');
+    } else {
+      console.error(e);
+    }
   }
 
 
