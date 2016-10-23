@@ -22,11 +22,14 @@ function aggregate_hardest_reader(period, cb) {
     status: 'done',
     commented: { $gt: 3 }
   }
+  var maxTime = 600000 // defaults to 10 min timeout
+  var limit = 500
   switch(period) {
     case 'last_30_days':
       query.updated = {
         $gte: new Date(now - ONE_MONTH)
       }
+      maxTime = 60000 // max 1 min for last 20 days
       break
     case 'this_year':
       query.updated = {
@@ -44,11 +47,14 @@ function aggregate_hardest_reader(period, cb) {
         $gt: new Date(now - ONE_MONTH * 12),
       }
       break
+    case 'all_time':
+      limit = 2000
+      maxTime = 1800000 // max 30min for calculating all time top reader
+      break
     default:
       break
   }
 
-  var limit = period == 'all_time' ? 2000 : 500
   var pipe = [
     { $match: query },
     { $project: { user_id: 1 } },
@@ -62,7 +68,10 @@ function aggregate_hardest_reader(period, cb) {
 
   mongo.queue(function(db, next) {
     log('Generating Toplist for %s...', key)
-    db.collection('book_interest').aggregate(pipe, function(err, results) {
+    db.collection('book_interest').aggregate(pipe, {
+      allowDiskUse: true,
+      maxTimeMS: maxTime
+    }, function(err, results) {
       next()
       if (err) {
         error('Toplist failed: ', err)
