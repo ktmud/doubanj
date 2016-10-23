@@ -51,7 +51,6 @@ function aggregate_hardest_reader(period, cb) {
   var limit = period == 'all_time' ? 2000 : 500
   var pipe = [
     { $match: query },
-    { $sort: { user_id: 1 } },
     { $project: { user_id: 1 } },
     { $group: {
         _id: "$user_id",
