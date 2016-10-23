@@ -16,7 +16,8 @@ module.exports = function(grunt) {
         delete dist_hash_cache[k];
       }
     }
-  } catch (e) {
+  } catch (err) {
+    var e = err.origError || err;
     if (e.code == 'MODULE_NOT_FOUND' || e.code == 'ENOENT') {
       console.error('No existing static hashmap.');
     } else {
