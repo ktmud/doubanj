@@ -29,8 +29,8 @@ module.exports = {
 
   // the port of the root server
   port: env.PORT || 3000,
+  ssl_root: env.SSL_ROOT,
   site_root: env.SITE_ROOT || 'http://localhost:3000',
-  ssl_root: env.SSL_ROOT || 'https://localhost:3000',
   assets_root: env.ASSETS_ROOT || 'http://localhost:3000',
 
   salt: env.COOKIE_SALT || 'keyboardcatndog',

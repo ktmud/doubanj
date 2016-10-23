@@ -23,6 +23,7 @@ function readConfig() {
   } catch (e) {}
 
   conf = _.merge({}, defaultConf, conf);
+  conf.ssl_root = conf.ssl_root || conf.site_root;
 
   removeTailingSlash(conf, 'assets_root');
   removeTailingSlash(conf, 'site_root');
