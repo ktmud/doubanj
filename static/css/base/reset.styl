@@ -4,13 +4,13 @@ a
   color: #37a;
 
 input[type="text"]
-  border-radius(3px)
+  border-radius(2px)
 
 ol, ul
   padding: 0
 
 .alert, .btn
-  border-radius(1px)
+  border-radius(2px)
 
 .navbar
   background: #f2f7f6
@@ -44,15 +44,41 @@ blockquote
    line-height: 1em;
    box-shadow(none);
 
+.navbar
+  background: none;
+  color: #999;
+  border: 0;
+
+.navbar-default
+  border-bottom: none;
+
 .navbar .nav a
-  color: #666;
-  padding: 14px 18px;
+  color: #444;
+  padding: 25px 14px 8px;
+  border: 1px solid #fff;
+  margin: 0 8px;
+
+.navbar-default .navbar-nav > li > a:hover, .navbar-defaultult .navbar-nav > li > a:focus
+  color: #777;
+
+.navbar-default .navbar-nav > li > a
+  color: #444;
 
 .navbar .nav > .active > a, .navbar .nav > .active > a:hover, .navbar .nav > .active > a:focus
-  background: #d3e6e3;
-  border: 1px solid #cdc;
+  background: #effbf0;
   border-width: 0 1px 1px;
-  color: #374;
+  border-color: #cae0ca;
+  padding-top: 28px;
+  padding-bottom: 10px;
+  color: #1b8e38;
+
+.navbar-default .navbar-brand
+  padding-top: 25px;
+  color: #444;
+  font-weight: 500;
+
+.navbar-form
+	padding-top: 10px;
 
 h2 small
   font-size: 70%;
