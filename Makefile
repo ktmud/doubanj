@@ -3,7 +3,7 @@ start:
 	@export DEBUG="dbj* cache*" && supervisor -w 'lib,serve,models,app.js,conf,tasks,Gruntfile.js' -p 1000 app.js 
 
 debug:
-	@export DEBUG="dbj* cache*" && supervisor -w 'lib,serve,models,app.js,conf,tasks,Gruntfile.js' --debug -p 1000 app.js 
+	@export DEBUG="*" && supervisor -w 'lib,serve,models,app.js,conf,tasks,Gruntfile.js' --debug -p 1000 app.js 
 
 grunt:
 	@export DEBUG="dbj*" && grunt
