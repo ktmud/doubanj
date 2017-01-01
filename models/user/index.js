@@ -267,7 +267,8 @@ User.prototype.merge = function(data, cb) {
     data.uid = String(data.uid).toLowerCase()
   }
   if (typeof data.created === 'string') {
-    data.created = new Date(data.created)
+    // add timezone (Douban's timezone GMT+800)
+    data.created = new Date(data.created  + '+800')
   }
   data._id = data.id
   delete data.id

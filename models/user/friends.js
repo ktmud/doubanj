@@ -113,7 +113,8 @@ User.prototype.pullFollowings = function(start, cb) {
           cls({ _id: item.id }).update({
             name: item.screen_name,
             uid: item.uid,
-            created: new Date(item.created_at),
+            // +800 is the timezone
+            created: new Date(item.created_at + '+800'),
             loc_name: item.city,
             signature: item.description,
             avatar: item.small_avatar

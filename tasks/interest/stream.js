@@ -211,6 +211,7 @@ FetchStream.prototype.write = function saveInterest(data, cb) {
 
     var s = item[ns];
     if (s) {
+      // normalize: clean up data
       s = utils.norm_subject(s, ns);
       subjects.push(s);
       //sids.push(s._id);

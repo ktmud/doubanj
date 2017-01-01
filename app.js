@@ -16,6 +16,7 @@ var express = require('express');
 var connect_domain = require('./lib/connect_domain');
 var central = require('./lib/central');
 var passport = require('./lib/passport');
+var ip2geo = require('./lib/ip2geo');
 var serve = require('./serve');
 var jade = require('jade');
 var Redis = require('redis');
@@ -36,7 +37,6 @@ module.exports.boot = function() {
   app.set('views', __dirname + '/templates');
 
   app.use(connect_domain());
-
   app.use(express.static(central.assets.root, { maxAge: TWO_WEEKS }));
 
   app.use(express.methodOverride());
@@ -48,6 +48,7 @@ module.exports.boot = function() {
       client: Redis.createClient(conf.redis)
     })
   }));
+  app.use(ip2geo.express());
   app.use(passport.initialize());
   app.use(passport.session());
 
@@ -56,13 +57,14 @@ module.exports.boot = function() {
   app.use(express.csrf());
 
   app.use(function(req, res, next) {
-    res.locals._csrf = req.csrfToken();
     req.is_ssl = req.headers['x-forwarded-proto'] === 'https';
+    res.locals.req = req;
+    res.locals._csrf = req.csrfToken();
     res.locals.static = function(url) {
       if (req.is_ssl) return URL.resolve(central.conf.https_root, url);
       return central.assets.fileUrl(url);
     };
-    res.locals.req = req;
+    res.locals.strftime = central.template_helpers.strftime.bind(res.locals);
     next();
   });
 

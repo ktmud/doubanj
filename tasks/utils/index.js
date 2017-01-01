@@ -56,7 +56,7 @@ function norm_interest(i) {
 
   i.status = normalize_status[i.status];
   i.commented = i.comment && i.comment.length || null;
-  i['updated'] = new Date(i['updated']);
+  i.updated = new Date(i.updated + '+800');
   return i;
 }
 
