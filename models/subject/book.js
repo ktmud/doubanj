@@ -8,7 +8,14 @@ function Book(info) {
 
   var self = this;
 
+  // fix douban img url
+  if (info.images) {
+    utils.forEach(info.images, function(item, key) {
+      info.images[key] = utils.douimg(item)
+    })
+  }
   info.type = info.subject_type = 'book';
+
   utils.extend(self, info);
 
   Object.defineProperty(this, 'prop_keys', {

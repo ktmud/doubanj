@@ -26,6 +26,10 @@ var USER_COLLECTION = consts.USER_COLLECTION
 function User(info) {
   if (!(this instanceof User)) return new User(info)
 
+  // fix douban img url
+  if (info.avatar) {
+    info.avatar = utils.douimg(info.avatar)
+  }
   utils.extend(this, info)
 
   central.DOUBAN_APPS.forEach(function(ns) {
@@ -183,6 +187,7 @@ User.get = function(uid, options, cb) {
     return cb(null, u)
   })
 }
+
 //User.get = redis.cached.wrap(User.get, 'user-{0}')
 User.prototype.clearCache = function(next) {
   return next()
