@@ -29,10 +29,10 @@ mixin overview(people)
   - s = people.book_stats
   - coll = s.all
   p 从 #{people.created.getFullYear()} 年至今，#{people == req.user ? '你' : people.name}一共收藏了 
-    strong.num #{s.total}
-    | 本图书，其中读过 
-    strong.num #{s.n_done} 
-    | 本，占全部收藏的 
+    strong.num #{s.total} 
+    |  本图书，其中读过 
+    strong.num #{s.n_done}  
+    |  本，占全部收藏的 
     em.percent #{s.ratio_done}%
     | 。
     if s.n_done < 10
