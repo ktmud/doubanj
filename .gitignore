@@ -4,9 +4,11 @@ cache
 stable_cache
 *.css
 *.bak
+*.swp
 .DS_Store
 var/*.log
-conf/*
+conf/development.conf.js
+conf/production.conf.js
 tmp/
 bower_components/
 static/hash.json
