@@ -3,6 +3,7 @@ var env = process.env;
 
 var MONGO_HOST = env.MONGODB_HOST ? (env.MONGODB_HOST + ':' + (env.MONGODB_PORT || 27017)) : null;
 var ARR_SPLITTER = /\s*,\s*/g;
+var is_prod = env.NODE_ENV == 'production';
 
 function getDoubanMore() {
   var ret = [];
@@ -30,8 +31,8 @@ module.exports = {
   // the port of the root server
   port: env.PORT || 3000,
   ssl_root: env.SSL_ROOT,
-  site_root: env.SITE_ROOT || 'http://localhost:3000',
-  assets_root: env.ASSETS_ROOT || 'http://localhost:3000',
+  site_root: env.SITE_ROOT || (is_prod ? 'http://www.doubanj.com' : 'http://localhost:3000'),
+  assets_root: env.ASSETS_ROOT || (is_prod ? 'http://doubanj.yjc.me' : 'http://localhost:3000'),
 
   salt: env.COOKIE_SALT || 'keyboardcatndog',
 
