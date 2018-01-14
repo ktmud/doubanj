@@ -54,7 +54,6 @@
   "subdomain": "doubanj",
   "scripts": {
     "prepublish": "npm prune",
-    "postinstall": "./node_modules/bower/bin/bower --interactive=false --allow-root install && ./node_modules/grunt-cli/bin/grunt build --force",
     "test": "make test",
     "start": "node app.js"
   }

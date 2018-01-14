@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "dokku": {
+      "predeploy": "./node_modules/bower/bin/bower --interactive=false --allow-root install && ./node_modules/grunt-cli/bin/grunt build --force"
+    }
+  }
+}
