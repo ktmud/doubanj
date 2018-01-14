@@ -60,3 +60,11 @@ make 的默认命令是使用 `forever` 执行 `app.js` 。
 
 发布上线前执行 `grunt build` ，将为压缩后的文件生成一个 hashmap (即 static/hash.json )，并重命名文件为 static/dist/js/xx\_HASH.js 格式。
 为了保证这套机制的顺利运行，请保证新加的静态文件名中不包括下划线（\_）。
+
+#### 提供 API Key
+
+采集豆瓣数据需要使用豆瓣 API。请配置一下环境变量来制定豆瓣 API KEY：
+
+- DOUBAN_APP_KEY
+- DOUBAN_APP_SECRET
+- DOUBAN_APP_MORE    - 格式：key1:secret1, key2:secret2
