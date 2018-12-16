@@ -29,7 +29,7 @@
     "grunt-includes": "~0.4.2",
     "jade": "~0.35.0",
     "lodash": "~3.8.0",
-    "moment": "~2.17.1",
+    "moment": "^2.23.0",
     "mongodb": "~2.2.11",
     "oauth": "^0.9.14",
     "passport": "~0.1.15",
