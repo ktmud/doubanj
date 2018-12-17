@@ -13,14 +13,19 @@
 var URL = require('url');
 var express = require('express');
 
-var connect_domain = require('./lib/connect_domain');
 var central = require('./lib/central');
 var passport = require('./lib/passport');
 var ip2geo = require('./lib/ip2geo');
 var serve = require('./serve');
 var jade = require('jade');
 var Redis = require('redis');
-var RedisStore = require('connect-redis')(express);
+var session = require('express-session');
+var RedisStore = require('connect-redis')(session);
+var methodOverride = require('method-override');
+var serveStatic = require('serve-static');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var csrf = require('csurf');
 
 var TWO_WEEKS = 60 * 60 * 24 * 14;
 
@@ -36,13 +41,17 @@ module.exports.boot = function() {
   app.set('view cache', !central.conf.debug);
   app.set('views', __dirname + '/templates');
 
-  app.use(connect_domain());
-  app.use(express.static(central.assets.root, { maxAge: TWO_WEEKS }));
+  app.use(serveStatic(central.assets.root, { maxAge: TWO_WEEKS }));
 
-  app.use(express.methodOverride());
-  app.use(express.cookieParser());
-  app.use(express.bodyParser());
-  app.use(express.session({
+  app.use(methodOverride());
+  app.use(cookieParser());
+
+  // parse application/x-www-form-urlencoded
+  app.use(bodyParser.urlencoded({ extended: false }))
+  // parse application/json
+  app.use(bodyParser.json())
+
+  app.use(session({
     secret: conf.salt,
     store: new RedisStore({
       client: Redis.createClient(conf.redis)
@@ -52,9 +61,12 @@ module.exports.boot = function() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  app.locals(central.template_helpers);
+  app.locals = {
+    ...app.locals,
+    ...central.template_helpers
+  }
 
-  app.use(express.csrf());
+  app.use(csrf());
 
   app.use(function(req, res, next) {
     req.is_ssl = req.headers['x-forwarded-proto'] === 'https';
