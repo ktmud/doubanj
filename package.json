@@ -54,7 +54,7 @@
     "mocha": "*"
   },
   "engines": {
-    "node": "6.9.1"
+    "node": "11.4.0"
   },
   "license": "MIT",
   "subdomain": "doubanj",
