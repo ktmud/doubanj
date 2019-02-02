@@ -31,8 +31,8 @@ module.exports = {
   // the port of the root server
   port: env.PORT || 5000,
   ssl_root: env.SSL_ROOT,
-  site_root: env.SITE_ROOT || (is_prod ? 'http://www.doubanj.com' : 'http://localhost:3000'),
-  assets_root: env.ASSETS_ROOT || (is_prod ? 'http://assets.doubanj.com' : 'http://localhost:3000'),
+  site_root: env.SITE_ROOT || (is_prod ? 'http://www.doubanj.com' : 'http://localhost:5000'),
+  assets_root: env.ASSETS_ROOT || (is_prod ? 'http://assets.doubanj.com' : 'http://localhost:5000'),
 
   salt: env.COOKIE_SALT || 'keyboardcatndog',
 

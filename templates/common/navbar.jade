@@ -9,12 +9,3 @@ if !locals.navbar_links
         span.icon-bar
         span.icon-bar
       a.navbar-brand(href=conf.site_root) #{conf.site_name}
-    .collapse.navbar-collapse.navbar-ex1-collapse
-      ul.nav.navbar-nav
-        each link in navbar_links
-          li(class=link.active ? 'active' : null)
-            a(href=link.href, title=link.title, target=link.target) #{link.text}
-      block navbar_form
-        form.navbar-form.navbar-right(id="navbar-form", action="/")
-          div.form-group
-            input.form-control(name="q", type="text", placeholder="豆瓣ID...", title="输入豆瓣ID以查看其统计", size="8")

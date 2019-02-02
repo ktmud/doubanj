@@ -1,11 +1,4 @@
 #footer
   .container
     p.text-muted.site-links
-      a(href="/donate", title="捐助以使此项目持续") 捐助
-      a(href="/about", title="本站的建站初衷以及责任声明") 关于
-      a(href="/about/privacy", title="有关隐私问题") 隐私
       a(href="http://github.com/ktmud/doubanj", target="github", title="doubanj.com on github") 源码
-      if req.url !== '/'
-        a(href="/", title="回首页") 首页
-      a(href="http://www.douban.com/#{locals.people ? '/people/' + people.uid + '/': 'update/'}", target="douban") 回豆瓣
-      a(href="https://www.linode.com/?r=e53b5b0715a0b88063f7c5de2bc43a3f6af5f025", target="_blank") 主机提供

@@ -3,21 +3,7 @@ extend layout/basic
 title = conf.site_name
 
 block main
-  form.vmiddle.form-inline(id="start-form", action="/")
-    div
-      label(for="uid")
-        输入你的豆瓣个人主页地址：
-    div
-      .form-group
-        input#uid.form-control(name="q", required, type="text", size="50", placeholder="http://www.douban.com/people/.../")
-      .form-group
-        &nbsp;
-        button.btn.btn-primary(type="submit") 开始
-    .hr-or
-      span 或
-    include ./auth/mods/douban
-    //hr
-    //include ./widgets/latest_synced.jade
+    由于豆瓣中止了免费的开放API，本站即将于2月底下线。感谢你的陪伴。
 
 block ending
   script.
@@ -27,4 +13,3 @@ block ending
   script(async).
     Do('d3');
 
-block navbar_form
