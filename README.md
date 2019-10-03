@@ -1,4 +1,6 @@
-# [豆瓣酱](http://www.doubanj.com) [![repo dependency](https://david-dm.org/ktmud/doubanj.png)](https://david-dm.org/ktmud/doubanj)
+# [豆瓣酱] [![repo dependency](https://david-dm.org/ktmud/doubanj.png)](https://david-dm.org/ktmud/doubanj)
+
+## This repo has been deprecated. 由于豆瓣关闭了 API 通道，本网站已下线。
 
 [豆瓣](http://www.douban.com) 私人收藏数据可视化。
 
