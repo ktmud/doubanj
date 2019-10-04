@@ -1,8 +1,8 @@
 form.vmiddle(method="post", action="/queue")
   input(type="hidden", name="_csrf", value=_csrf)
   input(type="hidden", name="uid", value=uid)
-  p
-    button.btn.btn-primary 开始为 #{name} 制造美味豆瓣酱
+  //- p
+  //-   button.btn.btn-primary 开始为 #{name} 制造美味豆瓣酱
   if req.user
     hr
     if req.user == people
