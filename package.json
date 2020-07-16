@@ -33,7 +33,7 @@
     "grunt-includes": "~0.4.2",
     "istatic": "^0.3.0",
     "jade": "~0.35.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "method-override": "^3.0.0",
     "moment": "^2.23.0",
     "mongodb": "~2.2.11",
