@@ -36,7 +36,7 @@
     "lodash": "^4.17.15",
     "method-override": "^3.0.0",
     "moment": "^2.23.0",
-    "mongodb": "~2.2.11",
+    "mongodb": "~3.1.13",
     "oauth": "^0.9.14",
     "passport": "~0.1.15",
     "passport-douban": "~0.0.1",
