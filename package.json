@@ -42,7 +42,7 @@
     "passport-douban": "~0.0.1",
     "passport-local": "~0.1.6",
     "raven": "~0.5.0",
-    "redis": "~2.8.0",
+    "redis": "~3.1.1",
     "redis-cached": "~0.0.1",
     "request": "^2.40.0",
     "resumable": "~0.0.1-1",
