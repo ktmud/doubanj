@@ -35,7 +35,7 @@
     "jade": "~0.35.0",
     "lodash": "^4.17.15",
     "method-override": "^3.0.0",
-    "moment": "^2.23.0",
+    "moment": "^2.29.4",
     "mongodb": "~2.2.11",
     "oauth": "^0.9.14",
     "passport": "~0.1.15",
